@@ -1,0 +1,31 @@
+/**
+ * @component     Simple Isotope
+ * Version			: 4.0.1
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @copyright (c) 2022 ConseilGouz. All Rights Reserved.
+ * @author ConseilGouz 
+**/
+.form-horizontal .controls {
+	margin-left: 10px;
+}
+.form-horizontal .control-label	 {
+	width:8em;
+}
+#depend_tab .subform-repeatable-group .control-group:nth-of-type(1){
+	float:left; width:50%;
+}
+#depend_tab .subform-repeatable-group .control-group:nth-of-type(2){
+	float:left; width:50%;
+}
+.alert-success {font-size:120%;
+text-align:center}
+
+.info-labels + div {
+background: none repeat scroll 0 0 #EEEEEE;
+color: #000000;
+font-size: 110%;
+font-style: italic;
+font-weight: normal;
+margin: 15px 0 30px;
+padding: 15px 10px 10px 20px;
+}

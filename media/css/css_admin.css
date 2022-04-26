@@ -1,0 +1,194 @@
+/**
+* Simple isotope module  - Joomla Module 
+* Version			: 4.0.1
+* Package			: Joomla 4.x.x
+* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+* From              : isotope.metafizzy.co
+*/
+#attrib-layout .subform-repeatable-group .control-group:nth-of-type(2){
+	float:left; width:25%;
+}
+#attrib-layout .subform-repeatable-group .control-group:nth-of-type(3){
+	float:left; width:25%;
+}
+#attrib-layout .subform-repeatable-group .control-group:nth-of-type(4){
+	float:left; width:25%;
+}
+#attrib-layout .subform-repeatable-group .control-group:nth-of-type(5){
+	float:left; width:25%;
+}
+#attrib-layout .subform-repeatable-group .control-group:nth-of-type(6){ 
+    clear:both;
+}
+#attrib-perso textarea{
+	width:80% !important;
+}
+#general .col-lg-9 .control-group:nth-of-type(4){ /* type info */
+	float:left;width:50%;
+}
+#general .col-lg-9 .control-group:nth-of-type(5){ /* content category */
+	float:left;width:50%;
+}
+#general .col-lg-9 .control-group:nth-of-type(6){ /* weblink category */
+	float:left;width:50%;
+}
+#general .col-lg-9 .control-group:nth-of-type(7){ /* k2 category */
+	float:left;width:50%;
+}
+#general .col-lg-9 .control-group:nth-of-type(8){ /* note */
+	clear:both
+}
+#general .col-lg-9 .control-group:nth-of-type(10){ /* sort dates*/
+	float:left;width:50%;
+}
+#general .col-lg-9 .control-group:nth-of-type(11){ /* sort categories*/
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(12){ /* sort alpha*/
+	clear: both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(13){ /* sort Visits*/
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(14){ /* sort ratings*/
+	clear: both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(15){ /* sort id*/
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(16){ /* sort blog*/
+	clear;float:left;width:50%;
+}
+#general .control-group:nth-of-type(17){ /* sort random*/
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(18){ /* sorting date */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(19){ /* default order */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(20){  /* note */
+	clear: both;
+}
+#general .control-group:nth-of-type(33){ /* type aff */
+	clear: both;
+}
+#general .control-group:nth-of-type(36){ /* tag group parent */
+	clear: both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(37){ /* tag display parent */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(39){ /* tag order */
+	clear: both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(39){ /* tag image */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(40){ /* note */
+	clear: both;
+}
+#general .control-group:nth-of-type(42){ /* Split fields */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(43){ /* display field label */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(44){ /* note */
+	clear: both;
+}
+#general .control-group:nth-of-type(44){ /* note  */
+	clear:both
+}
+#general .control-group:nth-of-type(45){ /* Sorting Date */
+	clear:both
+}
+#general .control-group:nth-of-type(51){ /* bootstrap button */
+	clear: both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(52){ /* display search */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(53){ /* nb articles */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(54){ /* max display  */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(55){ /* pagination */
+	clear:both;
+}
+#general .control-group:nth-of-type(56){ /* articles per page */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(57){ /* pagination order */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(58){ /* display type  */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(59){ /* nb col */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(60){ /* note */
+	clear:both;
+}
+#general .control-group:nth-of-type(61){ /* color  */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(62){ /* nb char */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(63){ /* hide ...  */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(64){ /* leave format */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(65){ /* intro img  */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(66){ /* img as link */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(67){ /* img width  */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(68){ /* img height */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(69){ /* block link */
+	clear:both;float:left;width:50%;
+}
+#general .control-group:nth-of-type(70){ /* title link */
+	float:left;width:50%;
+}
+#general .control-group:nth-of-type(71){ /*  readmore */
+	clear:both;
+}
+
+#depend_tab .control-group .control-label {
+	display:none;
+}
+#depend_tab .subform-repeatable-group {display:flex}
+#depend_tab .subform-repeatable-group .control-group:nth-of-type(2){
+	width:45%;
+}
+#depend_tab .subform-repeatable-group .control-group:nth-of-type(3){
+	width:45%;margin-left:2em;
+}
+#depend_tab .alert-success {font-size:120%;
+text-align:center}
+
+#depend_tab .info-labels + div {
+background: none repeat scroll 0 0 #EEEEEE;
+color: #000000;
+font-size: 110%;
+font-style: italic;
+font-weight: normal;
+margin: 15px 0 30px;
+padding: 15px 10px 10px 20px;
+}
+ 

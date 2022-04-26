@@ -1,0 +1,22 @@
+<changelogs>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.0.1</version>
+        <change>
+            <item>Isotope v3.0.6</item>
+        </change>
+		<fix>
+			<item>Suppress PHP 8.1 notices</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.0.0</version>
+        <addition>
+            <item>Joomla 4.0 compatibility</item>
+			<item>Re-ordering module's parameters</item>
+        </addition>
+	</changelog>
+</changelogs>

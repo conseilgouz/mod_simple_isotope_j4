@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<form>
+	    <fieldset name="fielddependance">
+			<field name="fieldparent" 
+				type="sql" class="btn-group" multiple="false"
+				query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0 "
+				key_field="id"	value_field="value"				
+				label="SSISO_FIELDSDEPEND_PARENT" description="SSISO_FIELDSDEPEND_PARENT_DESC" >
+			</field>
+			<field name="fieldchild" 
+				type="sql" class="btn-group" multiple="false"
+				query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0 "
+				key_field="id"	value_field="value"				
+				label="SSISO_FIELDSDEPEND_CHILD" description="SSISO_FIELDSDEPEND_CHILD_DESC" >
+			</field>
+		</fieldset>
+	</form>

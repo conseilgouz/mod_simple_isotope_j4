@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+     <fieldset name="section">
+		<field name="div" type="list" label="CG_DIV" description="CG_DIV_DESC" required="true">
+			<option value="">CG_DIV_SELECT</option>
+			<option value="search">CG_DIV_SEARCH</option>
+			<option value="sort">CG_DIV_SORT</option>
+			<option value="cat">CG_DIV_CAT</option>
+			<option value="tag">CG_DIV_TAG</option>
+			<option value="field">CG_DIV_FIELDS</option>
+			<option value="lang">CG_ISO_DIV_LANG</option>
+			<option value="range">CG_ISO_DIV_RANGE</option>
+			<option value="alpha">CG_ISO_DIV_ALPHA</option>
+			<option value="iso">CG_DIV_ISO</option>
+		</field>
+  		<field name="div_line" type="number" value="" min="1" max="5"  label="CG_DIV_LINE" description="CG_DIV_LINE_DESC" length="1" maxlength="1"  required="true" />
+  		<field name="div_pos" type="number" value="" min="1" max="5"  label="CG_DIV_POS" description="CG_DIV_POS_DESC" length="1" maxlength="1"  required="true"/>
+  		<field name="div_width" type="number" value="" min="1" max="12"  label="CG_DIV_WIDTH" description="CG_DIV_WIDTH_DESC" length="2" maxlength="2"  required="true"/>
+		<field showon="div!:iso" name="div_align" type="radio" class="btn-group btn-group-yesno"	default=""  label="CG_DIV_ALIGN" description="CG_DIV_ALIGN_DESC">
+			<option value="">CG_DIV_NONE</option>
+			<option value="fg-row fg-start">CG_DIV_LEFT</option>
+			<option value="fg-row fg-center">CG_DIV_CENTER</option>
+			<option value="fg-row fg-end">CG_DIV_RIGHT</option>
+			<option value="fg-row fg-around">CG_DIV_AROUND</option>
+			<option value="fg-row fg-between">CG_DIV_BETWEEN</option>
+		</field>
+	</fieldset>
+</form>

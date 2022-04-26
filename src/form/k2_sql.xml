@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+     <fieldset name="section">
+		<field name="default_cat_k2"	
+					type="sql" 
+					query="SELECT id as key,name as value FROM #__k2_categories WHERE trash = 0 ORDER BY parent, ordering"
+					label="SSISO_DEFAULT_CAT" description="SSISO_DEFAULT_CATDESC" 
+					default="">
+					<option value="">SSISO_LIBALL</option>
+					<option value="none">SSISO_LIBNONE</option>
+		</field>
+		<field name="default_tag_k2"	
+				type="sql" 
+				query="SELECT id as key ,name as value FROM #__k2_tags WHERE published = 1 order by name"
+				label="SSISO_DEFAULT_TAG" description="SSISO_DEFAULT_TAGDESC" 
+				default="">
+				<option value="">SSISO_LIBALL</option>
+				<option value="none">SSISO_LIBNONE</option>
+			</field>
+	</fieldset>
+</form>			
