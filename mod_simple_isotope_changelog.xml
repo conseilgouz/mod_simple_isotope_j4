@@ -2,6 +2,14 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.0.2</version>
+        <addition>
+            <item>Paginatio: infinite scroll</item>
+        </addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.0.1</version>
         <change>
             <item>Isotope v3.0.6</item>

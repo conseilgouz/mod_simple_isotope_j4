@@ -1,6 +1,6 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -261,9 +261,17 @@ function iso_cat_k2 ($,myid,options) {
 		});
 	}		
 
-	var $grid = $(me + '.isotope_grid').imagesLoaded(function() {
-		$grid.isotope({ 
-			itemSelector: me + '.isotope_item',
+	function rangeUpdated(){
+		range_sel = rangeSlider.getValue();
+		range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
+		CG_Cookie_Set(myid,'range',range_sel);
+		$grid.isotope();
+	};
+    if (typeof $sortby === 'string') {
+		$sortby = $sortby.split(',');
+	}
+	var $grid = $(me + '.isotope_grid').isotope({ 
+			itemSelector: 'none',
 			percentPosition: true,
 			layoutMode: options.layout,
 			getSortData: {
@@ -278,23 +286,76 @@ function iso_cat_k2 ($,myid,options) {
 			sortBy: $sortby,
 			sortAscending: $asc,
 			filter: function(){ return grid_filter($(this))	}			
-		}); // end of grid
+	}); // end of grid
+	
+	$grid.imagesLoaded( function() {
+		$grid.isotope( 'option', { itemSelector: '.isotope_item' });
+		var $items = $grid.find('.isotope_item');
+		$grid.isotope( 'appended', $items );
 		updateFilterCounts();
 		if ($sortby == "random") {
 			$grid.isotope('shuffle');
+		} else {
+			$grid.isotope();
 		}
 		$width = $toggle.width();
 		$height = $toggle.height();
-	}); // end of imageloaded
+	});
 	$(me + '.isotope-div').on("refresh", function(){
  	  $grid.isotope();
 	});
-	function rangeUpdated(){
-		range_sel = rangeSlider.getValue();
-		range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
-		CG_Cookie_Set(myid,'range',range_sel);
-		$grid.isotope();
-	};
+    if (options.pagination == 'infinite') { 
+		// --------------> infinite scroll <----------------
+		var iso = $grid.data('isotope');
+		$grid.infiniteScroll({
+			path: getPath,
+			append: '.isotope_item',
+			outlayer: iso,
+		    status: '.page-load-status',
+			// debug: true,
+		});
+        
+		function getPath() {
+			currentpage = this.loadCount;
+			return '?start='+(currentpage+1)*options.page_count;
+		}
+		if (options.infinite_btn == "true") {
+			$grid.infiniteScroll('option',{
+				button: '.iso_button_more',
+				loadOnScroll: false,
+			});
+			let $viewMoreButton = $('.iso_button_more');
+			jQuery(me+'.iso_button_more').show();
+			$viewMoreButton.on( 'click', function() {
+  // load next page
+			$grid.infiniteScroll('loadNextPage');
+  // enable loading on scroll
+			$grid.infiniteScroll( 'option', {
+				loadOnScroll: true,
+			});
+  // hide button
+			$viewMoreButton.hide();
+			});
+		} else {
+			jQuery(me+'.iso_div_more').hide();
+		}
+		$grid.on( 'append.infiniteScroll', function( event, body, path, items, response ) {
+			// console.log(`Appended ${items.length} items on ${path}`);
+			infinite_buttons(items);
+			if ((options.layout == "masonry") || (options.layout == "fitRows") || (options.layout == "packery"))
+				$('#isotope-main-' + myid + ' .isotope_item').css("width", (100 / parseInt(options.nbcol)-2)+"%" );
+			if (options.layout == "vertical") 
+				$('#isotope-main-' + myid + ' .isotope_item').css("width", "100%" );
+			$('#isotope-main-' + myid + ' .isotope_item').css("background", options.background );
+			if (parseInt(options.imgmaxheight) > 0) 
+				$('#isotope-main-' + myid + ' .isotope_item img').css("max-height",options.imgmaxheight + "px");
+			if (parseInt(options.imgmaxwidth) > 0) 
+				$('#isotope-main-' + myid + ' .isotope_item img').css("max-width",options.imgmaxwidth + "px");
+			$grid.isotope();
+		});
+	}
+	// --------------> end of infinite scroll <----------------
+	
 	$(me+'.sort-by-button-group').on( 'click', 'button', function() {
 		var sortValue = $(this).attr('data-sort-value');
 		if (sortValue == "random") {
@@ -539,6 +600,17 @@ function iso_cat_k2 ($,myid,options) {
 		}
 		updateFilterCounts();
 	});
+	/*------- infinite scroll : update buttons list------------*/
+	function infinite_buttons(appended_list) {
+		if (options.displayalpha != 'false') {
+		// alpha buttons list
+			for (x=0;x < appended_list.length-1;x++) {
+				alpha = appended_list[x].attributes['data-alpha'].value;
+				if ($(me+'.filter-button-group-alpha').find('.iso_button_alpha_'+alpha).length == 0) 
+					$(me+'.filter-button-group-alpha').append('<button class="'+options.button_bootstrap+' iso_button_alpha_'+alpha+'" data-sort-value="'+alpha+'" title="'+alpha+'">'+alpha+'</button>')
+			}
+		}
+	}
 	/*------- grid filter --------------*/
 	function grid_filter($this) {
 		var searchResult = qsRegex ? $this.text().match( qsRegex ) : true;
@@ -788,14 +860,14 @@ function iso_cat_k2 ($,myid,options) {
 				}
 				index++;
 			});
-			if (index < items_limit) { // unnecessary button
+			if (index < items_limit && options.pagination != 'infinite') { // unnecessary button
 				jQuery(me+'.iso_button_more').hide();
 			} else { // show more button required
 				jQuery(me+'.iso_button_more').show();
 			}
 		} 
 		// hide show see less button
-		if ((items_limit == 0) && (sav_limit > 0)) { 
+		if ((items_limit == 0) && (sav_limit > 0) && options.pagination != 'infinite') { 
 			jQuery(itemElems).each(function () {
 				if (jQuery(this).hasClass('iso_hide_elem')) {
 					count_items -=1;

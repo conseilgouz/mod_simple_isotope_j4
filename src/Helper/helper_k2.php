@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -142,7 +142,7 @@ class ModSimpleIsotopeHelperK2 {
 				if (is_array($item->extra_fields)) {
 					foreach ($item->extra_fields as $key => $extraField) {
 						if ($extraField->type == 'textarea' || $extraField->type == 'textfield') {
-							$tmp = new JObject();
+							$tmp = new \stdClass;
 							$tmp->text = $extraField->value;
 							if ($params->get('JPlugins', 1)) {
 								$dispatcher->trigger('onContentPrepare', array('mod_k2_content', &$tmp, &$params, $limitstart));

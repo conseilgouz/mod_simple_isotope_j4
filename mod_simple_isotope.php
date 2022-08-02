@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -22,8 +22,9 @@ $modulefield	= 'media/mod_simple_isotope/';
 $moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx',''));
 
 $limitstart = 0;
-if ($params->get("pagination","false") == 'true') {
-	$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
+if ($params->get("pagination","false") != 'false') {
+	$input = Factory::getApplication()->getInput();
+	$limitstart = $input->getVar('limitstart', 0, '', 'int');
 }
 $iso_entree = $params->get('iso_entree', 'webLinks');
 $article_cat_tag = $params->get('cat_or_tag',$iso_entree == "webLinks"?'cat':'tags'); 
@@ -32,6 +33,12 @@ $iso_nbcol = $params->get('iso_nbcol',2);
 $tags_list = $params->get('tags');
 $fields_list = $params->get('displayfields');
 $iso_limit = $params->get('iso_limit','all');
+
+$displaybootstrap = $params->get('bootstrapbutton','false'); 
+$button_bootstrap = "isotope_button";
+if ($displaybootstrap == 'true') { 
+	$button_bootstrap = "btn btn-sm ";
+}
 
 $displayrange =  $params->get('displayrange','false');
 $displayalpha =  $params->get('displayalpha','false');
@@ -102,7 +109,7 @@ if ($iso_entree == "k2") {
 		}
 	}
 	$article_tags = array();
-	if ($params->get("pagination","false") == 'true') {
+	if ($params->get("pagination","false") != 'false') {
 		$limit = (int) $params->get("page_count",0);
 		$order =  $params->get("page_order","a.ordering");
 	} else {
@@ -121,7 +128,11 @@ $wa = Factory::getDocument()->getWebAssetManager();
 $wa->registerAndUseStyle('iso',$modulefield.'css/isotope.css');
 $wa->registerAndUseStyle('up',$modulefield.'css/up.css');
 if ($params->get('css')) $wa->addInlineStyle($params->get('css')); 
-$wa->registerAndUseScript('imgload',$modulefield.'js/imagesloaded.min.js');
+if ($params->get("pagination","false") == 'infinite' ) {
+	$wa->registerAndUseScript('infinite',$modulefield.'js/infinite-scroll.min.js');
+} else {
+	$wa->registerAndUseScript('imgload',$modulefield.'js/imagesloaded.min.js');
+}
 $wa->registerAndUseScript('isotope',$modulefield.'js/isotope.min.js');
 $wa->registerAndUseScript('packery',$modulefield.'js/packery-mode.min.js');
 if ($displayrange == 'true') {
@@ -133,7 +144,7 @@ if ($params->get('customjs')) $wa->addInlineScript($params->get('customjs'));
 $min = ".min";
 if ((bool)Factory::getConfig()->get('debug')) $min = '';
 $wa->registerAndUseScript('cgisotope',$modulefield.'js/init'.$min.'.js');
-// ==> debug init.js ==> $document->addScript(''.JURI::base(true).'/media/simple_gisotope/js/init.js');
+// $document->addScript(''.JURI::base(true).'/media/mod_simple_isotope/js/init.js'); // ==> debug init.js <==
 
 
 $language_filter=$params->get('language_filter','false');
@@ -219,7 +230,9 @@ if ($iso_entree == "k2") {
 			  'displayfilter'=> $displayfilter, 'displayfiltercat' => $displayfiltercat,
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
-			  'empty' => $params->get("empty","false")));
+			  'empty' => $params->get("empty","false"),
+			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
+			  'button_bootstrap' => $button_bootstrap));
 } elseif (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields") ) {
 	$splitfields = $params->get('displayfiltersplitfields','false'); 
 	$displayfilterfields =  $params->get('displayfilterfields','button');
@@ -252,7 +265,9 @@ if ($iso_entree == "k2") {
 			  'displayrange'=>$displayrange,'rangestep'=>$rangestep, 'minrange'=>$minrange,'maxrange'=>$maxrange,			  
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
-			  'empty' => $params->get("empty","false")));
+			  'empty' => $params->get("empty","false"),
+			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
+			  'button_bootstrap' => $button_bootstrap));
 } else {
 	if ($article_cat_tag =="cat") {
 		$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
@@ -288,7 +303,9 @@ if ($iso_entree == "k2") {
 			  'displayrange'=>$displayrange,'rangestep'=>$rangestep, 'minrange'=>$minrange,'maxrange'=>$maxrange,			  
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
-			  'empty' => $params->get("empty","false")));
+			  'empty' => $params->get("empty","false"),
+			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
+			  'button_bootstrap' => $button_bootstrap));
 }
 
 if ($iso_entree == "k2") {

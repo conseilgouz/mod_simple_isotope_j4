@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -390,7 +390,7 @@ class IsotopeHelper
                                 }
                             }
                         } else { // one field value
-			              if ($option->value == $field->value) {
+			              if (property_exists($option,'value') && ($option->value == $field->value)) {
 			                $val=$option->name;
 			                $alias_sort = FilterOutput::stringURLSafe((string)$ix_field.'_'.$val);
 						    $alias =  FilterOutput::stringURLSafe((string)$val);
@@ -1043,7 +1043,7 @@ class IsotopeHelper
         if (is_array($item->extra_fields)) {
             foreach ($item->extra_fields as $key => $extraField) {
                 if ($extraField->type == 'textarea' || $extraField->type == 'textfield') {
-                    $extraFieldTempText = new JObject();
+                    $extraFieldTempText = new \stdClass;
                     $extraFieldTempText->text = $extraField->value;
                     $dispatcher->trigger('onContentPrepare', array(
                                 'mod_k2_content.item-extrafields',

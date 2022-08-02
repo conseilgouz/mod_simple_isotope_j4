@@ -1,6 +1,6 @@
 <?php
 /**
-* Simple Isotope Module  - Joomla 4.0.1 Component 
+* Simple Isotope Module  - Joomla 4.0.2 Component 
 * Package			: CG ISotope
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL

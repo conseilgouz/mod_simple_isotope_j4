@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -15,6 +15,8 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Helper;
 use Joomla\CMS\Plugin\PluginHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\IsotopeHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 
 $uri = Uri::getInstance();
 $user = Factory::getUser();
@@ -189,25 +191,25 @@ foreach ($layouts as $layout) {
 	$layouts_order[$layout->div_line.$layout->div_pos] = $layout->div;
 }
 //====================================Messages=====================================//
-$libreverse=JText::_('SSISO_LIBREVERSE');
-$liball = JText::_('SSISO_LIBALL');
-$libdate = JText::_('SSISO_LIBDATE');
-$libcategory = JText::_('SSISO_LIBCAT');
-$libvisit= JText::_('SSISO_LIBVISIT');
-$librating= JText::_('SSISO_LIBRATING');
-$libid= JText::_('SSISO_LIBID');
-$libblog= JText::_('SSISO_LIBBLOG');
-$libalpha=JText::_('SSISO_LIBALPHA');
-$libcreated=JText::_('SSISO_LIBCREATED'); 
-$libupdated=JText::_('SSISO_LIBUPDATED');
-$libpublished=JText::_('SSISO_LIBPUBLISHED'); 
-$librandom=JText::_('SSISO_RANDOM');
-$libfilter=JText::_('SSISO_LIBFILTER');  
-$libdateformat = $params->get('formatsortdate',JText::_('SSISO_DATEFORMAT'));
-$libotherdateformat = $params->get('formatotherdate',JText::_('SSISO_DATEFORMAT'));
-$libsearch = JText::_('SSISO_LIBSEARCH');
-$libmore = JText::_('SSISO_LIBMORE');
-$libsearchclear = JText::_('SSISO_SEARCHCLEAR');
+$libreverse=Text::_('SSISO_LIBREVERSE');
+$liball = Text::_('SSISO_LIBALL');
+$libdate = Text::_('SSISO_LIBDATE');
+$libcategory = Text::_('SSISO_LIBCAT');
+$libvisit= Text::_('SSISO_LIBVISIT');
+$librating= Text::_('SSISO_LIBRATING');
+$libid= Text::_('SSISO_LIBID');
+$libblog= Text::_('SSISO_LIBBLOG');
+$libalpha= Text::_('SSISO_LIBALPHA');
+$libcreated= Text::_('SSISO_LIBCREATED'); 
+$libupdated= Text::_('SSISO_LIBUPDATED');
+$libpublished= Text::_('SSISO_LIBPUBLISHED'); 
+$librandom= Text::_('SSISO_RANDOM');
+$libfilter= Text::_('SSISO_LIBFILTER');  
+$libdateformat = $params->get('formatsortdate', Text::_('SSISO_DATEFORMAT'));
+$libotherdateformat = $params->get('formatotherdate',Text::_('SSISO_DATEFORMAT'));
+$libsearch = Text::_('SSISO_LIBSEARCH');
+$libmore = Text::_('SSISO_LIBMORE');
+$libsearchclear = Text::_('SSISO_SEARCHCLEAR');
 ?>
 <div id="isotope-main-<?php echo $module->id;?>" data="<?php echo $module->id;?>" class="isotope-main">
 <div class="isotope-div fg-row" >
@@ -336,7 +338,7 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 							class="iso_cat_img" alt="'.$catparam->image_alt.'" /> '; // pascal
 						}
 					}
-					$filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$cats_note[$key].'"/>'.$img.JText::_($aff).'</button>'; 
+					$filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$cats_note[$key].'"/>'.$img.Text::_($aff).'</button>'; 
 				}
 			}
 			$filter_cat_div .= '</div>';
@@ -350,7 +352,7 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 		        if (!is_null($aff)) {
 					$selected = "";
 					if ($default_cat == $aff_alias) {$selected = "selected";}
-					$filter_cat_div .= '<option value="'.$aff_alias.'" '.$selected.'>'. JText::_($aff).'</option>';
+					$filter_cat_div .= '<option value="'.$aff_alias.'" '.$selected.'>'. Text::_($aff).'</option>';
 		        }
 		    }
 		    $filter_cat_div .= '</select>';
@@ -425,7 +427,8 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 					}
 					$checked = "";
 					if ($default_tag == $aff_alias) {$checked = "is-checked";}
-					$filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$tags_note[$aff_alias].'"/>'.$img.JText::_($aff).'</button>'; 
+					$one_title = array_key_exists($aff_alias,$tags_note) ? $tags_note[$aff_alias] : '';
+					$filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$one_title.'"/>'.$img.Text::_($aff).'</button>'; 
 				}
 			}
 			if ($tagsfilterparent == "true") $filter_tag_div .= '</div>';
@@ -443,7 +446,7 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 				if (!is_null($aff)) {
 					$selected = "";
 					if ($default_tag == $aff_alias) {$selected = "selected";}
-					$filter_tag_div .= '<option value="'.$aff_alias.'" '.$selected.'>'. JText::_($aff).'</option>';
+					$filter_tag_div .= '<option value="'.$aff_alias.'" '.$selected.'>'. Text::_($aff).'</option>';
 				}
 			}
 			$filter_tag_div .= '</select>';
@@ -513,7 +516,7 @@ foreach ($list as $key=>$category) {
 		if ($params->get('btnnew','false') == 'true') {
 			$nbday = $params->get('new_limit',0);
 			$tmp = date('Y-m-d H:i:s', mktime(date("H"), date("i"), 0, date("m"), date("d")-intval($nbday), date("Y")));    
-			$item->new = ($tmp < $item->publish_up) ? ' <span class="iso_badge_new">'.JText::_('SSISO_NEW').'</span> ' : '';
+			$item->new = ($tmp < $item->publish_up) ? ' <span class="iso_badge_new">'.Text::_('SSISO_NEW').'</span> ' : '';
 		}
 		$item->subtitle = "";
 		if ($params->get('btnsubtitle','false') == 'true') {
@@ -559,14 +562,14 @@ foreach ($list as $key=>$category) {
 			$perso = $params->get('perso');
 			$arr_css= array("{id}"=>$item->id,"{title}"=>$title, "{cat}"=>$cats_lib[$item->catid],"{date}"=>$libcreated.JHtml::_('date', $item->created, $libdateformat), "{visit}" =>$item->hits, "{intro}" => $item->description,"{tagsimg}" => $tag_img,"{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}"=>$item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags); 
 			foreach ($arr_css as $key_c => $val_c) {
-				$perso = str_replace($key_c, JText::_($val_c),$perso);
+				$perso = str_replace($key_c, Text::_($val_c),$perso);
 			}
 			foreach ($field_cust as $key_f => $val_f) { // affichage du contenu des champs personnalises
-				$perso = str_replace($key_f, JText::_($val_f),$perso);
+				$perso = str_replace($key_f, Text::_($val_f),$perso);
 			}
 			// apply content plugins on weblinks
 			$app = Factory::getApplication(); // Joomla 4.0
-			$item_cls = new stdClass;
+			$item_cls = new \stdClass;
 			$item_cls->text = $perso;
 			$item_cls->params = $params;
 			$app->triggerEvent('onContentPrepare', array ('com_content.article', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
@@ -599,15 +602,15 @@ foreach ($list as $key=>$category) {
 			$perso = IsotopeHelper::checkNullFields($perso,$item,$phocacount); // suppress null field if required			
 			$arr_css= array("{id}"=>$item->id,"{title}"=>$title, "{cat}"=>$cats_lib[$item->catid],"{date}"=>$libdate.JHtml::_('date', $item->displayDate, $libdateformat),"{create}"=>JHtml::_('date', $item->created, $libotherdateformat),"{pub}"=>JHtml::_('date', $item->publish_up, $libotherdateformat),"{modif}"=>JHtml::_('date', $item->modified, $libotherdateformat), "{visit}" =>$item->hits, "{intro}" => $item->displayIntrotext,"{stars}"=>$rating,"{rating}"=>$item->rating,"{ratingcnt}"=>$rating_count,"{count}"=>$phocacount,"{tagsimg}" => $tag_img, "{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}"=>$item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new , "{tags}" => $itemtags); 
 			foreach ($arr_css as $key_c => $val_c) {
-				$perso = str_replace($key_c, JText::_($val_c),$perso);
+				$perso = str_replace($key_c, Text::_($val_c),$perso);
 			}
 			foreach ($field_cust as $key_f => $val_f) { // affichage du contenu des champs personnalisees
-				$perso = str_replace($key_f, JText::_($val_f),$perso);
+				$perso = str_replace($key_f, Text::_($val_f),$perso);
 			}
 			$perso = IsotopeHelper::checkNoField($perso); // suppress empty fields
 			// apply content plugins
 			$app = Factory::getApplication(); // Joomla 4.0
-			$item_cls = new stdClass;
+			$item_cls = new \stdClass;
 			$item_cls->id = $item->id;
 			$item_cls->text = $perso;
 			$item_cls->params = $params;
@@ -618,7 +621,7 @@ foreach ($list as $key=>$category) {
 			if ($params->get('readmore','false') !='false') {
 				$isotope_grid_div .= '<p class="isotope-readmore">';
 				$isotope_grid_div .= '<a class="isotope-readmore-title"  data-articleid="'.$item->id.'" data-href="'.$item->link.'" href="'.$item->link.'">';
-				$isotope_grid_div .= JText::_('SSISO_READMORE');
+				$isotope_grid_div .= Text::_('SSISO_READMORE');
 				$isotope_grid_div .= '</a></p>';
 			}
 		} 
@@ -691,17 +694,27 @@ if ($params->get('readmore','false') =='iframe') {
 }
 ?>
 <div class="iso_div_empty iso_hide_elem">
-	<?php echo JText::_('SSISO_EMPTY'); ?>
+	<?php echo Text::_('SSISO_EMPTY'); ?>
 </div>
 <div class="iso_div_more">
 <button class="<?php echo $button_bootstrap;?> iso_button_more"><?php echo $libmore;?></button>
 </div>
 </div>
-	<?php if (($iso_entree != "webLinks") && ($params->get('pagination','true') == 'true')) {?> 
+	<?php if (($iso_entree != "webLinks") && ($params->get('pagination','false') == 'true')) {?> 
 	<div class="pagination isotope-pagination">	
 	<?php $lapagination = $pagination->getPagesLinks($params);
 	echo $lapagination;
 	?>
     </div>
-	<?php } ?>
-
+	<?php } if ($params->get('pagination','false') == 'infinite') { ?>
+<div class="page-load-status">
+  <div class="loader-ellips infinite-scroll-request">
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+  </div>
+  <p class="infinite-scroll-last"><?php echo Text::_('CG_ISO_END_OF_CONTENT'); ?></p>
+  <p class="infinite-scroll-error"><?php echo Text::_('CG_ISO_NO_MORE_PAGE'); ?></p>
+</div>
+<?php } ?>

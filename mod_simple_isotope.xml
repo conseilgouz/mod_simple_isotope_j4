@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>April 2022</creationDate>
+	<creationDate>July 2022</creationDate>
 	<copyright>Copyright (C) 2022 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.0.1</version>
+	<version>4.0.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -36,8 +36,8 @@
 		<fields name="params">
 			<fieldset name="basic" 
 			addfieldprefix="ConseilGouz\Module\SimpleIsotope\Site\Field">
-<field	name="notegeneralinfo"	type="note" label="CG_ISO_GENERALINFONOTE" class="alert-success"/>
-				<field name="iso_entree" type="radio"	default="articles"	class="btn-group"
+<field	name="notegeneralinfo"	type="note" label="CG_ISO_GENERALINFONOTE" class="alert-success clear half"/>
+				<field name="iso_entree" type="radio"	default="articles"	class="btn-group half left"
 					label="SSISO_ENTREE" description="SSISO_ENTREEDESC" >
 					<option value="webLinks">SSISO_ENTREEWEBLINKS</option> 
 					<option value="articles">SSISO_ENTREEARTICLES</option> 
@@ -45,31 +45,31 @@
 				</field>
 				<field showon="iso_entree:articles"
 				name="categories" type="category"	multiple="true"	extension="com_content" 
-				label="SSISO_CAT" description="SSISO_CATDESC" 
+				label="SSISO_CAT" description="SSISO_CATDESC" class="half right"
 				layout="joomla.form.field.list-fancy-select"
 				/>
 				<field showon="iso_entree:webLinks"
-				name="wl_categories" type="category" 
+				name="wl_categories" type="category" class="half right"
 				multiple="true"	extension="com_weblinks" 
 				label="SSISO_CAT" description="SSISO_WLCATDESC" 
 				layout="joomla.form.field.list-fancy-select"
 				/>
 				<field showon="iso_entree:k2"
-                name="categories_k2" type="sqlnoerr" default="" multiple="true"
+                name="categories_k2" type="sqlnoerr" default="" multiple="true" class="half right"
 				query="SELECT id,name FROM #__k2_categories WHERE trash = 0 ORDER BY parent, ordering"
 				key_field="id" value_field="name"
 				label="ISO_K2_SELECT_CATEGORIES" description="ISO_K2_SELECT_CATEGORIES_DESC"/>
-<field	name="notesortinfo"	type="note" label="CG_ISO_SORTINFONOTE" class="alert-success"/>
+<field	name="notesortinfo"	type="note" label="CG_ISO_SORTINFONOTE" class="alert-success clear half"/>
 				<field
 					name="displaysort"
-					type="radio" class="btn-group btn-group-yesno"	default="show"
+					type="radio" class="btn-group btn-group-yesno clear left half"	default="show"
 					label="SSISO_DISPLAYSORT"	description="SSISO_DISPLAYSORTDESC" >
 					<option value="show">JYES</option> 
 					<option value="hide">JNO</option> 
 				</field>
 				<field
 					showon="displaysort:show" name="btndate"
-					type="radio" class="btn-group" default="true"
+					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNDATE" description="SSISO_DISPLAYBTNDATEDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
@@ -77,7 +77,7 @@
 				</field>
 				<field
 					showon="displaysort:show" name="btncat"
-					type="radio" class="btn-group" default="ASC"
+					type="radio" class="btn-group half left" default="ASC"
 					label="SSISO_DISPLAYBTNCAT" 	description="SSISO_DISPLAYBTNCATDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
@@ -85,7 +85,7 @@
 				</field>
 				<field
 					showon="displaysort:show" name="btnalpha"
-					type="radio" class="btn-group" default="true"
+					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNALPHA" description="SSISO_DISPLAYBTNALPHADESC">
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
@@ -93,7 +93,7 @@
 				</field>
 				<field
 					showon="displaysort:show" name="btnvisit"
-					type="radio" class="btn-group"	default="true"
+					type="radio" class="btn-group half left"	default="true"
 					label="SSISO_DISPLAYBTNVISIT" description="SSISO_DISPLAYBTNVISITDESC">
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
@@ -101,7 +101,7 @@
 				</field>
 				<field
 					showon="displaysort:show" name="btnrating"
-					type="radio" class="btn-group" default="true"
+					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNRATING" description="SSISO_DISPLAYBTNRATINGDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
@@ -109,21 +109,21 @@
 				</field>
 				<field
 					showon="displaysort:show" name="btnid"
-					type="radio" class="btn-group" default="false"
+					type="radio" class="btn-group half left" default="false"
 					label="SSISO_DISPLAYBTNID" description="SSISO_DISPLAYBTNIDDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
 					<option value="false">JNO</option> 
 				</field>
 				<field	showon="displaysort:show" name="btnblog"
-					type="radio" class="btn-group " default="false"
+					type="radio" class="btn-group half right" default="false"
 					label="SSISO_DISPLAYBTNBLOG" description="SSISO_DISPLAYBTNBLOGDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
 					<option value="false">JNO</option> 
 				</field>
 				<field	showon="displaysort:show" name="btnrandom"
-					type="radio" class="btn-group " default="false"
+					type="radio" class="btn-group half left" default="false"
 					label="SSISO_DISPLAYBTNRANDOM" description="SSISO_DISPLAYBTNRANDOMDESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
@@ -133,14 +133,14 @@
 					name="choixdate"
 					query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0 and type like 'calendar'"
 					key_field="id"	value_field="value"						
-					type="sql" default="created"	class="btn-group"
+					type="sql" default="created"	class="btn-group clear"
 					label="SSISO_DATECHOICE" description="SSISO_DATECHOICEDESC" >
 					<option value="created">SSISO_DATECHOICECREATE</option> 
 					<option value="publish_up">SSISO_DATECHOICEPUBLISH</option> 
 					<option value="modified">SSISO_DATECHOICEMODIF</option> 
 				</field>
 				<field name="defaultdisplay" 
-					type="list" default="date_desc"
+					type="list" default="date_desc" 
 					label="SSISO_DEFDISPLAY"	description="SSISO_DEFDISPLAYDESC">				
 					<option value="date_asc">SSISO_DEFDISPLAYOLDERDATE</option> 
 					<option value="date_desc">SSISO_DEFDISPLAYRECENTDATE</option> 
@@ -156,9 +156,9 @@
 					<option value="blog_desc">SSISO_DEFDISPLAYBLOGREV</option> 
 					<option value="random">SSISO_DEFDISPLAYRANDOM</option> 
 				</field>				
-<field	name="notefilterinfo"	type="note" label="CG_ISO_FILTERINFONOTE" class="alert-success"/>
+<field	name="notefilterinfo"	type="note" label="CG_ISO_FILTERINFONOTE" class="alert-success clear half"/>
   				<field name="cat_or_tag" 
-				type="radio" class="btn-group "
+				type="radio" class="btn-group clear"
 				label="SSISO_CAT_TAGS" description="SSISO_CAT_TAGS_DESC"
 				default="cat">
 				<option value="cat">SSISO_CAT_TAGS_CAT</option>
@@ -178,7 +178,7 @@
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success"/>
+<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 
 				<field name="default_cat"	
 					showon="cat_or_tag:cat,cattags,catfields[AND]iso_entree:articles"
@@ -232,7 +232,7 @@
 				<field
 					showon="cat_or_tag:cattags,cat,catfields"
 					name="catfilteralias"
-					type="radio" class="btn-group" default="false" 
+					type="radio" class="btn-group half left" default="false" 
 					label="SSISO_CATFILTERALIAS" description="SSISO_CATFILTERALIASDESC">
 					<option value="true">SSISO_ALIAS</option>
 					<option value="false">SSISO_ALPHA</option>
@@ -241,12 +241,12 @@
 				<field
 					showon="cat_or_tag:cattags,cat,catfields"
 					name="catsfilterimg"
-					type="radio" class="btn-group btn-group-yesno" default="false" 
+					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_CATSFILTERIMG" description="SSISO_CATSFILTERIMGDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-<field	name="notefiltertagsinfo"	type="note" label="CG_ISO_FILTERTAGSINFONOTE" showon="cat_or_tag:tags,cattags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success"/>
+<field	name="notefiltertagsinfo"	type="note" label="CG_ISO_FILTERTAGSINFONOTE" showon="cat_or_tag:tags,cattags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 				<field name="default_tag"	
 					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
 					type="tag" 	mode="nested" custom="deny"	default=""
@@ -266,13 +266,13 @@
 					<option value="hide">SSISO_DISPLAYFILTERHIDE</option>
 				</field>
 				<field	showon="cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks" name="tagsfilterparent"
-					type="radio" class="btn-group btn-group-yesno" default="false" 
+					type="radio" class="btn-group btn-group-yesno half left" default="false" 
 					label="SSISO_TAGSFILTERPARENT" description="SSISO_TAGSFILTERPARENTDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field	showon="cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks[AND]tagsfilterparent:true" name="tagsfilterparentlabel"
-					type="radio" class="btn-group btn-group-yesno" default="false" 
+					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_TAGSFILTERPARENTLABEL" description="SSISO_TAGSFILTERPARENTLABELDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
@@ -280,7 +280,7 @@
 				<field
 					showon="cat_or_tag:cattags,tags,tagsfields"
 					name="tagsfilterorder"
-					type="radio" class="btn-group btn-group-yesno" default="false" 
+					type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
 					label="SSISO_TAGSFILTERORDER" description="SSISO_TAGSFILTERORDERDESC"
 				>
 				<option value="true">JYES</option>
@@ -289,14 +289,14 @@
 				<field
 					showon="cat_or_tag:cattags,tags,tagsfields"
 					name="tagsfilterimg"
-					type="radio" class="btn-group btn-group-yesno" default="false" 
+					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_TAGSFILTERIMG" 
 					description="SSISO_TAGSFILTERIMGDESC"
 				>
 				<option value="true">JYES</option>
 				<option value="false">JNO</option>
 				</field>
-<field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success"/>
+<field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>
 				<field
 					name="displayfilterfields"
 					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
@@ -312,7 +312,7 @@
 				<field
 					name="displayfiltersplitfields"
 					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
-					type="radio" default="false" class="btn-group"
+					type="radio" default="false" class="btn-group half left"
 					label="SSISO_DISPLAYFILTERSPLITFIELDS" description="SSISO_DISPLAYFILTERSPLITFIELDSDESC" >
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
@@ -320,12 +320,12 @@
 				<field
 					name="splitfieldstitle"
 					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields[AND]displayfiltersplitfields:true"
-					type="radio" default="false" class="btn-group"
+					type="radio" default="false" class="btn-group half right"
 					label="SSISO_SPLITFIELDSTITLE"	description="SSISO_SPLITFIELDSTITLEDESC" 	>
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-<field	name="noteotherfilterinfo"	type="note" label="CG_ISO_DISPLAYOTHERFILTERNOTE" class="alert-success"/>
+<field	name="noteotherfilterinfo"	type="note" label="CG_ISO_DISPLAYOTHERFILTERNOTE" class="alert-success clear half"/>
 				<field name="language_filter"
 					type="radio" class="btn-group"
 					label="SSISO_LANGUAGE_FILTER" description="SSISO_LANGUAGE_FILTER_DESC"
@@ -369,43 +369,51 @@
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
 					<option value="multi">SSISO_DISPLAYFILTERMULTIBUTTON</option> 
 				</field>	
-<field	name="notedisplayinfo"	type="note" label="CG_ISO_DISPLAYINFONOTE" class="alert-success"/>
+<field	name="notedisplayinfo"	type="note" label="CG_ISO_DISPLAYINFONOTE" class="alert-success clear half"/>
 				<field
 					name="bootstrapbutton"
-					type="radio" class="btn-group btn-group-yesno"	default="false" 
+					type="radio" class="btn-group btn-group-yesno clear half left"	default="false" 
 					label="SSISO_BOOTSTRAP" description="SSISO_BOOTSTRAPDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field
 					name="displaysearch"
-					type="radio" class="btn-group btn-group-yesno" default="false"
+					type="radio" class="btn-group btn-group-yesno half right" default="false"
 					label="SSISO_DISPLAYSEARCH" description="SSISO_DISPLAYSEARCHDESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
   				<field name="iso_count" 
-				showon="iso_entree:articles,k2"
+				showon="iso_entree:articles,k2" class="clear half left"
 				type="number" default="0" min="0" max="200" 
 				label="SSISO_COUNT" description="SSISO_COUNTDESC" />
-   				<field name="limit_items" 
+   				<field name="limit_items"  class="half right"
 				showon="iso_entree:articles,webLinks"
 				type="number" default="0" min="0" step="10" 
 				label="SSISO_LIMIT_ITEMS" description="SSISO_LIMIT_ITEMS_DESC"/>
    				<field name="pagination" 
 				showon="iso_entree:articles"
-				type="radio" class="btn-group btn-group-yesno"
+				type="radio" class="btn-group btn-group-yesno clear half left"
 				label="SSISO_PAGINATION" description="SSISO_PAGINATION_DESC"
 				default="false">
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
+					<option value="infinite">Infinite</option> 
 				</field>
-				<field name="page_count" 
-				showon="iso_entree:articles[AND]pagination:true"
+				<field name="infinite_btn" showon="iso_entree:articles[AND]pagination:infinite"
+					type="radio" class="btn-group half right"
+					label="SSISO_INFINITE_BUTTON" description="SSISO_INFINITE_BTN_DESC"
+					default="false">
+					<option value="false">JNO</option> 
+					<option value="true">JYES</option> 
+				</field>
+				<field name="page_count" class="clear half left"
+				showon="iso_entree:articles[AND]pagination:true,infinite"
 				type="number" default="1" min="1" max="200" 
 				label="SSISO_PAGE_SIZE" description="SSISO_PAGE_SIZE_DESC" />
-   				<field name="page_order" 
-				showon="iso_entree:articles[AND]pagination:true"
+   				<field name="page_order" class="half right"
+				showon="iso_entree:articles[AND]pagination:true,infinite"
 				type="list" 
 				label="SSISO_PAGE_ORDER" description="SSISO_PAGE_ORDER_DESC"
 				default="a.ordering ASC">
@@ -426,7 +434,7 @@
  
 				<field
 					name="iso_layout"
-					type="radio" default="fitRows" class="btn-group"
+					type="radio" default="fitRows" class="btn-group clear half left"
 					label="SSISO_DISPLAYTYPE" description="SSISO_DISPLAYTYPEDESC">
 					<option value="fitRows">SSISO_DISPLAYTYPELINES</option> 
 					<option value="masonry">SSISO_DISPLAYTYPEMASO</option> 
@@ -435,67 +443,67 @@
 				</field>
 				<field
 					showon="iso_layout:masonry,fitRows,packery"
-					name="iso_nbcol"
+					name="iso_nbcol" class="third right"
 					type="number"	default="2"	min="1"	max="10" step="1"
 					label="SSISO_NBCOL"	description="SSISO_NBCOLDESC" 
 				/>				
-<field	name="notearticleinfo"	type="note" label="CG_ISO_DISPLAYARTICLENOTE" class="alert-success"/>
-				<field name="backgroundcolor" 
+<field	name="notearticleinfo"	type="note" label="CG_ISO_DISPLAYARTICLENOTE" class="alert-success clear half"/>
+				<field name="backgroundcolor"  class="half left"
 					type="color" default="#eee"
 					label="SSISO_BACKGD" description="SSISO_BACKGDDESC" />	
 				
-   				<field name="introtext_limit" 
+   				<field name="introtext_limit" class="half right"
 				showon="iso_entree:articles,k2"
 				type="number" default="100" min="0" max="500" step="20"
 				label="SSISO_NBCHAR" description="SSISO_NBCHARDESC"	 />
 				<field name="hide_more" showon="iso_entree:articles,k2"
-				type="radio" class="btn-group btn-group-yesno"	default="false" 
+				type="radio" class="btn-group btn-group-yesno half left"	default="false" 
 				label="SSISO_HIDEMORE" description="SSISO_HIDEMOREDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-   				<field name="introtext_leave_tags" 
+   				<field name="introtext_leave_tags" class="half right"
 				showon="iso_entree:articles,webLinks"
 				type="checkbox" default="0" 
 				label="SSISO_LEAVE_TAGS" description="SSISO_LEAVE_TAGS_DESC"
 				/>
    				<field name="introtext_img" 
-				type="radio" class="btn-group btn-group-yesno"	default="true" 
+				type="radio" class="btn-group btn-group-yesno clear half left"	default="true" 
 				label="SSISO_SHOWIMG" 	description="SSISO_SHOWIMGDESC"	>
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
    				<field name="introtext_img_link" 
 				showon="introtext_img:true"
-				type="radio" class="btn-group btn-group-yesno"	default="false" 
+				type="radio" class="btn-group btn-group-yesno half right"	default="false" 
 				label="SSISO_SHOWIMGLINK" 	description="SSISO_SHOWIMGLINKDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field name="introimg_maxwidth"
-				showon="introtext_img:true"
+				showon="introtext_img:true" class="half left"
 				type="number" default="0" min="0" max="100" step="10"
                 label="SSISO_MAXIMGWIDTH" description="SSISO_MAXIMGWIDTHDESC" />
-				<field name="introimg_maxheight"
+				<field name="introimg_maxheight" class="half right"
 				showon="introtext_img:true"
 				type="number" default="0" min="0" max="1000" step="10"
                 label="SSISO_MAXIMGHEIGHT" description="SSISO_MAXIMGHEIGHTDESC" />
 				
    				<field name="blocklink" 
-				type="radio" class="btn-group btn-group-yesno" default="false" 
+				type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
 				label="SSISO_BLOCKLINK" description="SSISO_BLOCKLINKDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
    				<field name="titlelink" 
-				type="radio" class="btn-group btn-group-yesno" default="true" 
+				type="radio" class="btn-group btn-group-yesno half right" default="true" 
 				label="SSISO_TITLELINK" description="SSISO_TITLELINKDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
    				<field name="readmore" 
 				showon="iso_entree:articles,k2"
-				type="radio" class="btn-group btn-group-yesno" default="false" 
+				type="radio" class="btn-group btn-group-yesno clear" default="false" 
 				label="SSISO_READMORELBL" description="SSISO_READMOREDESC">
 					<option value="true">JYES</option>
 					<option value="iframe">IFrame</option>
@@ -573,8 +581,6 @@
 	</config>
 	<updateservers>
 	<server type="extension" name="Simple Isotope" priority="1">https://www.conseilgouz.com/updates/simple_isotope_update.xml</server>
-	<server type="extension" name="Simple Isotope" priority="2">http://432473037d.url-de-test.ws/updateserver/updates/simple_isotope_update.xml
-	</server>
 	</updateservers>
 	
 </extension>
