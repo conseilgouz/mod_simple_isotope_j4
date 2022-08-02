@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.1
+* Version			: 4.0.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -17,7 +17,7 @@ use Joomla\CMS\Filesystem\File;
 
 class mod_simple_isotopeInstallerScript
 {
-	private $min_joomla_version      = '4.0.1';
+	private $min_joomla_version      = '4.0.0';
 	private $min_php_version         = '7.0';
 	private $name                    = 'Simple Isotope';
 	private $exttype                 = 'module';
