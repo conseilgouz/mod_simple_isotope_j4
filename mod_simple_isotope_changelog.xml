@@ -2,9 +2,23 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.0.3</version>
+        <note>
+            <item>Update : 02/10/2022</item>
+        </note>
+        <addition>
+            <item>look for updates/changelog files on github</item>
+        </addition>
+		<fix>
+            <item>Tags : display all available tags in module's parameters</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.0.2</version>
         <addition>
-            <item>Paginatio: infinite scroll</item>
+            <item>Pagination : infinite scroll</item>
         </addition>
 	</changelog>
 	<changelog>
