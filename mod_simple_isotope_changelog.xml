@@ -2,6 +2,28 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.0.5</version>
+        <note>
+            <item>Update :23/11/2022</item>
+        </note>
+		<fix>
+            <item>init.js : fix e.indefOf error in init.min.js</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.0.4</version>
+        <note>
+            <item>Update : 02/10/2022</item>
+        </note>
+		<fix>
+            <item>Remove obsolete update files in database</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.0.3</version>
         <note>
             <item>Update : 02/10/2022</item>

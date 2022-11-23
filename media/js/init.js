@@ -1,6 +1,6 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.2
+* Version			: 4.0.5
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -126,7 +126,7 @@ resetToggle = function () {
 		$('.isotope-main .isotope-div').trigger('refresh');
 	}
 }
-$article_frame.load(function(){
+$article_frame.on("load",function(){
 	$article.removeClass('article-loading');
 	if ($close)	$close.removeClass('isotope-hide');
 	$article_frame.height($height);

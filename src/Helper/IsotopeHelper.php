@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.3
+* Version			: 4.0.5
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -29,7 +29,7 @@ class IsotopeHelper
 		return 'Simple Isotope';
 	}
     public static function getCGVersion() {
-		return '4.0.3';
+		return '4.0.5';
 	}
 
 	public static function getWebLinks(&$params,$weblinks_params,&$tags,&$tags_alias,&$tags_note,&$tags_image,&$tags_parent,&$tags_parent_alias,&$article_tags,&$cats_lib, &$cats_alias,&$cats_note, &$cats_params ,&$fields,&$article_fields, &$article_fields_names,$rangefields,&$alpha) {

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.3
+* Version			: 4.0.4
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -128,6 +128,20 @@ class mod_simple_isotopeInstallerScript
 				}
 			}
 		}
+		// remove obsolete update sites
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->delete('#__update_sites')
+			->where($db->quoteName('location') . ' like "%432473037d.url-de-test.ws/%"');
+		$db->setQuery($query);
+		$db->execute();
+		// Simple Isotope is now on Github
+		$query = $db->getQuery(true)
+			->delete('#__update_sites')
+			->where($db->quoteName('location') . ' like "%conseilgouz.com/updates/simple_isotope%"');
+		$db->setQuery($query);
+		$db->execute();
+
 	}
 	// Check if Joomla version passes minimum requirement
 	private function passMinimumJoomlaVersion()
