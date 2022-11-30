@@ -95,8 +95,8 @@ if ($iso_entree == "webLinks") {
 	$list[] = IsotopeHelper::getItems($categories,$params,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias, $cats_lib, $cats_alias, $cats_note,$cats_params, $article_tags,$module,$fields,$article_fields, $article_fields_names, $pagination, $limitstart, $limit,$order,$rangefields,$rangetitle,$rangelabel,$rangedesc,$minrange,$maxrange,$alpha);
 
 }
-HTMLHelper::_('bootstrap.framework');
-HTMLHelper::_('jquery.framework');   
+// HTMLHelper::_('bootstrap.framework');
+// HTMLHelper::_('jquery.framework');   
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = Factory::getDocument()->getWebAssetManager();
 

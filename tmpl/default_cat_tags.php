@@ -56,6 +56,7 @@ $imgmaxwidth = $params->get('introimg_maxwidth','0');
 $imgmaxheight = $params->get('introimg_maxheight','0'); 
 $button_bootstrap = "isotope_button";
 if ($displaybootstrap == 'true') { 
+	HTMLHelper::_('bootstrap.button', '.selector');
 	$button_bootstrap = "btn btn-sm ";
 }
 $params_fields = $params->get('displayfields',array());

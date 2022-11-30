@@ -141,7 +141,7 @@
 				</field>
 				<field name="defaultdisplay" 
 					type="list" default="date_desc" 
-					label="SSISO_DEFDISPLAY"	description="SSISO_DEFDISPLAYDESC">				
+					label="SSISO_DEFDISPLAY"	description="SSISO_DEFDISPLAYDESC" class="btn-group clear">				
 					<option value="date_asc">SSISO_DEFDISPLAYOLDERDATE</option> 
 					<option value="date_desc">SSISO_DEFDISPLAYRECENTDATE</option> 
 					<option value="cat_asc">SSISO_DEFDISPLAYCAT</option> 
@@ -410,10 +410,10 @@
 					<option value="false">JNO</option> 
 				</field>
   				<field name="iso_count" 
-				showon="iso_entree:articles" class="clear half left"
+				showon="iso_entree:articles" class="clear"
 				type="number" default="0" min="0" max="200" 
 				label="SSISO_COUNT" description="SSISO_COUNTDESC" />
-   				<field name="limit_items"  class="half right"
+   				<field name="limit_items"  class="clear"
 				showon="iso_entree:articles,webLinks"
 				type="number" default="0" min="0" step="10" 
 				label="SSISO_LIMIT_ITEMS" description="SSISO_LIMIT_ITEMS_DESC"/>

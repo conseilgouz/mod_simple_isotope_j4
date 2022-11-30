@@ -54,6 +54,7 @@ $col_bootstrap_sort = "";
 $col_bootstrap_filter = "";
 $div_bootstrap = "row";
 if ($displaybootstrap == 'true') { 
+	HTMLHelper::_('bootstrap.button', '.selector');
 	$button_bootstrap = "btn btn-sm ";
 }
 //==============================LAYOUTS======================================//

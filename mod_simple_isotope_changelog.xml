@@ -9,11 +9,15 @@
 		<remove>
             <item>Remove JQuery dependency</item>
 			<item>Remove K2</item>
+			<item>Remove JQuery/Full Bootstrap call</item>
 		</remove>
 		<add>
 			<item>Offcanvas filtering</item>
 			<item>Featured items first</item>
 		</add>
+		<fix>
+			<item>Weblinks parameters order</item>
+		</fix>
 	</changelog>
 	<changelog>
 		<element>mod_simple_isotope</element>
