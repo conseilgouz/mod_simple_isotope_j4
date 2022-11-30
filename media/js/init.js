@@ -1,6 +1,6 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.1.1
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -1520,7 +1520,7 @@ function set_family(me,$parent,child,sortValue,$type) {
 							} else {
 								oneval = $vals[$j].getAttribute('data-sort-value');
 							}
-							if (oneval != "*") newparents.push(onval);
+							if (oneval != "*") newparents.push(oneval);
 						}
 					}
 				}

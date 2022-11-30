@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.1</version>
+        <note>
+            <item>Update :30/11/2022</item>
+        </note>
+		<fix>
+			<item>Error onval undefined in init.js</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.0</version>
         <note>
             <item>Update :26/11/2022</item>
