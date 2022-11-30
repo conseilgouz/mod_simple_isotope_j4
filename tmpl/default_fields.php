@@ -594,6 +594,7 @@ foreach ($list as $key=>$category) {
 	foreach ($category as $item) {
 		$tag_display = "";
 		$tag_img = "";
+		$cat_img = "";
 		if (($article_cat_tag  == "tagsfields") || ($article_cat_tag  == "cattagsfields")) { // filtre 
 			foreach ($article_tags[$item->id] as $tag) {
 				$tag_display .= " ".$tags_alias[$tag->tag];
