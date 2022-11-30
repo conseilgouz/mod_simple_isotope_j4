@@ -2,6 +2,22 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.0</version>
+        <note>
+            <item>Update :26/11/2022</item>
+        </note>
+		<remove>
+            <item>Remove JQuery dependency</item>
+			<item>Remove K2</item>
+		</remove>
+		<add>
+			<item>Offcanvas filtering</item>
+			<item>Featured items first</item>
+		</add>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.0.5</version>
         <note>
             <item>Update :23/11/2022</item>

@@ -1,12 +1,12 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.2
+* Version			: 4.1.0
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
-.isotope-main {overflow: hidden}
+/*.isotope-main {overflow: hidden}*/
 
 .isotope_pointer {
 cursor: pointer;
@@ -35,7 +35,9 @@ cursor: pointer;
 .isotope_button-group .btn:active,
 .isotope_button-group .btn.is-checked,
 .isotope_button:active,
-.isotope_button.is-checked {
+.isotope_button.is-checked,
+#offcanvas-clone .btn:active,
+#offcanvas-clone .btn.is-checked {
   background-color: #28F;
   background: #28F;
   color: white;
@@ -93,7 +95,7 @@ margin : 0px 0px 0px 0px !important;
 .filter-button-group-fields p{
 	margin-right:0.5em;
 	padding:0;
-	width:100%;
+	width:auto;
 }
 /* --- language buttons ----- */
 .isotope_button-group.iso_lang .btn-sm{
@@ -119,7 +121,6 @@ margin : 0px 0px 0px 0px !important;
   display: block;
   clear: both;
 }
-
 /* ---- .element-item ---- */
 .isotope_item {
   float: left;
@@ -138,21 +139,8 @@ margin : 0px 0px 0px 0px !important;
 	width:100%;
 	height:auto;
 }
-.isotope_select { width:150px;height: 30px;
-border:1px solid;
--webkit-border-top-right-radius: 5px;
--webkit-border-bottom-right-radius: 5px;
--webkit-border-top-left-radius: 5px;
--webkit-border-bottom-left-radius: 5px;
--moz-border-radius-topright: 5px;
--moz-border-radius-bottomright: 5px;
--moz-border-radius-topleft: 5px;
--moz-border-radius-bottomleft: 5px;
-border-top-left-radius: 5px;
-border-top-right-radius: 5px;
-border-bottom-left-radius: 5px;
-border-bottom-right-radius: 5px;
-padding:2px;
+.isotope_select { 
+	width:15em
 }
 .iso_badge_new {
     display: inline-block;
@@ -230,7 +218,7 @@ padding:2px;
   -moz-osx-font-smoothing: grayscale;
   text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
 }
- 
+.offcanvas-header .ison-cancel-squared:before { content: ''; width:0} 
 .ison-cancel-squared:before { content: '\e801'; font-size: 200%; color: grey;cursor: pointer;} 
 /* 1.1.0 : display article in isotope component */
 .isotope-hide {
@@ -364,4 +352,23 @@ div.itemExtraFields ul li span.itemExtraFieldsLabel {
 .loader-ellips__dot:nth-child(4) {
   animation-name: reveal;
   animation-direction: reverse;
+}
+/* OffCanvas */
+#offcanvas-hamburger-btn.left {max-height:3em;position: absolute;left:0;margin-right:0}
+#offcanvas-hamburger-btn.right {max-height:3em;position: absolute;right:0;margin-right:0}
+#offcanvas-hamburger-btn{float:left;margin-right:1em}
+.offcanvas-start,.offcanvas-end {width:auto;max-width:15em}
+.offcanvas .iso_fields_title  p{width:100%}
+.offcanvas .choices {width:13rem}
+.offcanvas-header {padding: 1rem 1rem 0rem 1rem !important;}
+.offcanvas-body .isotope_button-group,.offcanvas-body .iso_range {margin-bottom: 1rem;}
+@media (min-width: 640px) {
+	.offcanvas-start.offcanvas25,.offcanvas-end.offcanvas25{
+		width:25%!important
+	}
+	.offstart,.offend{
+		width: 75% !important;
+	}
+	.offstart{ right:-25%}
+	
 }

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.2
+* Version			: 4.1.0
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -12,7 +12,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Helper\ModuleHelper;
 use Joomla\CMS\Component\ComponentHelper;
-use ConseilGouz\Module\SimpleIsotope\Site\Helper\IsotopeHelper;
+use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
 use Joomla\CMS\Language\Text;
 
 $document 		= Factory::getDocument();
@@ -39,6 +39,8 @@ $button_bootstrap = "isotope_button";
 if ($displaybootstrap == 'true') { 
 	$button_bootstrap = "btn btn-sm ";
 }
+$imgmaxwidth =  $params->get('introimg_maxwidth','0');
+$imgmaxheight =  $params->get('introimg_maxheight','0');
 
 $displayrange =  $params->get('displayrange','false');
 $displayalpha =  $params->get('displayalpha','false');
@@ -65,34 +67,7 @@ $article_fields = array();
 $article_fields_names = array(); 
 $alpha = array(); 
 
-if ($iso_entree == "k2") {
-	$db = JFactory::getDbo();
-	$db->setQuery("SELECT enabled FROM #__extensions WHERE name = 'COM_K2'");
-	$is_enabled = $db->loadResult();        
-	if ($is_enabled != 1) { 
-		Factory::getApplication()->enqueueMessage('Where is K2 ?', 'error');	
-		return true;
-	} 
-	require_once __DIR__ . '/helper_k2.php';
-	$tags_list = array();
-	if (($params->get('cat_or_tag') == "tags") || ($params->get('cat_or_tag') == "cattags")) { 
-		$tags_list = $params->get('tags_k2');
-	}
-	$categories = $params->get('categories_k2');
-	if (is_null($categories)) {
-		$res = IsotopeK2Helper:: getAllCategories_K2($params);
-		$categories = array();
-		foreach ($res as $catid) {
-			if ($catid->count > 0) {
-				$categories[] = $catid->id;
-			}
-		}
-	}
-	$article_tags = array();
-	foreach ($categories as $catid) {
-		$list[$catid] = IsotopeK2Helper::getCategory_K2($catid,$params,$tags,$tags_alias,$tags_note,$tags_image, $cats_lib, $cats_alias,$cats_note,$cats_params, $article_tags,$module,$fields, $article_fields,$alpha);
-	}
-} elseif ($iso_entree == "webLinks") {
+if ($iso_entree == "webLinks") {
 	$categories = $params->get('wl_categories');
 	$weblinks_params = ComponentHelper::getParams('com_weblinks');
 	$list = IsotopeHelper::getWebLinks($params,$weblinks_params,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias,$article_tags,$cats_lib ,$cats_alias,$cats_note,$cats_params,$fields,$article_fields, $article_fields_names,$rangefields,$alpha);
@@ -142,11 +117,25 @@ if ($displayrange == 'true') {
 if ($params->get('customjs')) $wa->addInlineScript($params->get('customjs')); 
 
 $min = ".min";
-if ((bool)Factory::getConfig()->get('debug')) $min = '';
-$wa->registerAndUseScript('cgisotope',$modulefield.'js/init'.$min.'.js');
-// $document->addScript(''.JURI::base(true).'/media/mod_simple_isotope/js/init.js'); // ==> debug init.js <==
+if ((bool)Factory::getConfig()->get('debug')) { // Mode debug
+	$document->addScript(''.JURI::base(true).'/media/mod_simple_isotope/js/init.js'); 
+} else {
+	$wa->registerAndUseScript('cgisotope',$modulefield.'js/init.min.js');
+}
 
-
+if (($iso_layout == "masonry") || ($iso_layout == "fitRows") || ($iso_layout == "packery") ) {
+	$width = (100 / $iso_nbcol) - 2;
+	$wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item{ width:'.$width.'%}');
+}
+if ($iso_layout == "vertical") {
+	$wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item{ width:100%}');
+}
+if  ($imgmaxwidth) {
+	$wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item img{ max-width:'.$imgmaxwidth.'px}');
+}
+if  ($imgmaxheight) {
+	$wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item img{ max-height:'.$imgmaxheight.'px}');
+}
 $language_filter=$params->get('language_filter','false');
 $defaultdisplay = $params->get('defaultdisplay', 'date_desc');
 $sortBy = "";$sortAscending = "";
@@ -164,18 +153,11 @@ if ($defaultdisplay == "id_asc") { $sortBy = "id"; $sortAscending = "true";}
 if ($defaultdisplay == "id_desc") {$sortBy = "id"; $sortAscending = "false";}
 if ($defaultdisplay == "blog_asc") {$sortBy = "blog"; $sortAscending = "true";}
 if ($defaultdisplay == "blog_desc") {$sortBy = "blog"; $sortAscending = "false";}
-
+if ($params->get('btnfeature','false') != "false") { // featured always first
+	$sortBy = 'featured,'.$sortBy;
+}
 $displayfilter =  $params->get('displayfilter','button');
-if ($iso_entree == "k2") {
-	$default_cat = $params->get('default_cat_k2','');
-	$default_tag = $params->get('default_tag_k2','');
-	if (($default_cat != "") && ($default_cat != "none"))  {
-		$default_cat = $cats_alias[$default_cat];
-	}
-	if (($default_tag != "") && ($default_tag != "none"))  {
-		$default_tag = $tags_alias[$default_tag];
-	}
-} elseif ($iso_entree == "webLinks") {
+if ($iso_entree == "webLinks") {
 	$default_cat = $params->get('default_cat_wl','');
 	if (($default_cat != "") && ($default_cat != "none"))  {
 		$default_cat = $cats_alias[$params->get('default_cat_wl')];
@@ -197,46 +179,11 @@ if ($iso_entree == "k2") {
 	}
 }	
 $default_field = "";
-if ($iso_entree == "k2") {
-	if ($article_cat_tag =="cat") {
-		$default_tag = "";
-		$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
-	} else {
-		$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
-	}
-	$searchmultiex = "false";
-	if (  ( ($article_cat_tag == "tags") && ($displayfilter == "multiex")) 
-		|| ( ($article_cat_tag  == "cattags") && ($displayfilter == "multiex"))
-		|| ( ($article_cat_tag == "cat") && ($displayfiltercat == "multiex")) 
-		|| ( ($article_cat_tag  == "cattags") && ($displayfiltercat == "multiex"))){
-		$searchmultiex = "true";
-	}
-	if ($article_cat_tag =="cat") {
-		$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
-	} else {
-		$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
-	}
-	$document->addScriptOptions('mod_simple_isotope_'.$module->id, 
-		array('entree' => $iso_entree,'article_cat_tag' => $article_cat_tag,
-			  'default_cat' => $default_cat,
-		      'default_tag' => $default_tag,
-			  'layout' => $iso_layout,'nbcol' => $iso_nbcol,
-			  'background' => $params->get("backgroundcolor","#eee"),
-			  'imgmaxwidth' => $params->get('introimg_maxwidth','0'),
-			  'imgmaxheight' => $params->get('introimg_maxheight','0'),
-			  'sortby' => $sortBy, 'ascending' => $sortAscending,
-			  'searchmultiex' => $searchmultiex, 'liball' => Text::_('SSISO_LIBALL'),
-			  'language_filter' => $language_filter,
-			  'displayfilter'=> $displayfilter, 'displayfiltercat' => $displayfiltercat,
-			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
-			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
-			  'empty' => $params->get("empty","false"),
-			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
-			  'button_bootstrap' => $button_bootstrap));
-} elseif (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields") ) {
+if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields") || ($article_cat_tag == "cattagsfields") ) {
 	$splitfields = $params->get('displayfiltersplitfields','false'); 
 	$displayfilterfields =  $params->get('displayfilterfields','button');
-	$displayfilter =  $params->get('displayfilter_f','button');
+	$displayfiltertags = $params->get('displayfiltertags','button'); 
+	$displayfilter =  $params->get('displayfilter','button');
 	$searchmultiex = "false";
 	if  ( ($displayfilterfields == "multiex") || ($displayfilterfields == "listex"))  {	
 		$searchmultiex = "true";
@@ -260,7 +207,7 @@ if ($iso_entree == "k2") {
 			  'sortby' => $sortBy, 'ascending' => $sortAscending,
 			  'searchmultiex' => $searchmultiex, 'liball' => Text::_('SSISO_LIBALL'),
 			  'language_filter' => $language_filter,
-			  'displayfilter'=>  $displayfilterfields, 
+			  'displayfilterfields'=>  $displayfilterfields,'displayfiltertags' => $displayfiltertags, 
 			  'displayfiltercat' => $displayfiltercat,
 			  'displayrange'=>$displayrange,'rangestep'=>$rangestep, 'minrange'=>$minrange,'maxrange'=>$maxrange,			  
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
@@ -308,9 +255,7 @@ if ($iso_entree == "k2") {
 			  'button_bootstrap' => $button_bootstrap));
 }
 
-if ($iso_entree == "k2") {
-	require ModuleHelper::getLayoutPath('mod_simple_isotope', 'default_k2');
-} elseif (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields")) {
+if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields")) {
 	require ModuleHelper::getLayoutPath('mod_simple_isotope', 'default_fields');
 } else {
 	require ModuleHelper::getLayoutPath('mod_simple_isotope', 'default_cat_tags');

@@ -24,5 +24,13 @@
 			<option value="fg-row fg-around">CG_DIV_AROUND</option>
 			<option value="fg-row fg-between">CG_DIV_BETWEEN</option>
 		</field>
+		<field	showon="div!:iso" name="offcanvas"
+				type="radio" class="btn-group btn-group-yesno" default="false"
+				label="CG_ISO_OFFCANVAS" description="CG_ISO_OFFCANVASDESC" >
+				<option value="true">JYES</option> 
+				<option value="false">JNO</option> 
+		</field>
+		<field showon="div:iso" name="empty" type="text" label="" size="0">
+		</field>
 	</fieldset>
 </form>

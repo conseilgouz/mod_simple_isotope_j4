@@ -1,27 +1,36 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.5
+* Version			: 4.1.0
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
-var $close,$toggle,$article,
-	$height,$width,$article_frame;
+
+/* note : diffrence entre module et composant
+
+	displayfiltertags => displayfilter dans module
+*/
+var $close,grid_toggle,iso_article,iso,me,
+	empty_message,items_limit, sav_limit,
+	iso_height,iso_width,article_frame;
 var resetToggle,options,myid;
 var qsRegex,$asc,$sortby,filters;
 var rangeSlider,range_init,range_sel,min_range,max_range;
 var cookie_name;
-jQuery(document).ready(function($) {
-$('.isotope-main').each(function() {
-	var $this = $(this);
-	myid = $this.attr("data");
+var std_parents = ['cat','tags','lang','alpha'] // otherwise it's a custom field
+
+document.addEventListener('DOMContentLoaded', function() {
+mains = document.querySelectorAll('.isotope-main');
+for(var i=0; i<mains.length; i++) {
+	var $this = mains[i];
+	myid = $this.getAttribute("data");
 	if (typeof Joomla === 'undefined' || typeof Joomla.getOptions === 'undefined') {
 		console.log('Simple Isotope : Joomla /Joomla.getOptions  undefined');
 	} else {
 		 options = Joomla.getOptions('mod_simple_isotope_'+myid);
 	}
-	if (typeof options === 'undefined' ) { // cache Joomla problem
+	/*if (typeof options === 'undefined' ) { // cache Joomla problem
 		request = {
 			'option' : 'com_ajax',
 			'module' : 'simple_isotope',
@@ -40,147 +49,130 @@ $('.isotope-main').each(function() {
 					return true;
 				}
 			});
-	}
+	}*/
 	if (typeof options === 'undefined' ) {return false}
     cookie_name = 'simple_isotope_'+myid;
-	iso_cat_k2($,myid,options);
-})
-if (typeof options === 'undefined' ) {return false}
-
-init_readmore($);
-})
-function init_readmore($) {
-$toggle = jQuery('.isotope_grid'),
-$article = jQuery('.isotope_an_article'),
-$article_frame=jQuery('iframe#isotope_article_frame');
-if ((options.readmore == 'ajax') || (options.readmore == 'iframe'))  {
-	$height = $toggle.height();
-	$width = $toggle.width();
-	$('.isotope-readmore-title').on('click touchstart', function (e) {
-		$pos = $('.isotope-div').offset().top;
-		$("html, body").animate({ scrollTop: $pos }, "slow");
-		e.stopPropagation();
-		e.preventDefault();		
-		$toggle.addClass('isotope-hide');
-		$article.addClass('isotope-open');
-		$article.removeClass('isotope-hide');
-		$article.height('auto');
-		$article.addClass('article-loading');
-		if (options.readmore == 'ajax') {
-			$("#isotope_an_article").html('');
-			var token = $("#token").attr("name");
-			request = {
-				'option' : 'com_ajax',
-				'module' : 'simple_isotope',
-				'data'   : 'readmore',
-				'id'     : myid,
-				'article': this.dataset['articleid'],
-				'entree': options.entree,			
-				'format' : 'json'
-			};
-			jQuery.ajax({
-				type   : 'POST',
-				data   : request,
-				success: function (result) {
-					$article.removeClass('article-loading');
-					$article.height($height);
-					$article.width($width);
-					displayArticle(result); 
-				},
-				error: function(message) {console.log(message.responseText)}
-			});
-		} else if (options.readmore == 'iframe') {	
-	/* iFrame */
-			$article_frame.height(0);
-			$article_frame.width(0);
-			$char = '?';
-			if ( this.dataset['href'].indexOf('?') > 0 ) $char = '&';
-			$article_frame.attr('src',this.dataset['href']+$char+'tmpl=component');
-			$article.addClass('article-loading');
-			$close = $('button.close');
-			$close.addClass('isotope-hide');
-			$close.on('click touchstart', resetToggle);
-		}
-	// listen to exit event
-		$toggle.on('click touchstart', resetToggle);
-	});
+	iso_cat_k2(myid,options);
 }
-$('.isotope-div').on('click touchstart', function() {
-	resetToggle();
-});
-
-$('.isotope_button-group').on('click touchstart', function() {
-	resetToggle();
-});
-
-resetToggle = function () {
-	if ($toggle.hasClass('isotope-hide')) {
-		$article.removeClass('isotope-open');
-		$article.addClass('isotope-hide');
-		$toggle.removeClass('isotope-hide');
-		$('.isotope-main .isotope-div').trigger('refresh');
-	} else if (jQuery("#isotope_an_article").hasClass('isotope-open')) {
-		jQuery("#isotope_an_article").removeClass('isotope-open');
-		jQuery("#isotope_an_article").addClass('isotope-hide');
-		jQuery("#isotope_an_article").html('');
-		$('.isotope-main .isotope-div').trigger('refresh');
+grid_toggle = document.querySelector('.isotope_grid')
+iso_article = document.querySelector('.isotope_an_article')
+iso_div = document.querySelector('.isotope-main .isotope-div')
+article_frame=document.querySelector('iframe#isotope_article_frame')
+if ((options.readmore == 'ajax') || (options.readmore == 'iframe'))  {
+	iso_height = grid_toggle.offsetHeight;
+	iso_width = grid_toggle.offsetWidth;
+	readmoretitles =  document.querySelectorAll('.isotope-readmore-title');
+	for (var t=0;t < readmoretitles.length;t++ ) {
+		['click', 'touchstart'].forEach(type => {
+			readmoretitles[t].addEventListener(type,function(e) {	
+				$pos = iso_div.offsetTop;
+				document.querySelector("body").scrollTo($pos,1000)
+				e.stopPropagation();
+				e.preventDefault();		
+				addClass(grid_toggle,'isotope-hide');
+				addClass(iso_article,'isotope-open');
+				removeClass(iso_article,'isotope-hide');
+				iso_article.offsetHeight ='auto';
+				addClass(iso_article,'article-loading');
+				if (options.readmore == 'ajax') {
+					document.querySelector("#isotope_an_article").innerHTML = '';
+					var mytoken = document.getElementById("token");
+					token = mytoken.getAttribute("name");
+					/* en attente bug Joomla 4 : ajax module */
+					url = '?option=com_ajax&module=simple_isotope&article='+ this.dataset['articleid']+'&entree=articles&data=readmore&format=json&id='+myid;
+					Joomla.request({
+						method : 'POST',
+						url : url,
+						onSuccess: function(data, xhr) {
+							removeClass(iso_article,'article-loading');
+							var result = JSON.parse(data);
+							iso_article.style.height = iso_height;
+							iso_article.style.width = iso_width+'px';
+							if (!result.success) result.success = true; 
+							displayArticle(result.data); 
+						},
+						onError: function(message) {console.log(message.responseText)}
+					}) 
+				} else if (options.readmore == 'iframe') {	
+	/* iFrame */
+					if (iso_height == 0) iso_height="100vh";
+					article_frame.style.height = 0;
+					article_frame.style.width = 0;
+					achar = '?';
+					if ( this.dataset['href'].indexOf('?') > 0 ) achar = '&';
+					article_frame.setAttribute('src',this.dataset['href']+achar+'tmpl=component');
+					addClass(iso_article,'article-loading');
+					$close = document.querySelector('button.close');
+					addClass($close,'isotope-hide');
+					['click', 'touchstart'].forEach(type => {
+							$close.addEventListener(type,function(e) {
+									e.stopPropagation();
+									e.preventDefault();		
+									resetToggle();
+							});
+					})
+				}
+	// listen to exit event
+				['click', 'touchstart'].forEach(type => {
+					grid_toggle.addEventListener(type, function(e) {
+							e.stopPropagation();
+							e.preventDefault();		
+							resetToggle();
+							})
+				})
+			})
+		});
 	}
 }
-$article_frame.on("load",function(){
-	$article.removeClass('article-loading');
-	if ($close)	$close.removeClass('isotope-hide');
-	$article_frame.height($height);
-	$article_frame.width($width);
-	}).show(); 
+['click', 'touchstart'].forEach(type => {
+	iso_div.addEventListener(type, function(e) {
+		resetToggle();
+	});
+})
+
+resetToggle = function () {
+	if (grid_toggle && hasClass(grid_toggle,'isotope-hide')) {
+		removeClass(iso_article,'isotope-open');
+		addClass(iso_article,'isotope-hide');
+		removeClass(grid_toggle,'isotope-hide');
+		iso_div.refresh;
+	} else if (iso_article && hasClass(iso_article,'isotope-open')) {
+		removeClass(iso_article,'isotope-open');
+		addClass(iso_article,'isotope-hide');
+		iso_article.innerHTML('');
+		iso_div.refresh;
+	}
 }
+if (article_frame) {
+	article_frame.addEventListener('load',function(){ // Joomla 4.0
+		removeClass(iso_article,'article-loading');
+		if ($close)	removeClass($close,'isotope-hide');
+		article_frame.style.height= iso_height;
+		article_frame.style.width =iso_width+'px';
+		}); 
+}
+}) // end of ready --------------
 function displayArticle(result) {
 	var html ='';
-
+	// Joomla 4.0 : replace result.data by result
     if (result.success) {
-		$info = result.data;
-		for (var i=0; i< $info.data.length; i++) {
-            html += '<h1>'+$info.data[i].title+'<button type="button" class="close">X</button></h1>';
-			if ((options.entree == "k2") && ($info.data[i].image)) {
-				html += '<span class="itemImage"><a class="moduleItemImage" href="'+$info.data[i].link+'">';
-				html += '<img src="'+$info.data[i].image+'" alt="'+$info.data[i].title+'" /></a></span>';
-			}
-			html +=$info.data[i].fulltext;
-			if ($info.data[i].fulltext =="") html += $info.data[i].introtext;
-			if ((options.entree == "k2") && ($info.data[i].extra_fields)) {
-				html +='<div class="itemExtraFields"><ul>';
-				if (Array.isArray($info.data[i].extra_fields) ) {
-					$l = $info.data[i].extra_fields.length;
-					for (var x=0; x< $l; x++) {
-						html += '<li class="typeTextfield">';
-						html += '<span class="itemExtraFieldsLabel">'+$info.data[i].extra_fields[x].name+"</span>";
-						html += '<span class="itemExtraFieldsValue">'+$info.data[i].extra_fields[x].value+"</span>";
-						html += "</li>";
-					}
-				} else { 
-					$l = Object.values($info.data[i].extra_fields).length;
-					for (var x in $info.data[i].extra_fields ) {
-					html += '<li class="typeTextfield">';
-					html += '<span class="itemExtraFieldsLabel">'+$info.data[i].extra_fields[x].name+"</span>";
-					html += '<span class="itemExtraFieldsValue">'+$info.data[i].extra_fields[x].value+"</span>";
-					html += "</li>";
-				}
-
-				}
-				html +='</ul></div>';
-			}
-			if ($info.data[i].scripts.length > 0) {
-				for (var s=0; s < $info.data[i].scripts.length ;s++) {
+		for (var i=0; i<result.data.length; i++) {
+            html += '<h1>'+result.data[i].title+'<button type="button" class="close">X</button></h1>';
+			html +=result.data[i].fulltext;
+			if (result.data[i].fulltext =="") html += result.data[i].introtext;
+			if (result.data[i].scripts.length > 0) {
+				for (var s=0; s < result.data[i].scripts.length ;s++) {
 					var scriptElement = document.createElement( "script" );
 					scriptElement.addEventListener(	"load",function() {
 							console.log( "Successfully loaded scripts" );
 						}
 					);
- 					scriptElement.src = $info.data[i].scripts[s];
+ 					scriptElement.src = result.data[i].scripts[s];
 					document.head.appendChild( scriptElement );
 				}
 			}
-			if ($info.data[i].css.length > 0) {
-				for (var s=0; s < $info.data[i].css.length ;s++) {
+			if (result.data[i].css.length > 0) {
+				for (var s=0; s < result.data[i].css.length ;s++) {
 					var link = document.createElement( "link" );
 					link.type = "text/css";
 					link.rel = "stylesheet";
@@ -189,15 +181,18 @@ function displayArticle(result) {
 							console.log( "Successfully loaded css" );
 						}
 					);
- 					link.href = $info.data[i].css[s];
+ 					link.href = result.data[i].css[s];
 					document.head.appendChild( link );
 				}
 			}
-			
         }
-        jQuery("#isotope_an_article").html(html);		
-		$close = jQuery('button.close'),
-		$close.on('click touchstart', resetToggle);
+        iso_article.innerHTML = html;
+		$close = document.querySelector('button.close');
+		// addClass($close,'isotope-hide');
+		['click', 'touchstart'].forEach(type => {
+				$close.addEventListener(type,resetToggle)
+		})							
+		
 	} else {
         html = result.message;
         if ((result.messages) && (result.messages.error)) {
@@ -207,17 +202,28 @@ function displayArticle(result) {
 		}
 	}
 }
-function iso_cat_k2 ($,myid,options) {
-	var me = "#isotope-main-"+myid+" ";
+function iso_cat_k2 (myid,options) {
 	var parent = 'cat';
-	var items_limit = options.limit_items;
-	var sav_limit = options.limit_items;
-	var empty_message = (options.empty == "true");
+	me = "#isotope-main-"+myid+" ";
+	items_limit = options.limit_items;
+	sav_limit = options.limit_items;
+	empty_message = (options.empty == "true");
 	filters = {};
-	$asc = (options.ascending == "true");
-	$sortby = options.sortby;
+	asc = (options.ascending == "true");
+	sort_by = options.sortby;
+	if (sort_by.indexOf("featured") !== -1) { // featured 
+		sortValue = sort_by.split(',');
+		asc = {};
+		for (i=0;i < sortValue.length;i++) {
+			if ( sortValue[i] == "featured"){  // featured always first
+				asc[sortValue[i]] = false ;
+			} else {
+				asc[sortValue[i]] = (options.ascending == "true");
+			}
+		}
+	}
 	if (options.limit_items == 0) { // no limit : hide show more button
-		$(me+'.iso_button_more').hide();
+		document.querySelector(me+'.iso_button_more').style.display = "none";
 	}
 	if ((options.default_cat == "") || (options.default_cat == null) || (typeof options.default_cat === 'undefined'))
 		filters['cat'] = ['*']
@@ -234,15 +240,6 @@ function iso_cat_k2 ($,myid,options) {
 		$arr = $cookie.split('&');
 		$arr.forEach(splitCookie);
 	}
-	if ((options.layout == "masonry") || (options.layout == "fitRows") || (options.layout == "packery"))
-		$('#isotope-main-' + myid + ' .isotope_item').css("width", (100 / parseInt(options.nbcol)-2)+"%" );
-	if (options.layout == "vertical") 
-		$('#isotope-main-' + myid + ' .isotope_item').css("width", "100%" );
-	$('#isotope-main-' + myid + ' .isotope_item').css("background", options.background );
-	if (parseInt(options.imgmaxheight) > 0) 
-		$('#isotope-main-' + myid + ' .isotope_item img').css("max-height",options.imgmaxheight + "px");
-	if (parseInt(options.imgmaxwidth) > 0) 
-		$('#isotope-main-' + myid + ' .isotope_item img').css("max-width",options.imgmaxwidth + "px");
 	if (options.displayrange == "true") {
 		if (!min_range) {
 			min_range = parseInt(options.minrange);
@@ -260,17 +257,11 @@ function iso_cat_k2 ($,myid,options) {
 			onChange: rangeUpdated,
 		});
 	}		
-
-	function rangeUpdated(){
-		range_sel = rangeSlider.getValue();
-		range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
-		CG_Cookie_Set(myid,'range',range_sel);
-		$grid.isotope();
-	};
-    if (typeof $sortby === 'string') {
-		$sortby = $sortby.split(',');
+    if (typeof sort_by === 'string') {
+		sort_by = sort_by.split(',');
 	}
-	var $grid = $(me + '.isotope_grid').isotope({ 
+	var grid = document.querySelector(me + '.isotope_grid');
+	iso = new Isotope(grid,{ 
 			itemSelector: 'none',
 			percentPosition: true,
 			layoutMode: options.layout,
@@ -281,36 +272,38 @@ function iso_cat_k2 ($,myid,options) {
 				click: '[data-click] parseInt',
 				rating: '[data-rating] parseInt',
 				id: '[data-id] parseInt',
-				blog: '[data-blog] parseInt'
+				blog: '[data-blog] parseInt',
+				featured: '[data-featured] parseInt'
 			},
-			sortBy: $sortby,
-			sortAscending: $asc,
-			filter: function(){ return grid_filter($(this))	}			
-	}); // end of grid
-	
-	$grid.imagesLoaded( function() {
-		$grid.isotope( 'option', { itemSelector: '.isotope_item' });
-		var $items = $grid.find('.isotope_item');
-		$grid.isotope( 'appended', $items );
+			sortBy: sort_by,
+			sortAscending: asc,
+			isJQueryFiltering : false,
+			filter: function(itemElem ){ if (itemElem) return grid_filter(itemElem)	}				
+	}); // end of Isotope definition
+	imagesLoaded(grid, function() {
+		iso.options.itemSelector ='.isotope_item';
+		var $items = Array.prototype.slice.call(iso.element.querySelectorAll('.isotope_item'));
+		iso.appended($items );
 		updateFilterCounts();
-		if ($sortby == "random") {
-			$grid.isotope('shuffle');
-		} else {
-			$grid.isotope();
+		if (sort_by == "random") {
+			iso.shuffle();
 		}
-		$width = $toggle.width();
-		$height = $toggle.height();
+		if (typeof $toogle !== 'undefined') {
+			iso_width = grid_toggle.width();
+			iso_height = grid_toggle.height();
+		}
 	});
-	$(me + '.isotope-div').on("refresh", function(){
- 	  $grid.isotope();
+	iso_div = document.querySelector(me + '.isotope-div');
+	iso_div.addEventListener("refresh", function(){
+ 	  iso.arrange();
 	});
     if (options.pagination == 'infinite') { 
 		// --------------> infinite scroll <----------------
-		var iso = $grid.data('isotope');
-		$grid.infiniteScroll({
+		var elem = Isotope.data('.isotope_grid');
+		var infScroll = new InfiniteScroll('.isotope_grid',{
 			path: getPath,
 			append: '.isotope_item',
-			outlayer: iso,
+			outlayer: elem,
 		    status: '.page-load-status',
 			// debug: true,
 		});
@@ -319,424 +312,695 @@ function iso_cat_k2 ($,myid,options) {
 			currentpage = this.loadCount;
 			return '?start='+(currentpage+1)*options.page_count;
 		}
+		let more = document.querySelector(me+'.iso_button_more');		
 		if (options.infinite_btn == "true") {
-			$grid.infiniteScroll('option',{
-				button: '.iso_button_more',
-				loadOnScroll: false,
-			});
-			let $viewMoreButton = $('.iso_button_more');
-			jQuery(me+'.iso_button_more').show();
-			$viewMoreButton.on( 'click', function() {
-  // load next page
-			$grid.infiniteScroll('loadNextPage');
-  // enable loading on scroll
-			$grid.infiniteScroll( 'option', {
-				loadOnScroll: true,
-			});
-  // hide button
-			$viewMoreButton.hide();
-			});
+			infScroll.option({button:'.iso_button_more',loadOnScroll: false});
+			let $viewMoreButton = document.querySelector('.iso_button_more');
+			more.style.display = "block";
+			['click', 'touchstart'].forEach(type => {
+				$viewMoreButton.addEventListener( type, function(e) {
+					e.stopPropagation();
+					e.preventDefault();		
+				// load next page
+					infScroll.loadNextPage();
+					// enable loading on scroll
+					infScroll.option({loadOnScroll: true});
+				// hide button
+					$viewMoreButton.style.display = "none";
+					event.preventDefault();
+				});
+			})
 		} else {
-			jQuery(me+'.iso_div_more').hide();
+			more.style.display = "hide";
 		}
-		$grid.on( 'append.infiniteScroll', function( event, body, path, items, response ) {
+		infScroll.on( 'append', function( body, path, items, response ) {
 			// console.log(`Appended ${items.length} items on ${path}`);
 			infinite_buttons(items);
-			if ((options.layout == "masonry") || (options.layout == "fitRows") || (options.layout == "packery"))
-				$('#isotope-main-' + myid + ' .isotope_item').css("width", (100 / parseInt(options.nbcol)-2)+"%" );
-			if (options.layout == "vertical") 
-				$('#isotope-main-' + myid + ' .isotope_item').css("width", "100%" );
-			$('#isotope-main-' + myid + ' .isotope_item').css("background", options.background );
-			if (parseInt(options.imgmaxheight) > 0) 
-				$('#isotope-main-' + myid + ' .isotope_item img').css("max-height",options.imgmaxheight + "px");
-			if (parseInt(options.imgmaxwidth) > 0) 
-				$('#isotope-main-' + myid + ' .isotope_item img').css("max-width",options.imgmaxwidth + "px");
-			$grid.isotope();
-		});
+			// iso.arrange();
+		 });
 	}
 	// --------------> end of infinite scroll <----------------
-	
-	$(me+'.sort-by-button-group').on( 'click', 'button', function() {
-		var sortValue = $(this).attr('data-sort-value');
-		if (sortValue == "random") {
-			CG_Cookie_Set(myid,'sort',sortValue+'-');
-			$grid.isotope('shuffle');
-			return;
-		} 
-		sens = $(this).attr('data-sens');
-		sortValue = sortValue.split(',');
-		if (!$(this).hasClass('is-checked')) { // first time sorting
-			sens = $(this).attr('data-init');
-			$(this).attr("data-sens",sens);
-			asc=true;
-			if (sens== "-") asc = false;
-		} else { // invert order
-			if (sens == "-") {
-				$(this).attr("data-sens","+");
-				asc = true;
-			} else {
-				$(this).attr("data-sens","-");
-				asc = false;
+	hamburgerbtn = document.getElementById('offcanvas-hamburger-btn');
+	if (hamburgerbtn ) {
+	// Offcanvas is on ----------------------------------
+		['click'].forEach(type => {
+			hamburgerbtn.addEventListener(type,function(e){
+	// conflict rangeslider/offcanvas : add a timer
+				var selector = '.offcanvas';
+				var waitForEl = function (callback, maxTimes = false) {
+					if (maxTimes === false || maxTimes > 0) {
+						maxTimes != false && maxTimes--;
+						setTimeout(function () {
+							waitForEl(callback, maxTimes);
+						}, 100);
+					} else {
+						if (typeof rangeSlider !== 'undefined')	rangeSlider.onResize();
+						callback();
+					}
+				};
+				waitForEl(function () {
+					document.querySelector(selector); // do something with selector
+				}, 3);		
+			})
+		})
+	// set default buttons in cloned area
+		if ( (filters['cat'][0] != '*') || (filters['tags'][0] != '*') ) { // default value set for tags or categories ?
+			grouptype = ['cat','tags']
+			optionstype = [options.displayfiltercat,options.displayfilter]
+			for (var g = 0; g < grouptype.length;g++) {
+				if (filters[grouptype[g]][0] == "*") continue; // ignore 'all' value
+				clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[grouptype[g]]+'"]');
+				if (!clone_exist) {
+					agroup = document.querySelectorAll(me+'.filter-button-group-'+grouptype[g]+' button'); 
+					for (var i=0; i< agroup.length;i++) {
+						if (agroup[i].getAttribute('data-sort-value') == filters[grouptype[g]]) {
+							create_clone_button(grouptype[g],filters[grouptype[g]],agroup[i].textContent,optionstype[g],'');
+							create_clone_listener(filters[grouptype[g]]);
+						}
+					}
+				}
 			}
-		}
-		CG_Cookie_Set(myid,'sort',sortValue+'-'+asc);
-		$grid.isotope({ 
-			sortBy: sortValue, 
-			sortAscending: asc,
-		});
-	});
-	$(me+'.sort-by-button-group').each( function( i, buttonGroup ) {
-		var $buttonGroup = jQuery( buttonGroup );
-		$buttonGroup.find('.is-checked').removeClass('is-checked');
-		$buttonGroup.children().each(function(j, child) {
-			var sortValue = $(this).attr('data-sort-value');
-			sortValue = sortValue.split(',');
-			if ((Array.isArray($sortby) && (sortValue[0] == $sortby[0])) || 
-			    ((typeof $sortby === 'string') && (sortValue[0] == $sortby)) ) {
-				jQuery(this).addClass('is-checked');
-				jQuery(this).attr("data-sens","+");
-				if (!$asc) jQuery(this).attr("data-sens","-"); // $asc = boolean
-			}
-		});
-	});
-	$(me+'.sort-by-button-group').each( function( i, buttonGroup ) {
-		var $buttonGroup = $( buttonGroup );
-		$buttonGroup.on( 'click', 'button', function() {
-			$buttonGroup.find('.is-checked').removeClass('is-checked');
-			$( this ).addClass('is-checked');
-		});
-	});
-	
-// use value of search field to filter
-	var $quicksearch = $(me+'.quicksearch').keyup( 
-		debounce( function() {
-			qsRegex = new RegExp( $quicksearch.val(), 'gi' );
-			CG_Cookie_Set(myid,'search',$quicksearch.val());
-			$grid.isotope();
-			updateFilterCounts();
-		}) 
-	);
-//  clear search button + reset filter buttons
-	$(me+'.ison-cancel-squared').on( 'click', function() {
-		$(me+'.quicksearch').val("");
-		qsRegex = new RegExp( $quicksearch.val(), 'gi' );
-		CG_Cookie_Set(myid,'search',$quicksearch.val());
-		if (rangeSlider) {
-			range_sel = range_init;
-			ranges = range_sel.split(",");
-			rangeSlider.setValues(parseInt(ranges[0]),parseInt(ranges[1]));
-			CG_Cookie_Set(myid,'range',range_sel);
-		}
-		filters['cat'] = ['*']
-		filters['tags'] = ['*']
-		filters['lang'] = ['*']
-		filters['alpha'] = ['*']
-		$(me+'.filter-button-group-cat').each( function( i, buttonGroup ) {
-			var $buttonGroup = $( buttonGroup );
-			$buttonGroup.each( function() {
-				$(this).find('.is-checked').removeClass('is-checked');
-				$(this).find('[data-sort-value="*"]').addClass('is-checked');
-				$(this).find('[data-all="all"]').attr('selected',true); // list : all
-			});
-		});
-		$(me+'.filter-button-group-tags').each( function( i, buttonGroup ) {
-			var $buttonGroup = $( buttonGroup );
-			$buttonGroup.each( function() {
-				$(this).find('.is-checked').removeClass('is-checked');
-				$(this).find('[data-sort-value="*"]').addClass('is-checked');
-				$(this).find('[data-all="all"]').attr('selected',true); // list : all
-			});
-		});
-		$(me + '.filter-button-group-fields').each(function(i, buttonGroup) {
-			var $buttonGroup = $( buttonGroup ).attr('data-filter-group');
-			filters[$buttonGroup] = ['*'];
-			$(this).find('.is-checked').removeClass('is-checked');
-			$(this).find('.iso_hide_elem').removeClass('iso_hide_elem');
-			$(this).find('[data-sort-value="*"]').addClass('is-checked');
-			$(this).find('[data-all="all"]').attr('selected',true); // list : all
-		});
-		$(me+'.iso_lang').each( function( i, buttonGroup ) {
-			var $buttonGroup = $( buttonGroup );
-			$buttonGroup.each( function() {
-				$(this).find('.is-checked').removeClass('is-checked');
-				$(this).find('[data-sort-value="*"]').addClass('is-checked');
-				$(this).find('[data-all="all"]').attr('selected',true); // list : all
-			});
-		});
-		$(me+'.filter-button-group-alpha').each( function( i, buttonGroup ) {
-			var $buttonGroup = $( buttonGroup );
-			$buttonGroup.each( function() {
-				$(this).find('.is-checked').removeClass('is-checked');
-				$(this).find('[data-sort-value="*"]').addClass('is-checked');
-				$(this).find('[data-all="all"]').attr('selected',true); // list : all
-			});
-		});
-		update_cookie_filter(filters);
-		$grid.isotope();
-		updateFilterCounts();
-		$(me+'.quicksearch').focus();
-	});
-	if  ((options.displayfilter == "list") || (options.displayfilter == "listex")) { 
-		$(me+'.filter-button-group-tags').on( 'change', function() {
-			filter_list($(this));
-		});
-		$(me + '.filter-button-group-fields').on( 'change', function() {
-			set_filter_list($(this))
-		});
-	} 
-	if  ((options.displayfiltercat == "list")  || (options.displayfiltercat == "listex")) { 
-		$(me+'.filter-button-group-cat').on( 'change', function() {
-			filter_list($(this));
-		});
-		$(me + '.filter-button-group-fields').on( 'change', function() {
-			set_filter_list($(this))
-		});
-		if ((options.article_cat_tag == "tagsfields") || (options.article_cat_tag == "cattagsfields"))  { // fields + tags
-			$(me+'.filter-button-group-tags').on( 'change', function() {
-				filter_list($(this));
-			});
-		}
-	} 
-	if ((options.displayfiltercat == "multi") || (options.displayfiltercat == "multiex")) {
-		$(me+'.filter-button-group-cat').on( 'click', 'button', function() {
-			filter_multi($(this));
-		});
-		$(me+'.filter-button-group-cat').each( function( i, buttonGroup ) {
-			set_buttons_multi($( buttonGroup ));
-		});
-		if (options.article_cat_tag == "tagsfields") { // fields + tags
-			$(me+'.filter-button-group-tags').on( 'click', 'button', function() {
-				filter_multi($(this));
-			});
-			$(me+'.filter-button-group-tags').each( function( i, buttonGroup ) {
-				set_buttons_multi($( buttonGroup ));
-			});
 		}
 	}
-	if ((options.displayfilter == "multi") || (options.displayfilter == "multiex")) { 
-		$(me+'.filter-button-group-tags').on( 'click', 'button', function() {
-			filter_multi($(this));
+	var sortbybutton = document.querySelectorAll(me+'.sort-by-button-group button');
+	for (var i=0; i< sortbybutton.length;i++) {
+		['click', 'touchstart'].forEach(type => {
+			sortbybutton[i].addEventListener(type,function(e) {
+				e.stopPropagation();
+				e.preventDefault();		
+				update_sort_buttons(this);
+				for (var j=0; j< sortbybutton.length;j++) {
+					sortbybutton[j].classList.remove('is-checked');
+				}
+				this.classList.add('is-checked');
+			});
+		})
+	}
+// use value of search field to filter
+	var quicksearch = document.querySelector(me+'.quicksearch');
+	if (quicksearch) {
+		quicksearch.addEventListener('keyup',debounce( function() {
+			qsRegex = new RegExp( quicksearch.value, 'gi' );
+			CG_Cookie_Set(myid,'search',quicksearch.value);
+			iso.arrange();
+			updateFilterCounts();
+		}));
+	}
+//  clear search button + reset filter buttons
+    var cancelsquarred = document.querySelectorAll(me+'.ison-cancel-squared');
+	for (var cl=0; cl< cancelsquarred.length;cl++) {
+	['click', 'touchstart'].forEach(type => {
+		cancelsquarred[cl].addEventListener( type, function(e) {
+			e.stopPropagation();
+			e.preventDefault();	
+			if (quicksearch) {
+				quicksearch.value = "";
+			}
+			qsRegex = new RegExp( "", 'gi' );
+			CG_Cookie_Set(myid,'search',"");
+			if (rangeSlider) {
+				range_sel = range_init;
+				ranges = range_sel.split(",");
+				rangeSlider.setValues(parseInt(ranges[0]),parseInt(ranges[1]));
+				CG_Cookie_Set(myid,'range',range_sel);
+			}
+			filters['cat'] = ['*']
+			filters['tags'] = ['*']
+			filters['lang'] = ['*']
+			filters['alpha'] = ['*']
+			grouptype = ['cat','tags','alpha','fields']
+			for (var g = 0; g < grouptype.length;g++) {
+				agroup = document.querySelectorAll(me+'.filter-button-group-'+grouptype[g]+' button'); 
+				for (var i=0; i< agroup.length;i++) {
+					agroup[i].classList.remove('is-checked');
+					if (agroup[i].getAttribute('data-sort-value') == "*") addClass(agroup[i],'is-checked');
+					if (agroup[i].getAttribute('data-all') == "all") agroup[i].setAttribute('selected',true);
+					if (grouptype[g] == 'fields') {
+						removeClass(agroup[i],'iso_hide_elem');
+						myparent = agroup[i].parentNode.getAttribute('data-filter-group');
+						if (myparent) filters[myparent] = ['*'];
+					}
+				}
+			}
+			agroup = document.querySelectorAll(me+'.iso_lang button');
+			for (var i=0; i< agroup.length;i++) {
+				agroup[i].classList.remove('is-checked');
+				if (agroup[i].getAttribute('data-sort-value') == "*") addClass(agroup[i],'is-checked');
+				if (agroup[i].getAttribute('data-all') == "all") agroup[i].setAttribute('selected',true);
+			}
+			agroup= document.querySelectorAll(me+'select[id^="isotope-select-"]');
+			for (var i=0; i< agroup.length;i++) {
+				var myval = agroup[i].parentElement.parentElement.parentElement.getAttribute('data-filter-group');
+				var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+myval);
+				var choicesInstance = elChoice.choicesInstance;
+				choicesInstance.removeActiveItems();
+				choicesInstance.setChoiceByValue('')
+				filters[myval] = ['*']
+			};
+			$buttons = document.querySelectorAll('#clonedbuttons .is-checked');
+			for (var i=0; i< $buttons.length;i++) { // remove buttons
+				$buttons[i].remove(); 
+			}
+			update_cookie_filter(filters);
+			iso.arrange();
+			updateFilterCounts();
+			if (quicksearch) {
+				quicksearch.focus();
+			}
 		});
-		$(me+'.filter-button-group-tags').each( function( i, buttonGroup ) {
-			set_buttons_multi($( buttonGroup ));
-		});
-		$(me + '.filter-button-group-fields').on( 'click', 'button', function() {
-			filter_multi($(this));
-		});
-		$(me + '.filter-button-group-fields').each( function( i, buttonGroup ) {
-			set_buttons_multi($( buttonGroup ));
-		});		
+	})
+	}
+	if  (options.displayfilter == "listmulti") 	{ 
+		events_listmulti('tags');
+	}
+	if (options.displayfiltercat == "listmulti") {
+		events_listmulti('cat');
+	}
+	if  (options.displayfilterfields == "listmulti")	{ 
+		events_listmulti('fields');
+	}
+	if  ((options.displayfiltercat == "list") || (options.displayfiltercat == "listex")) { 
+		events_list('cat');
+	} 
+	if  ((options.displayfilter == "list") || (options.displayfilter == "listex")) { 
+		events_list('tags');
+	} 
+	if  ((options.displayfilterfields == "list") || (options.displayfilterfields == "listex")) { 
+		events_list('fields');
+	} 
+	if ((options.displayfiltercat == "multi") || (options.displayfiltercat == "multiex")  ) {
+		events_multibutton('cat')
+	}
+	if ((options.displayfilter == "multi") || (options.displayfilter == "multiex")  ) {
+		events_multibutton('tags')
+	}
+	if ((options.displayfilterfields == "multi") || (options.displayfilterfields == "multiex")) { 
+		events_multibutton('fields');
 	}
 	if (options.language_filter == "multi") { 
-		$(me + '.iso_lang').on( 'click', 'button', function() {
-			filter_multi($(this));
-		});
-		$(me + '.iso_lang').each( function( i, buttonGroup ) {
-			set_buttons_multi($( buttonGroup ));
-		});
-	}
+		events_multibutton('lang')	}
 	if (options.displayalpha == "multi") { 
-		$(me + '.filter-button-group-alpha').on( 'click', 'button', function() {
-			filter_multi($(this));
-		});
-		$(me + '.filter-button-group-alpha').each( function( i, buttonGroup ) {
-			set_buttons_multi($( buttonGroup ));
-		});
+		events_multibutton('alpha')
 	}
 	if (options.displayfiltercat == "button"){
-		$(me+'.filter-button-group-cat').on( 'click', 'button', function() {
-			filter_button($(this));
-		});
-		$(me+'.filter-button-group-cat').each( function( i, buttonGroup ) {
-			set_buttons($( buttonGroup ));
-		});
-		if ((options.article_cat_tag == "tagsfields") || (options.article_cat_tag == "cattagsfields")) { // fields + tags
-			$(me+'.filter-button-group-tags').on( 'click', 'button', function() {
-				filter_button($(this));
-			});
-			$(me+'.filter-button-group-tags').each( function( i, buttonGroup ) {
-				set_buttons($( buttonGroup ));
-			});
-		}
+		events_button('cat');
 	}
 	if (options.displayfilter == "button") { 
-		$(me+'.filter-button-group-tags').on( 'click', 'button', function() {
-			filter_button($(this));
-		});
-		$(me+'.filter-button-group-tags').each( function( i, buttonGroup ) {
-			set_buttons($( buttonGroup ));
-		});
-		$(me + '.filter-button-group-fields').on( 'click', 'button', function() {
-			filter_button($(this));
-		});
-		$(me + '.filter-button-group-fields').each( function( i, buttonGroup ) {
-			set_buttons($( buttonGroup ));
-		});
+		events_button('tags');
+	}
+	if (options.displayfilterfields == "button") { 
+		events_button('fields');
 	}
 	if (options.language_filter == "button") { 
-		$(me + '.iso_lang').on( 'click', 'button', function() {
-			filter_button($(this));
-		});
-		$(me + '.iso_lang').each( function( i, buttonGroup ) {
-			set_buttons($( buttonGroup ));
-		});
+		events_button('lang');
 	}
 	if (options.displayalpha == "button") { 
-		$(me+'.filter-button-group-alpha').on( 'click', 'button', function() {
-			filter_button($(this));
-		});
-		$(me+'.filter-button-group-alpha').each( function( i, buttonGroup ) {
-			set_buttons($( buttonGroup ));
-		});
+		events_button('alpha');
 	}
-	$(me+'.iso_button_more').on('click', function(e) {
-		e.preventDefault();
-		if (items_limit > 0) {
-			items_limit = 0; // no limit
-			$(this).text(options.libless);
+	more = document.querySelector(me+'.iso_button_more');
+	if (more) {
+		['click', 'touchstart'].forEach(type => {
+			more.addEventListener(type, function(e) {
+				e.stopPropagation();
+				e.preventDefault();		
+				if (items_limit > 0) {
+					items_limit = 0; // no limit
+					this.textContent = options.libless;
+				} else {
+					items_limit = options.limit_items; // set limit
+					this.textContent = options.libmore;
+				}
+				updateFilterCounts();
+			});
+		})
+	}
+	//-------------------- offcanvas : update isotope width
+	var myOffcanvas = document.getElementById('offcanvas_isotope');
+	if (myOffcanvas) {
+		myOffcanvas.addEventListener('hidden.bs.offcanvas', function () {
+			document.getElementById('offcanvas_isotope').classList.remove('offcanvas25');
+			document.getElementsByClassName('isotope_grid')[0].classList.remove('isogrid75');
+			document.getElementsByClassName('isotope_grid')[0].classList.remove('offstart');
+			document.getElementsByClassName('isotope_grid')[0].classList.remove('offend');
+			iso.arrange();
+		})
+		myOffcanvas.addEventListener('show.bs.offcanvas', function () {
+			document.getElementById('offcanvas_isotope').classList.add('offcanvas25');
+			if (document.getElementById('offcanvas_isotope').classList.contains("offcanvas-start")) 
+				document.getElementsByClassName('isotope_grid')[0].classList.add('offstart');
+			if (document.getElementById('offcanvas_isotope').classList.contains("offcanvas-end")) 
+				document.getElementsByClassName('isotope_grid')[0].classList.add('offend');
+			iso.arrange();
+		})
+	}
+}// end of iso_cat_k2
+function rangeUpdated(){
+	range_sel = rangeSlider.getValue();
+	range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
+	CG_Cookie_Set(myid,'range',range_sel);
+	iso.arrange();
+}
+// create listmulti eventListeners
+function events_listmulti(component) {
+	agroup= document.querySelectorAll(me+'select[id^="isotope-select-'+component+'"]');
+	for (var i=0; i< agroup.length;i++) {
+		agroup[i].addEventListener('choice',function(evt, params) {
+			filter_list_multi(this,evt,'choice');
+		});
+		agroup[i].addEventListener('removeItem',function(evt, params) {
+			filter_list_multi(this,evt,'remove');
+		});
+		$parent = agroup[i].parentElement.parentElement.parentElement.getAttribute('data-filter-group');
+		if (typeof filters[$parent] === 'undefined' ) { 
+			filters[$parent] = ['*'];
+		}			
+	};	
+	if ((filters[$parent][0] != '*') && (filters[$parent].length == 1)) {
+		var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+component);
+		var choicesInstance = elChoice.choicesInstance;
+		var savefilter = filters[$parent][0];
+		choicesInstance.removeActiveItemsByValue(''); // remove all 
+		choicesInstance.setChoiceByValue(savefilter);
+		if (elChoice.parentElement.parentElement.className == "offcanvas-body") { // need clone
+			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[component]+'"]');
+			if (!clone_exist) { // create default button
+				sel = savefilter;
+				lib = choicesInstance.getValue()[0].label;
+				child = null;
+				create_clone_button(component,sel,lib,'list',child);
+				create_clone_listener(sel);
+			}
+		}
+	}	
+}
+// create list eventListeners
+function events_list(component) {
+	agroup= document.querySelectorAll(me+'.filter-button-group-'+component);
+	for (var i=0; i< agroup.length;i++) {
+		agroup[i].addEventListener('choice',function(evt, params) {
+			filter_list(this,evt,'choice')
+			});
+		agroup[i].addEventListener('removeItem',function(evt, params) {
+			filter_list(this,evt,'remove');
+		});
+			
+	};
+	var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+component);
+	if (!elChoice) return;
+	var choicesInstance = elChoice.choicesInstance;
+	choicesInstance.setChoiceByValue(filters[component]);
+	if ((elChoice.parentElement.parentElement.className == "offcanvas-body") && (filters[component] != '*')) { // need clone
+		clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[component]+'"]');
+		if (!clone_exist) { // create default button
+			sel = filters[component];
+			lib = choicesInstance.getValue().label;
+			child = null;
+			create_clone_button(component,sel,lib,'list',child);
+			create_clone_listener(sel);
+		}
+	}	
+}
+// create buttons eventListeners
+function events_button(component) {
+	if (component == "lang")
+		agroup= document.querySelectorAll(me+'.iso_lang button')
+	else 
+		agroup= document.querySelectorAll(me+'.filter-button-group-'+component+' button');
+	for (var i=0; i< agroup.length;i++) {
+		['click', 'touchstart'].forEach(type => {
+			agroup[i].addEventListener(type,function(evt) {
+				evt.stopPropagation();
+				evt.preventDefault();		
+				filter_button(this,evt)
+			// reset other buttons
+				mygroup= this.parentNode.querySelectorAll('button' );
+				for (var g=0; g< mygroup.length;g++) {
+					removeClass(mygroup[g],'is-checked');
+				}
+				addClass(this,'is-checked');
+			});
+		})
+	};
+}
+// create multiselect buttons eventListeners
+function events_multibutton(component) {
+	if (component == "lang")
+		agroup= document.querySelectorAll(me+'.iso_lang button')
+	else 
+		agroup= document.querySelectorAll(me+'.filter-button-group-'+component+' button');
+	for (var i=0; i< agroup.length;i++) {
+		['click', 'touchstart'].forEach(type =>{
+			agroup[i].addEventListener(type,function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();		
+			filter_multi(this,evt);
+			set_buttons_multi(this);
+			})
+		})
+	};
+}	
+function update_sort_buttons($this) {
+	var sortValue = $this.getAttribute('data-sort-value');
+	if (sortValue == "random") {
+		CG_Cookie_Set(myid,'sort',sortValue+'-');
+		iso.shuffle();
+		return;
+	} 
+	sens = $this.getAttribute('data-sens');
+	sortValue = sortValue.split(',');
+	if (!hasClass($this,'is-checked')) { // first time sorting
+		sens = $this.getAttribute('data-init');
+		$this.setAttribute("data-sens",sens);
+		asc=true;
+		if (sens== "-") asc = false;
+	} else { // invert order
+		if (sens == "-") {
+			$this.setAttribute("data-sens","+");
+			asc = true;
 		} else {
-			items_limit = options.limit_items; // set limit
-			$(this).text(options.libmore);
+			$this.setAttribute("data-sens","-");
+			asc = false;
 		}
-		updateFilterCounts();
-	});
-	/*------- infinite scroll : update buttons list------------*/
-	function infinite_buttons(appended_list) {
-		if (options.displayalpha != 'false') {
-		// alpha buttons list
-			for (x=0;x < appended_list.length-1;x++) {
-				alpha = appended_list[x].attributes['data-alpha'].value;
-				if ($(me+'.filter-button-group-alpha').find('.iso_button_alpha_'+alpha).length == 0) 
-					$(me+'.filter-button-group-alpha').append('<button class="'+options.button_bootstrap+' iso_button_alpha_'+alpha+'" data-sort-value="'+alpha+'" title="'+alpha+'">'+alpha+'</button>')
+	}
+	sortAsc = {};
+	for (i=0;i < sortValue.length;i++) {
+		if ( sortValue[i] == "featured"){  // featured always first
+			sortAsc[sortValue[i]] = false ;
+		} else {
+			sortAsc[sortValue[i]] = asc;
+		}
+	}
+	CG_Cookie_Set(myid,'sort',sortValue+'-'+asc);
+	iso.options.sortBy = sortValue;
+	iso.options.sortAscending = sortAsc;
+	iso.arrange();
+}
+/*------- infinite scroll : update buttons list------------*/
+function infinite_buttons(appended_list) {
+	if (options.displayalpha != 'false') {
+	// alpha buttons list
+		for (x=0;x < appended_list.length-1;x++) {
+			alpha = appended_list[x].attributes['data-alpha'].value;
+			mybutton= document.querySelector(me+'.filter-button-group-alpha .iso_button_alpha_'+alpha);
+			if (!mybutton) {
+				buttons = document.querySelector(me+'.filter-button-group-alpha');
+				var abutton = document.createElement('button');
+				abutton.classList.add('btn');
+				abutton.classList.add(options.button_bootstrap.substr(4,100).trim());
+				abutton.classList.add('iso_button_alpha_'+alpha);
+				abutton.setAttribute('data-sort-value',alpha);
+				abutton.title = alpha;
+				abutton.innerHTML = alpha;
+				buttons.append(abutton);
 			}
 		}
 	}
-	/*------- grid filter --------------*/
-	function grid_filter($this) {
-		var searchResult = qsRegex ? $this.text().match( qsRegex ) : true;
-		var	lacat = $this.attr('data-category');
-		var laclasse = $this.attr('class');
-		var lescles = laclasse.split(" ");
-		var buttonResult = false;
-		var rangeResult = true;
-		var searchAlpha = true;
-		if (filters['alpha'].indexOf('*') == -1) {// alpha filter
-			alpha = $this.attr('data-title').substring(0,1);
-			if (filters['alpha'].indexOf(alpha) == -1) return false;
+}
+/*------- grid filter --------------*/
+function grid_filter($this) {
+	var searchResult = qsRegex ? $this.textContent.match( qsRegex ) : true;
+	var	lacat = $this.getAttribute('data-category');
+	var laclasse = $this.getAttribute('class');
+	var lescles = laclasse.split(" ");
+	var buttonResult = false;
+	var rangeResult = true;
+	var searchAlpha = true;
+	if (filters['alpha'].indexOf('*') == -1) {// alpha filter
+		alpha = $this.getAttribute('data-title').substring(0,1);
+		if (filters['alpha'].indexOf(alpha) == -1) return false;
+	}
+	if (filters['lang'].indexOf('*') == -1) { 
+		lalang = $this.getAttribute('data-lang') ;
+		if (filters['lang'].indexOf(lalang) == -1)  {
+			return false;
 		}
-		if (filters['lang'].indexOf('*') == -1) { 
-			lalang = $this.attr('data-lang') ;
-			if (filters['lang'].indexOf(lalang) == -1)  {
-				return false;
+	}
+	if 	(rangeSlider) {
+		var lerange = $this.getAttribute('data-range');
+		if (range_sel != range_init) {
+			ranges = range_sel.split(",");
+			rangeResult = (parseInt(lerange) >= parseInt(ranges[0])) && (parseInt(lerange) <= parseInt(ranges[1]));
+		}
+	}
+	if ((options.article_cat_tag != "fields") && (options.article_cat_tag != "catfields") && (options.article_cat_tag != "tagsfields") && (options.article_cat_tag != "cattagsfields")) {
+		if ((filters['cat'].indexOf('*') != -1) && (filters['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
+		count = 0;
+		if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if (filters['cat'].indexOf(lacat) == -1)  {
+				return false; // n'appartient pas à la bonne classe: on ignore
+			} else { count = 1; } // on a trouvé la catégorie
+		}
+		if (filters['tags'].indexOf('*') != -1) { // tous les tags
+			return searchResult && rangeResult && true;
+		}
+		for (var i in lescles) {
+			if  (filters['tags'].indexOf(lescles[i]) != -1) {
+				buttonResult = true;
+				count += 1;
 			}
 		}
-		if 	(rangeSlider) {
-			var lerange = $this.attr('data-range');
-			if (range_sel != range_init) {
-				ranges = range_sel.split(",");
-				rangeResult = (lerange >= ranges[0]) && (lerange <= ranges[1]);
-			}
+		if (options.searchmultiex == "true")	{
+			lgth = filters['cat'].length + filters['tags'].length;
+			if ((filters['tags'].indexOf('*') != -1) || (filters['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
+			return searchResult && rangeResult && (count == lgth) ;
+		} else { 
+			return searchResult && rangeResult && buttonResult;
 		}
-		if ((options.article_cat_tag != "fields") && (options.article_cat_tag != "catfields") && (options.article_cat_tag != "tagsfields") && (options.article_cat_tag != "cattagsfields")) {
-			if ((filters['cat'].indexOf('*') != -1) && (filters['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
-			count = 0;
-			if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-				if (filters['cat'].indexOf(lacat) == -1)  {
-					return false; // n'appartient pas à la bonne classe: on ignore
-				} else { count = 1; } // on a trouvé la catégorie
-			}
-			if (filters['tags'].indexOf('*') != -1) { // tous les tags
-				return searchResult && rangeResult && true ;
-			}
+	} else { // fields
+		ix = 0;
+		if (typeof filters === 'undefined' ) { // aucun filtre: on passe
+			return searchResult && rangeResult && true;
+		}
+		// combien de filtres diff. tout ?
+		filterslength = 0;
+		for (x in filters) {
+			if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags') ) continue; 
+			filterslength++;
+			if (filters[x].indexOf('*') != -1) ix++; 
+		}
+		catok = false;
+		if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if (filters['cat'].indexOf(lacat) == -1)  {
+				return false; // n'appartient pas à la bonne classe: on ignore
+			} else { catok = true; } // on a trouvé la catégorie
+		} else {
+			catok = true;
+		}
+		tagok = false;
+		if (filters['tags'].indexOf('*') == -1) { // on a demandé un tag
 			for (var i in lescles) {
 				if  (filters['tags'].indexOf(lescles[i]) != -1) {
-					buttonResult = true;
+					tagok = true;
+				//	filterslength++;
+				}
+			}
+		} else {
+			tagok = true;
+		}
+		if ( (ix == filterslength) && catok && tagok) return searchResult && rangeResult && true;
+		count = 0;
+		for ( var j in lescles) {
+			for (x in filters) {
+				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags'))continue; 
+				if  (filters[x].indexOf(lescles[j]) != -1) { 
+					// buttonResult = true;
 					count += 1;
 				}
 			}
-			if (options.searchmultiex == "true")	{
-				lgth = filters['cat'].length + filters['tags'].length;
-				if ((filters['tags'].indexOf('*') != -1) || (filters['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
-				return searchResult && rangeResult && (count == lgth) ;
-			} else { 
-				return searchResult && rangeResult && buttonResult ;
-			}
-		} else { // fields
-			ix = 0;
-			if (typeof filters === 'undefined' ) { // aucun filtre: on passe
-				return searchResult && rangeResult && true ;
-			}
-			// combien de filtres diff. tout ?
-			filterslength = 0;
+		}
+		if (options.searchmultiex == "true")	{ // multi-select on grouped buttons
+			lgth = 0;
 			for (x in filters) {
-				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags')) continue; 
-				filterslength++;
-				if (filters[x].indexOf('*') != -1) ix++; 
+				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') ||(x == 'tags')) continue;
+				lgth = lgth + filters[x].length;
+				if (filters[x].indexOf('*') != -1) lgth = lgth - 1;
 			}
-			catok = false;
-			if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-				if (filters['cat'].indexOf(lacat) == -1)  {
-					return false; // n'appartient pas à la bonne classe: on ignore
-				} else { catok = true; } // on a trouvé la catégorie
-			} else {
-				catok = true;
+			return searchResult && rangeResult && (count == lgth) && tagok;
+		} else  {
+			return searchResult && rangeResult && (count >= (filterslength -ix)) && catok && tagok;
+		}
+	}
+} 
+// ---- Filter List 
+function filter_list($this,evt,params) {
+	$parent = $this.getAttribute('data-filter-group');
+	$isclone = false;
+	if ($this.parentNode.id == "clonedbuttons") { // clone 
+		$selectid = $parent;
+		$isclone = true;
+		sortValue =  '';
+	} else {
+		$selectid = $this.getAttribute('data-filter-group');
+		sortValue = $this.querySelector(".is-highlighted");
+		sortValue = sortValue.dataset.value;
+	}
+	if (typeof sortValue === 'undefined') sortValue = ""
+	elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+$selectid);
+	choicesInstance = elChoice.choicesInstance;
+	$needclone = false;
+	$grdparent = $this.parentNode;
+	if ($grdparent.className == "offcanvas-body") {
+		$needclone = true;
+	}
+	if (params == 'remove' && $needclone) { // remove item from offcanvas => remove button
+		removeFilter( filters, $parent, evt.detail.value );
+		myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+evt.detail.value+'"]')
+		if (myclone) myclone.remove();
+		if (filters[$parent].length == 0) {
+			filters[$parent] = ['*'] ;
+			choicesInstance.setChoiceByValue('')
+			update_cookie_filter(filters);
+		}	
+		return;
+	}
+	if (sortValue == '')   {
+		choicesInstance.removeActiveItems();
+		choicesInstance.setChoiceByValue('')		
+		filters[$parent] = ['*'];
+		$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+		for (var i=0; i< $buttons.length;i++) { // remove buttons
+			$buttons[i].remove(); 
+		}
+	} else { 
+		filters[$parent] = [sortValue];
+		if ($needclone) { // clone
+			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+			for (var i=0; i< $buttons.length;i++) { // remove buttons
+				$buttons[i].remove(); 
 			}
-			tagok = false;
-			if (filters['tags'].indexOf('*') == -1) { // on a demandé un tag
-				for (var i in lescles) {
-					if  (filters['tags'].indexOf(lescles[i]) != -1) {
-						tagok = true;
-					//	filterslength++;
-					}
-				}
-			} else {
-				tagok = true;
-			}
-			if ( (ix == filterslength) && catok && tagok) return searchResult && rangeResult && true ;
-			count = 0;
-			for ( var j in lescles) {
-				for (x in filters) {
-					if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags'))continue; 
-					if  (filters[x].indexOf(lescles[j]) != -1) { 
-						// buttonResult = true;
-						count += 1;
-					}
-				}
-			}
-			if (options.searchmultiex == "true")	{ // multi-select on grouped buttons
-				lgth = 0;
-				for (x in filters) {
-					if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') ||(x == 'tags')) continue;
-					lgth = lgth + filters[x].length;
-					if (filters[x].indexOf('*') != -1) lgth = lgth - 1;
-				}
-				return searchResult && rangeResult && (count == lgth) && tagok ;
-			} else  {
-				return searchResult && rangeResult && (count == (filterslength -ix)) && catok && tagok ;
+			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[$parent]+'"]');
+			if (!clone_exist) {
+				lib = evt.detail.choice.label;
+				create_clone_button($parent,sortValue,lib,'list','');
+				create_clone_listener(sortValue);
 			}
 		}
-	} 
-	function filter_list($this) {
-		$parent = $this.attr('data-filter-group');
-		var sortValue = $this.find(":selected").val();
-		if (sortValue == options.liball)   {
-			filters[$parent] = ['*'];
-		} else { 
-			filters[$parent] = [sortValue];
+	}
+	update_cookie_filter(filters);
+	iso.arrange(); 
+	updateFilterCounts();
+}
+	// ----- Filter MultiSelect List
+	function filter_list_multi($this,evt,params) {
+		$evnt = evt;
+		$params = params;
+		$isclone = false;
+		if ($this.parentNode.id == "clonedbuttons") { // clone 
+			$parent = $this.getAttribute('data-filter-group');
+			$selectid = "isotope-select-"+$parent;
+			$isclone = true;
+		} else {
+			$parent = $this.parentNode.parentNode.parentNode.getAttribute('data-filter-group')
+			$selectid = $this.getAttribute('id');
+		}
+		if (typeof filters[$parent] === 'undefined' ) { 
+			filters[$parent] = [];
+		}
+		var elChoice = document.querySelector('joomla-field-fancy-select#'+$selectid);
+		var choicesInstance = elChoice.choicesInstance;
+		
+		if ($params == "remove") { // deselect element except all
+			if ($isclone) {
+				removeFilter( filters, $parent, $this.getAttribute('data-sort-value') );
+				savfilter = JSON.parse(JSON.stringify(filters));
+				choicesInstance.removeActiveItems();
+				filters = JSON.parse(JSON.stringify(savfilter));
+				choicesInstance.removeActiveItemsByValue('');
+				for (var i = 0; i < filters[$parent].length; i++) {
+					remval = filters[$parent][i];
+					choicesInstance.setChoiceByValue(remval);
+				}
+			} else {
+				removeFilter( filters, $parent, $evnt.detail.value );
+				myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+$evnt.detail.value+'"]')
+				if (myclone) myclone.remove();
+			}
+			if (filters[$parent].length == 0) {
+				filters[$parent] = ['*'] ;
+				choicesInstance.setChoiceByValue('')
+			}
+		}
+		$needclone = false;
+		$grdparent = $this.parentNode.parentNode.parentNode.parentNode.parentNode;
+		if ($grdparent.classList[0] == "offcanvas-body") {
+			$needclone = true;
+		}
+		if ($params == "choice") {
+			sel = $evnt.detail.choice.value;
+			lib = $evnt.detail.choice.label;
+			if (sel == '') {// all
+				filters[$parent] = ['*'];
+				choicesInstance.removeActiveItems();
+				choicesInstance.setChoiceByValue('');
+				$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+				for (var i=0; i< $buttons.length;i++) { // remove buttons
+					$buttons[i].remove(); 
+				}
+			} else {
+				if (filters[$parent].indexOf('*') != -1) { // was all
+					choicesInstance.removeActiveItemsByValue('')
+					filters[$parent] = []; // remove it
+				}
+				if ($needclone) {
+					clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[$parent]+'"]');
+					if (!clone_exist) {
+						create_clone_button($parent,sel,lib,'list_multi','');
+						create_clone_listener(sel);
+					}
+				}
+				addFilter( filters, $parent, sel );
+			}
+			choicesInstance.hideDropdown();
 		}
 		update_cookie_filter(filters);
-		$grid.isotope(); 
+		iso.arrange(); 
 		updateFilterCounts();
 	}
-	function filter_button($this) {
-		$parent = $this.parent().attr('data-filter-group');
-		child =  $this.attr('data-child'); // child group number
-		var sortValue = $this.attr('data-sort-value');
+     
+	function filter_button($this,evt) {
+		if (hasClass($this,'disabled')) return; //ignore disabled buttons
+		$parent = $this.parentNode.getAttribute('data-filter-group');
+		child =  $this.getAttribute('data-child'); // child group number
+		var sortValue = $this.getAttribute('data-sort-value');
+		$isclone = false;
+		if ($this.parentNode.id == "clonedbuttons") { // clone 
+			$parent = $this.getAttribute('data-filter-group');
+			abutton = document.querySelector('.isotope_button-group .iso_button_'+$parent+'_'+sortValue);
+			toggleClass(abutton,'is-checked');
+			sortValue = '*';
+			if (std_parents.indexOf($parent) != -1) {
+				abutton = document.querySelector('.iso_button_'+$parent+'_tout');
+			} else {// custom field
+				abutton = document.querySelector('.iso_button_tout.filter-button-group-'+$parent);
+			}
+			toggleClass(abutton,'is-checked'); // all button
+			$isclone = true;
+		} 		
 		if (typeof filters[$parent] === 'undefined' ) { 
 			filters[$parent] = {};
 		}
+		$needclone = false;
+		$grdparent = $this.parentNode.parentNode;
+		if (hasClass($grdparent,"offcanvas-body")) {
+			$needclone = true;
+		}
+		if ($needclone) {
+			if (hasClass($this,'is-checked')) {return} // already cloned
+			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+			for (var i=0; i< $buttons.length;i++) { // remove buttons
+					$buttons[i].remove(); 
+			}
+			if (sortValue != '*') { // don't clone all button
+				lib = evt.srcElement.innerHTML;
+				create_clone_button($parent,sortValue,lib,'button',child);
+				create_clone_listener(sortValue);
+			}
+		}
 		if (sortValue == '*') {
 			filters[$parent] = ['*'];
+			if ($isclone) {
+				$this.remove;
+			}
 			if (child) {
 				set_family_all(me,child,'button');
 			}
@@ -747,20 +1011,53 @@ function iso_cat_k2 ($,myid,options) {
 			}
 		}
 		update_cookie_filter(filters);
-		$grid.isotope(); 
+		iso.arrange(); 
 		updateFilterCounts();
 	}
-	function filter_multi($this) {
-		$parent = $this.parent().attr('data-filter-group');
-		child =  $this.attr('data-child'); // child group number
-		var sortValue = $this.attr('data-sort-value');
-		$this.toggleClass('is-checked');
-		var isChecked = $this.hasClass('is-checked');
+	function filter_multi($this,evt) {
+		var sortValue = $this.getAttribute('data-sort-value');
+		child =  $this.getAttribute('data-child'); // child group number
+		$isclone = false;
+		if ($this.parentNode.id == "clonedbuttons") { // clone 
+			$parent = $this.getAttribute('data-filter-group');
+			$buttons = document.querySelectorAll('.iso_button_'+$parent+'_'+sortValue);
+			for (var i=0; i< $buttons.length;i++) { 
+					toggleClass($buttons[i],'is-checked');
+			}
+			$isclone = true;
+		} else {
+			$parent = $this.parentNode.getAttribute('data-filter-group');
+			toggleClass($this,'is-checked');
+		}
+		var isChecked = hasClass($this,'is-checked');
+		// clone offcanvas button
+		$needclone = false;
+		$grdparent = $this.parentNode.parentNode;
+		if (hasClass($grdparent,"offcanvas-body")) {
+			$needclone = true;
+		}
+		if ($needclone) {
+			if ((isChecked) && (sortValue != "*")) { // clone button
+				lib = evt.srcElement.innerHTML;
+				create_clone_button($parent,sortValue,lib,'multi',child);
+				create_clone_listener(sortValue);
+			} else { // remove cloned button
+				if (sortValue != "*") {
+					aclone = document.querySelector('#clonedbuttons .iso_button_'+$parent+'_'+sortValue)
+					aclone.remove();
+				}
+			}
+		}
+		// end of cloning
 		if (typeof filters[$parent] === 'undefined' ) { 
 			filters[$parent] = [];
 		}
 		if (sortValue == '*') {
 			filters[$parent] = ['*'];
+			clones = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+			for (var i=0; i< clones.length;i++) { 
+				clones[i].remove(); // remove other cloned buttons
+			}
 			if (child) {
 				set_family_all(me,child,'button')
 			}
@@ -774,9 +1071,15 @@ function iso_cat_k2 ($,myid,options) {
 				}
 			} else {
 				removeFilter( filters, $parent, sortValue );
+				if (filters[$parent].length == 0) {// no more selection
+					filters[$parent] = ['*'];
+					if ($isclone) {
+						aclone = document.querySelector('.filter-button-group-'+$parent+' [data-sort-value="*"]');
+						addClass(aclone,'is-checked');
+					}
+				}
 				if (child) {
-					if (filters[$parent].length == 0) {// no more selection
-						filters[$parent] = ['*'];
+					if (filters[$parent] == ['*']) {// no more selection
 						set_family_all(me,child,'button')
 					} else { // remove current selection
 						del_family(me,$parent,child,sortValue,'button')
@@ -785,103 +1088,111 @@ function iso_cat_k2 ($,myid,options) {
 			}	
 		}
 		update_cookie_filter(filters);
-		$grid.isotope(); 
+		iso.arrange(); 
 		updateFilterCounts();
 	}
-	function set_filter_list($this) {
-		$parent = $this.attr('data-filter-group');
-		child =  $this.find(":selected").attr('data-child'); // child group number
-		var sortValue = $this.find(":selected").val();
-		if (typeof filters[$parent] === 'undefined' ) { 
-			filters[$parent] = ['*'];
-		}
-		if (sortValue == options.liball)   {
-			filters[$parent] = ['*'];
-			if (child) {
-				set_family_all(me,child,'list');
+	function set_buttons_multi($this) {
+		$parent = $this.parentNode.getAttribute('data-filter-group');
+		if ($this.getAttribute('data-sort-value') == '*') { // on a cliqué sur tout => on remet le reste à blanc
+			buttons = $this.parentNode.querySelectorAll('button.is-checked');
+			for (var i=0; i< buttons.length;i++) { 
+					removeClass(buttons[i],'is-checked');
 			}
-		} else { 
-			filters[$parent] = [sortValue];
-			if (child) {
-				set_family(me,'',child,sortValue,'list');
-			}
-		}
-		update_cookie_filter(filters);
-		$grid.isotope(); 
-		updateFilterCounts();
-	}
-	function set_buttons($buttonGroup) {
-		$parent = $(this).parent().attr('data-filter-group');  
-		$buttonGroup.on( 'click', 'button', function() {
-			$(this).parent().find('.is-checked').removeClass('is-checked');
-			$(this).addClass('is-checked');
-		});
-	}
-	function set_buttons_multi($buttonGroup) {
-		$buttonGroup.on( 'click', 'button', function() {
-		$parent = $(this).parent().attr('data-filter-group');
-		if ($(this).attr('data-sort-value') == '*') { // on a cliqué sur tout => on remet le reste à blanc
-			$(this).parent().find('.is-checked').removeClass('is-checked');
-			$( this ).addClass('is-checked');
+			addClass($this,'is-checked');
 		} else { // on a cliqué sur un autre bouton : uncheck le bouton tout
-		if ((filters[$parent].length == 0) || (filters[$parent] == '*')) {// plus rien de sélectionné : on remet tout actif
-				$(this).parent().find('[data-sort-value="*"]').addClass('is-checked');
+			if ((filters[$parent].length == 0) || (filters[$parent] == '*')) {// plus rien de sélectionné : on remet tout actif
+				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
+				addClass(button_all,'is-checked');
 				filters[$parent] = ['*'];
 				update_cookie_filter(filters);
-				$grid.isotope();
+				iso.arrange();
 			}
 			else {
-				$(this).parent().find('[data-sort-value="*"]').removeClass('is-checked');
+				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
+				removeClass(button_all,'is-checked');
 			}
 		}
-		});
 	}
+	//
 	// check items limit and hide unnecessary items
 	function updateFilterCounts() {
-		if (jQuery(me + '.isotope_item').hasClass('iso_hide_elem')) {
-			jQuery(me + '.isotope_item').removeClass('iso_hide_elem');
+		var items = document.querySelectorAll(me + '.isotope_item');
+		var more = document.querySelector(me+'.iso_button_more')
+		var itemElems = iso.getFilteredItemElements();
+		var count_items = itemElems.length;
+		var divempty = document.querySelector(me + '.iso_div_empty')
+		for (var i=0;i < items.length;i++) {
+			if (hasClass(items[i],'iso_hide_elem')) {
+				removeClass(items[i],'iso_hide_elem');
+			}
 		}
-		var itemElems = $grid.isotope('getFilteredItemElements');
-		var count_items = jQuery(itemElems).length;
 		if (empty_message) { // display "empty message" or not
 			if (count_items == 0) {
-				jQuery(me + '.iso_div_empty').removeClass('iso_hide_elem')
+				removeClass(divempty,'iso_hide_elem')
 			} else {
-				if (!jQuery(me + '.iso_div_empty').hasClass('iso_hide_elem')) {
-					jQuery(me + '.iso_div_empty').addClass('iso_hide_elem')
+				if (!hasClass(divempty,'iso_hide_elem')) {
+					addClass(divempty,'iso_hide_elem')
 				}
 			}
 		}
 		if (items_limit > 0)  { 
-			var index = 0;
-			jQuery(itemElems).each(function () {
+			for(var index=0;index < itemElems.length;index++) {
 				if (index >= items_limit) {
-					jQuery(this).addClass('iso_hide_elem');
+					addClass(items[index],'iso_hide_elem');
 				}
-				index++;
-			});
+			};
 			if (index < items_limit && options.pagination != 'infinite') { // unnecessary button
-				jQuery(me+'.iso_button_more').hide();
+				addClass(more,'iso_hide_elem');
 			} else { // show more button required
-				jQuery(me+'.iso_button_more').show();
+				removeClass(more,'iso_hide_elem');
 			}
 		} 
 		// hide show see less button
 		if ((items_limit == 0) && (sav_limit > 0) && options.pagination != 'infinite') { 
-			jQuery(itemElems).each(function () {
-				if (jQuery(this).hasClass('iso_hide_elem')) {
+			for(var index=0;index < itemElems.length;index++) {
+				if (hasClass(itemElems[index],'iso_hide_elem')) {
 					count_items -=1;
 				}
-			});
+			};
 			if (count_items > sav_limit) {
-				jQuery(me+'.iso_button_more').show();
+				removeClass(more,'iso_hide_elem');
 			} else {
-				jQuery(me+'.iso_button_more').hide();
+				addClass(more,'iso_hide_elem');
 			}
 		}
-		$grid.isotope();
+		iso.arrange();
 	}
-}// end of iso_cat_k2
+// -- Create a clone button
+function create_clone_button($parent,$sel,$lib,$type,child) {
+	buttons = document.querySelector('#clonedbuttons');
+	var abutton = document.createElement('button');
+	abutton.classList.add('btn');
+	abutton.classList.add('btn-sm');
+	abutton.classList.add('iso_button_'+$parent+'_'+$sel);
+	abutton.classList.add('is-checked');
+	abutton.setAttribute('data-sort-value',$sel);
+	abutton.setAttribute('data-filter-group',$parent);
+	abutton.setAttribute('data-clone-type',$type);
+	if (child)	abutton.setAttribute('data-child',child);
+	abutton.title = $lib;
+	abutton.innerHTML = $lib;
+	buttons.prepend(abutton);
+}
+// -- Create cloned button event listener
+function create_clone_listener($sel) {
+	onebutton =  document.querySelector('#clonedbuttons [data-sort-value="'+$sel+'"] ');
+	['click', 'touchstart'].forEach(type => {
+		onebutton.addEventListener(type,function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();		
+			if (this.getAttribute('data-clone-type') == "multi")	filter_multi(this);
+			if (this.getAttribute('data-clone-type') == "button") filter_button(this);
+			if (this.getAttribute('data-clone-type') == "list_multi") filter_list_multi(this,evt,'remove');
+			if (this.getAttribute('data-clone-type') == "list") filter_list(this,evt);
+			this.remove();
+		})
+	})
+}
 function debounce( fn, threshold ) {
 	var timeout;
 	return function debounced() {
@@ -896,11 +1207,13 @@ function debounce( fn, threshold ) {
 	}  
 }
 function addFilter( filters, $parent, filter ) {
+	if (!$parent) return;
 	if ( filters[$parent].indexOf( filter ) == -1 ) {
 		filters[$parent].push( filter );
 	}
 }
 function removeFilter( filters, $parent, filter ) {
+	if (!Array.isArray(filters[$parent])) filters[$parent] = ['*']; // lost : assume all
 	var index = filters[$parent].indexOf( filter);
 	if ( index != -1 ) {
 		filters[$parent].splice( index, 1 );
@@ -909,6 +1222,7 @@ function removeFilter( filters, $parent, filter ) {
 function update_cookie_filter(filters) {
 	$filter_cookie = "";
 	for (x in filters) {
+		if (x == "null") continue;
 		if ($filter_cookie.length > 0) $filter_cookie += ">";
 		$filter_cookie += x+'<'+filters[x].toString();
 	}
@@ -957,76 +1271,178 @@ function replaceCookie(item,index,arr) {
 }
 function splitCookie(item) {
 	me = "#isotope-main-"+myid+" ";
-	if (item.indexOf('search:') >= 0) {
+	// check if quicksearch still exists (may be removed during testing)
+	quicksearch = document.querySelector(me+'.quicksearch');
+	if (item.indexOf('search:') >= 0 &&  quicksearch ) {
 		val = item.split(':');
 		qsRegex = new RegExp( val[1], 'gi' );
-		jQuery(me+'.quicksearch').val(val[1]);
+		quicksearch.value = val[1];
 	}
 	if (item.indexOf('sort:') >= 0) {
 		val = item.split(':');
 		val = val[1].split('-');
-		$sortby = val[0].split(',');
-		$asc = (val[1] == "true");
-		jQuery(me+'.sort-by-button-group').each( function( i, buttonGroup ) {
-			var $buttonGroup = jQuery( buttonGroup );
-			if (val[0] != '*') { // tout
-				$buttonGroup.find('.is-checked').removeClass('is-checked');
-				$buttonGroup.children().each(function(j, child) {
-					if (jQuery( this ).attr("data-sort-value") == val[0]) {
-						jQuery(this).addClass('is-checked');
-						jQuery(this).attr("data-sens","+");
-						if (val[1] != "true") jQuery(this).attr("data-sens","-");
-					}
-				});
+		sort_by = val[0].split(',');
+		asc = (val[1] == "true");
+		//if (sort_by[0] == "featured") { // featured always first
+			sortAsc = {};
+			for (i=0;i < sort_by.length;i++) {
+				if ( sort_by[i] == "featured"){  // featured always first
+					sortAsc[sort_by[i]] = false ;
+				} else {
+					sortAsc[sort_by[i]] = asc;
+				}
 			}
-		});
-	};
+			asc = sortAsc;
+		// } 
+		sortButtons = document.querySelectorAll(me+'.sort-by-button-group button');
+		for(s=0;s < sortButtons.length;s++) {
+			if (val[0] != '*') { // tout
+				sortButtons[s].classList.remove('is-checked');
+				if (sortButtons[s].getAttribute("data-sort-value") == val[0]) {
+					sortButtons[s].classList.add('is-checked');
+					sortButtons[s].setAttribute("data-sens","+");
+					if (val[1] != "true") sortButtons[s].setAttribute("data-sens","-");
+				}
+			}
+		}
+	}
 	if (item.indexOf('filter:') >=0) {
 		val = item.split(':');
 		if (val[1].length > 0) {
 			val = val[1].split('>'); // get filters
 			for (x=0;x < val.length-1;x++) {
 				values = val[x].split("<");
-				if ((values[0] == 'cat') || (values[0] == "tags") || (values[0] == 'lang') || (values[0] == 'alpha') ) {
-					if (values[1] != '*') { // !tout
+				if (std_parents.indexOf(values[0]) != -1) { // not a custom field
+					if ( (values[0] == "tags" && options.displayfilter == 'listmulti') || (values[0] == "cat" && options.displayfiltercat == 'listmulti')) { // liste multi select	
+						var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
+						var choicesInstance = elChoice.choicesInstance;
 						filters[values[0]] = values[1].split(',');
-						if (values[0] == 'lang') {
-							jQuery(me+'.iso_lang').find('.is-checked').removeClass('is-checked');
+						if (values[1] == '*') {
+							choicesInstance.setChoiceByValue('')
 						} else {
-							jQuery(me+'.filter-button-group-'+values[0]).find('.is-checked').removeClass('is-checked');
-						}
-						for(v=0;v < filters[values[0]].length;v++) {
-							if ( ((values[0] == "tags") && (options.displayfilter == 'list') && (options.article_cat_tag != "tagsfields") && (options.article_cat_tag != "cattagsfields")) ||
-								 ((values[0] == "cat") && (options.displayfiltercat == 'list')) ) {
-								jQuery(me+'.filter-button-group-'+values[0]+' .isotope_select').val(filters[values[0]][v]).attr('selected',true);
-							} else {
-								jQuery( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]).addClass('is-checked');
+							choicesInstance.removeActiveItemsByValue('')
+							vals = values[1].split(',')
+							for(c=0;c < vals.length;c++) {
+								choicesInstance.setChoiceByValue(vals[c]);
 							}
-						};
-				    }
-				} else  { // fields
-					if (values[1] != '*') { // !tout
-						jQuery(me+'.class_fields_'+values[0]).find('.is-checked').removeClass('is-checked');
+							if (elChoice.parentElement.parentElement.className == "offcanvas-body")  { // need clone
+								for (c=0;c < choicesInstance.getValue().length;c++) {
+									lib = choicesInstance.getValue()[c].label;
+									sel = choicesInstance.getValue()[c].value;
+									child = null;
+									create_clone_button(values[0],sel,lib,'list_multi',child);
+									create_clone_listener(sel);
+								}
+							}
+						}
+					} else {
+						if (values[1] != '*') { // !tout
+							filters[values[0]] = values[1].split(',');
+							if (values[0] == 'lang') {
+								filterButtons = document.querySelectorAll(me+'.iso_lang button.is-checked');
+							} else {
+								filterButtons = document.querySelectorAll(me+'.filter-button-group-'+values[0]+' button.is-checked')
+							}
+							for(f=0;f < filterButtons.length;f++) {
+								filterButtons[f].classList.remove('is-checked');
+							}
+							for(v=0;v < filters[values[0]].length;v++) {
+								if ( ((values[0] == "tags") && (options.displayfilter == 'list') ) ||
+									((values[0] == "cat") && (options.displayfiltercat == 'list')) ) {
+									var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
+									var choicesInstance = elChoice.choicesInstance;
+									choicesInstance.setChoiceByValue(filters[values[0]][v]);
+									if (elChoice.parentElement.parentElement.className == "offcanvas-body")  { // need clone
+										var choicesInstance = elChoice.choicesInstance;
+										sel = filters[values[0]][v];
+										lib = choicesInstance.getValue().label;
+										child = null;
+										create_clone_button(values[0],sel,lib,'list',child);
+										create_clone_listener(sel);
+									}
+								} else {
+									$button =  document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]);
+									addClass($button,'is-checked');
+									if (hasClass($button.parentNode.parentNode,"offcanvas-body"))  { // need clone
+										$type ='button'; // assume button
+										if ((values[0] == "cat" && (options.displayfiltercat == "multi" || options.displayfiltercat == "multiex")) ||
+										    (values[0] == "tags" && (options.displayfilter == "multi" || options.displayfiltercat == "multiex")) || 
+											(values[0] == "alpha" && (options.displayalpha == "multi" || options.displayalpha == "multiex")) ) {
+												$type = 'multi';
+										}
+										child = null;
+										lib = $button.innerHTML;
+										create_clone_button(values[0],filters[values[0]][v],lib,$type,child);
+										create_clone_listener(filters[values[0]][v]);
+									}
+								}
+							};
+						}
+					}
+				} else { //fields
+					if (options.displayfilterfields == 'listmulti') { // liste multi select		
+						var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
+						var choicesInstance = elChoice.choicesInstance;
+						filters[values[0]] = values[1].split(',');
+						if (values[1] == '*') {
+							choicesInstance.setChoiceByValue('')
+						} else {
+							choicesInstance.removeActiveItemsByValue('')
+							vals = values[1].split(',')
+							for(c=0;c < vals.length;c++) {
+								choicesInstance.setChoiceByValue(vals[c]);
+							}
+							if (elChoice.parentElement.parentElement.className == "offcanvas-body")  { // need clone
+								for (c=0;c < choicesInstance.getValue().length;c++) {
+									lib = choicesInstance.getValue()[c].label;
+									sel = choicesInstance.getValue()[c].value;
+									child=null;
+									create_clone_button(values[0],sel,lib,'list',child);
+									create_clone_listener(sel);
+								}
+							}
+						}
+					} else { if (values[1] != '*') { // !tout
+						alist = document.querySelectorAll(me+'.class_fields_'+values[0]+' .is-checked');
+						for(l=0;l < alist.length;l++) {
+								alist[l].classList.remove('is-checked');
+						}
 						filters[values[0]] = values[1].split(',');
 						for(v=0;v < filters[values[0]].length;v++) {
-							if ((options.displayfilter == 'list') ||(options.displayfilter == 'listex')) {
-								$this = jQuery(me+'.class_fields_'+values[0]+' .isotope_select').val(filters[values[0]][v]);
-								$this.attr('selected',true);
-								child =  $this.find(":selected").attr('data-child'); // child group number
-								if (child) {
-									sortValue = filters[values[0]][v];
-									set_family(me,'',child,sortValue,'list');
+							if ((options.displayfilterfields == 'list') ||(options.displayfilterfields == 'listex')) {
+								elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
+								choicesInstance = elChoice.choicesInstance;
+								filters[values[0]] = values[1].split(',');
+								if (values[1] == '*') {
+									choicesInstance.setChoiceByValue('')
+								} else {
+									choicesInstance.removeActiveItemsByValue('')
+									choicesInstance.setChoiceByValue(values[1]);
+									if (elChoice.parentElement.parentElement.parentElement.className == "offcanvas-body")  { // need clone
+										lib = choicesInstance.getValue().label;
+										sel = choicesInstance.getValue().value;
+										child=null;
+										create_clone_button(values[0],sel,lib,'list',child);
+										create_clone_listener(sel);
+									}
 								}
 							} else {
-								$this = jQuery( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]);
-								$this.addClass('is-checked');		
-								child =  $this.attr('data-child'); // child group number
+								$this = document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]);
+								addClass($this,'is-checked');		
+								child =  $this.getAttribute('data-child'); // child group number
 								if (child) {
-									sortValue = $this.attr('data-sort-value');
+									sortValue = $this.getAttribute('data-sort-value');
 									set_family(me,'',child,sortValue,'button')
 								}
+								if (hasClass($this.parentNode.parentNode.parentNode,"offcanvas-body"))  { // need clone
+									$type ='button'; 
+									lib = $this.innerHTML;
+									create_clone_button(values[0],filters[values[0]][v],lib,$type,child);
+									create_clone_listener(filters[values[0]][v]);
+								}
 							}
 						};
+						}
 					}
 				}
 			}
@@ -1044,29 +1460,47 @@ function splitCookie(item) {
 function set_family(me,$parent,child,sortValue,$type) {
 	parents = [];
     while (child) {
-		if ($type == 'list') {
-			$this = jQuery(me+'.filter-button-group-fields').find('[data-group-id="'+child+'"]');
-			$this.find('option').addClass('iso_hide_elem'); // hide all
-			child = $this.find('[data-all="all"]').removeClass('iso_hide_elem').attr('selected',true).attr('data-child'); // show all 
-		} else {
-			$this = jQuery(me+'.filter-button-group-fields').parent().find('[data-group-id="'+child+'"]');
+		if ($type == 'list') { // todo : not tested
+			$this = document.querySelector(me+'.filter-button-group-fields [data-group-id="'+child+'"]');
+			listoptions = $this.querySelectorAll('option');
+			for (var i=0;i < listoptions.length;i++) {
+				if (!hasClass(listoptions[i],'iso_hide_elem')) addClass(listoptions[i],'iso_hide_elem'); // hide all options
+			}
+			// show all 
+			$all = $this.querySelector('[data-all="all"]');
+			removeClass($all,'iso_hide_elem')
+			$all.setAttribute('selected',true)
+			child = $all.getAttribute('data-child'); 
+		} else { // button
+			$myparent = document.querySelector(me+'.filter-button-group-fields').parentNode;
+			$this = $myparent.querySelector('[data-group-id="'+child+'"]');
 			if (($parent == "") || (($parent != "") && (filters[$parent].length == 1) && (filters[$parent] != '*'))) { // multi-select
-				$this.find('button').addClass('iso_hide_elem').removeClass('is-checked'); // hide all
+				buttons = $this.querySelectorAll('button');
+				for (var i=0;i< buttons.length;i++) {
+					if (!hasClass(buttons[i],'iso_hide_elem'))	addClass(buttons[i],'iso_hide_elem')
+					removeClass(buttons[i],'is-checked'); // hide all buttons
+				}
 			} 
-			child = $this.find('button.iso_button_tout').removeClass('iso_hide_elem').addClass('is-checked').attr('data-child'); 
+			abutton = $this.querySelector('button.iso_button_tout')
+			removeClass(abutton,'iso_hide_elem');
+			addClass(abutton,'is-checked'); 
+			child = abutton.getAttribute('data-child');
 		}
 		if (parents.length == 0) {
-			$this.find('[data-parent="'+sortValue+'"]').removeClass('iso_hide_elem');
-			newparents = $this.find('[data-parent="'+sortValue+'"]');
+			buttons = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
+			for(var i = 0;i < buttons.length;i++) {
+				removeClass(buttons[i],'iso_hide_elem');
+			}
+			newparents = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
 			parents=[];
 			if (newparents.length > 0) {
 				for ($i = 0;$i < newparents.length;$i++) {
 					if ($type == 'list') {
-						$val = newparents[$i].getAttribute('value');
+						newval = newparents[$i].getAttribute('value');
 					} else {
-						$val = newparents[$i].getAttribute('data-sort-value');
+						newval = newparents[$i].getAttribute('data-sort-value');
 					}
-					if ($val != "*") parents.push($val);
+					if (newval != "*") parents.push(newval);
 				}
 			}
 		} else {
@@ -1074,23 +1508,26 @@ function set_family(me,$parent,child,sortValue,$type) {
 			for ($i=0; $i < parents.length; $i++) {
 				sortValue = parents[$i];
 				if (sortValue != '*') {
-					$this.find('[data-parent="'+sortValue+'"]').removeClass('iso_hide_elem');
-					$vals = $this.find('[data-parent="'+sortValue+'"]');
+					buttons = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
+					for(var i = 0;i < buttons.length;i++) {
+						removeClass(buttons[i],'iso_hide_elem');
+					}
+					$vals = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
 					if ($vals.length > 0) {
 						for ($j = 0;$j < $vals.length;$j++) {
 							if ($type == 'list') {
-								$val = $vals[$j].getAttribute('value');
+								oneval = $vals[$j].getAttribute('value');
 							} else {
-								$val = $vals[$j].getAttribute('data-sort-value');
+								oneval = $vals[$j].getAttribute('data-sort-value');
 							}
-							if ($val != "*") newparents.push($val);
+							if (oneval != "*") newparents.push(onval);
 						}
 					}
 				}
 			}
 			parents = newparents;
 		}
-		childstr = $this.attr('data-filter-group');
+		childstr = $this.getAttribute('data-filter-group');
 		filters[childstr] = ['*'];
 		sortValue = '';
 	}
@@ -1098,22 +1535,28 @@ function set_family(me,$parent,child,sortValue,$type) {
 function del_family(me,$parent,child,sortValue,$type) {
 	parents = [];
     while (child) {
-		$this = jQuery(me+'.filter-button-group-fields').parent().find('[data-group-id="'+child+'"]');
-		$this.find('[data-parent="'+sortValue+'"]').addClass('iso_hide_elem').removeClass('is-checked');
-		child = $this.find('button.iso_button_tout').removeClass('iso_hide_elem').addClass('is-checked').attr('data-child'); 
+		myparent = document.querySelector(me+'.filter-button-group-fields').parentNode;
+		$this = myparent.querySelector('[data-group-id="'+child+'"]');
+		abutton = $this.querySelector('[data-parent="'+sortValue+'"]')
+		addClass(abutton,'iso_hide_elem')
+		removeClass(abutton,'is-checked');
+		abutton = $this.querySelector('button.iso_button_tout');
+		removeClass(abutton,'iso_hide_elem');
+		addClass(abutton,'is-checked')
+		child = $this.getAttribute('data-child'); 
 		if (parents.length == 0) {
-			newparents = $this.find('[data-parent="'+sortValue+'"]');
+			newparents = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
 			parents=[];
 			if (newparents.length > 0) {
 				for ($i = 0;$i < newparents.length;$i++) {
 					if ($type == 'list') {
-						$val = newparents[$i].getAttribute('value');
+						delval = newparents[$i].getAttribute('value');
 					} else {
-						$val = newparents[$i].getAttribute('data-sort-value');
+						delval = newparents[$i].getAttribute('data-sort-value');
 					}
-					if ($val != "*") {
-						parents.push($val);
-						newparents[$i].addClass('iso_hide_elem');
+					if (delval != "*") {
+						parents.push(delval);
+						addClass(newparents[$i],'iso_hide_elem');
 					}
 				}
 			}
@@ -1122,17 +1565,17 @@ function del_family(me,$parent,child,sortValue,$type) {
 			for ($i=0; $i < parents.length; $i++) {
 				sortValue = parents[$i];
 				if (sortValue != '*') {
-					$vals = $this.find('[data-parent="'+sortValue+'"]');
+					$vals = $this.querySelectorAll('[data-parent="'+sortValue+'"]');
 					if ($vals.length > 0) {
 						for ($j = 0;$j < $vals.length;$j++) {
 							if ($type == 'list') {
-								$val = $vals[$j].getAttribute('value');
+								delval = $vals[$j].getAttribute('value');
 							} else {
-								$val = $vals[$j].getAttribute('data-sort-value');
+								delval = $vals[$j].getAttribute('data-sort-value');
 							}
-							if ($val != "*") { 
-								newparents.push($val);
-								$vals[$j].addClass('iso_hide_elem');
+							if (delval != "*") { 
+								newparents.push(delval);
+								addClass($vals[$j],'iso_hide_elem');
 							}
 						}
 					}
@@ -1140,7 +1583,7 @@ function del_family(me,$parent,child,sortValue,$type) {
 			}
 			parents = newparents;
 		}
-		childstr = $this.attr('data-filter-group');
+		childstr = $this.getAttribute('data-filter-group');
 		filters[childstr] = ['*'];
 		sortValue = '';
 	}
@@ -1149,30 +1592,37 @@ function set_family_all(me,child,$type) {
 	parents = [];
 	while(child) {
 		if ($type == 'list') {
-			$this = jQuery(me+'.filter-button-group-fields');
+			$this = document.querySelector(me+'.filter-button-group-fields');
 		} else {
-			$this = jQuery(me+'.filter-button-group-fields').parent();
+			$this = document.querySelector(me+'.filter-button-group-fields').parentNode;
 		}
-		parents = $this.find('[data-child="'+child+'"]');
-		for ($i = 0;$i < parents.length;$i++) {
-			if (jQuery(parents[$i]).hasClass('iso_hide_elem')) continue; // ignore hidden elements
+		parents = $this.querySelectorAll('[data-child="'+child+'"]');
+		for (i = 0;i < parents.length;i++) {
+			if (hasClass(parents[i],'iso_hide_elem')) continue; // ignore hidden elements
 			if ($type == 'list') {
-				$val = parents[$i].getAttribute('value');
+				setval = parents[i].getAttribute('value');
 			} else {
-				$val = parents[$i].getAttribute('data-sort-value');
+				setval = parents[i].getAttribute('data-sort-value');
 			}
-			if ($val && ($val != "*")) $this.find('[data-parent="'+$val+'"]').removeClass('iso_hide_elem');
-
+			if (setval && (setval != "*")) {
+				removeClass($this.querySelector('[data-parent="'+setval+'"]'),'iso_hide_elem');
+			}
 		}
 		if ($type == 'list') {
-			child = $this.find('[data-group-id="'+child+'"]').find('[data-all="all"]').attr('data-child'); 
+			allbuton = $this.querySelector('[data-group-id="'+child+'"] [data-all="all"]')
+			child = allbutton.getAttribute('data-child'); 
 		} else {
-			$this.find('[data-group-id="'+child+'"]').find('button').removeClass('is-checked'); 
-			$this.find('[data-group-id="'+child+'"]').find('button.iso_button_tout').addClass('is-checked'); 
-			$this = jQuery(me+'.filter-button-group-fields').parent().find('[data-group-id="'+child+'"]');
-			child = $this.find('button.iso_button_tout').attr('data-child'); 
+			buttons = $this.querySelectorAll('[data-group-id="'+child+'"] button')
+			for (var i=0;i < buttons.length;i++) {
+				removeClass(buttons[i],'is-checked'); 
+			}
+			addClass($this.querySelector('[data-group-id="'+child+'"] button.iso_button_tout'),'is-checked'); 
+			myparent = 
+			$mychild = $this.querySelector('[data-group-id="'+child+'"]');
+			$mychild_all = $mychild.querySelector('button.iso_button_tout')
+			child = $mychild_all.getAttribute('data-child'); 
 		}
-		childstr = $this.attr('data-filter-group');
+		childstr = $this.getAttribute('data-filter-group');
 		filters[childstr] = ['*'];
 	}
 }
@@ -1183,4 +1633,47 @@ function go_click($entree,$link) {
 	} else {
 		location=$link;
 	}
+}
+// from https://code.tutsplus.com/tutorials/from-jquery-to-javascript-a-reference--net-23703
+hasClass = function (el, cl) {
+    var regex = new RegExp('(?:\\s|^)' + cl + '(?:\\s|$)');
+    return !!el.className.match(regex);
+}
+addClass = function (el, cl) {
+    el.className += ' ' + cl;
+},
+removeClass = function (el, cl) {
+    var regex = new RegExp('(?:\\s|^)' + cl + '(?:\\s|$)');
+    el.className = el.className.replace(regex, ' ');
+},
+toggleClass = function (el, cl) {
+    hasClass(el, cl) ? removeClass(el, cl) : addClass(el, cl);
+};
+// from https://gist.github.com/andjosh/6764939
+var scrollTo = function(to, duration) {
+    var element = document.scrollingElement || document.documentElement,
+    start = element.scrollTop,
+    change = to - start,
+    startTs = performance.now(),
+    // t = current time
+    // b = start value
+    // c = change in value
+    // d = duration
+    easeInOutQuad = function(t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+    },
+    animateScroll = function(ts) {
+        var currentTime = ts - startTs;
+        element.scrollTop = parseInt(easeInOutQuad(currentTime, start, change, duration));
+        if(currentTime < duration) {
+            requestAnimationFrame(animateScroll);
+        }
+        else {
+            element.scrollTop = to;
+        }
+    };
+    requestAnimationFrame(animateScroll);
 }

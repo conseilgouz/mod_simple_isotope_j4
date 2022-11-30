@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.5
+* Version			: 4.1.0
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -19,17 +19,27 @@ use Joomla\CMS\Router\Route;
 use \Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Component\Content\Site\Model\ArticlesModel;
+use Joomla\Component\Content\Site\Model\ArticleModel;
 use Joomla\Component\Content\Site\Helper\RouteHelper; 
 use Joomla\CMS\Filter;
 use  Joomla\CMS\Filter\OutputFilter as FilterOutput;
+use Joomla\Component\Modules\Administrator\Helper\ModulesHelper;
+use Joomla\CMS\Response\JsonResponse;
 
-class IsotopeHelper
+class SimpleIsotopeHelper
 {
 	public static function getCGName() {
 		return 'Simple Isotope';
 	}
     public static function getCGVersion() {
-		return '4.0.5';
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('manifest_cache');
+		$query->from($db->quoteName('#__extensions'));
+		$query->where('name = "' . self::getCGName() . '"');
+		$db->setQuery($query);
+		$manifest = json_decode($db->loadResult(), true);
+		return $manifest['version'];		
 	}
 
 	public static function getWebLinks(&$params,$weblinks_params,&$tags,&$tags_alias,&$tags_note,&$tags_image,&$tags_parent,&$tags_parent_alias,&$article_tags,&$cats_lib, &$cats_alias,&$cats_note, &$cats_params ,&$fields,&$article_fields, &$article_fields_names,$rangefields,&$alpha) {
@@ -678,27 +688,50 @@ class IsotopeHelper
 			if ($splitfieldstitle == "true") $result.="</p>";
 			
 		} else {
-			$result .= "<p class='iso_fields_title  ".$col_width." '>";
+			Factory::getDocument()->getWebAssetManager()
+				->useScript('webcomponent.field-fancy-select')
+				->usePreset('choicesjs');
+			$selectAttr = array('allowHTML:true');
+			$multiple = "";
+			$multiple_id = "";
+			if ($displayfilterfields == "listmulti") {
+				$libmulti = Text::_('CG_ISO_LIBLISTMULTI');
+				$multiple = "  place-placeholder='".$libmulti."'";
+				$selectAttr[] = ' multiple';
+				$multiple_id = "fields-";
+			}
+			$attributes = array(
+				'class="isotope_select"',
+				' data-filter-group="'.$group_lib.'"',
+				' id="isotope-select-'.$group_lib.'"',
+				' allowHTML="true"'
+			);
+			$name = "isotope-select-".$multiple_id.$group_id;
+
+			$first_time = true;
+		    foreach ($onefilter as $key=>$filter) {
+		         $obj = $fields[$key];
+				 if ($first_time) { 	
+					$options['']['items'][] = ModulesHelper::createOption('',$liball);				 
+					$first_time = false;
+				 }
+		         $aff_alias = $obj->alias;
+		         $aff = strip_tags($obj->render);
+		         if (!is_null($aff)) {
+		            $options['']['items'][] = ModulesHelper::createOption($aff_alias,Text::_($aff));
+		        }
+		    }
+
+			$result .= "<div class='iso_fields_title  ".$col_width." '><p>";
 			if ($splitfieldstitle == "true") {
 				$result .= Text::_($group_title).' : ';
 			} else {
 				$result .=  '<span class="hidden-phone" >'.$libfilter.' : </span>';
 			}
-			$result .=  '<select class="isotope_select" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'">';
-			$first_time = true;
-			foreach ($onefilter as $key=>$filter) {
-		         $obj = $fields[$key];
-				 if ($first_time) { 		    
-					$result .=  '<option data-all="all" data-child="'.$obj->child.'">'.$liball.'</option>';
-					$first_time = false;
-				 }
-		         $aff_alias = $obj->alias;
-		         $aff = $obj->render;
-		         if (!is_null($aff)) {
-		            $result .=  '<option value="'.$aff_alias.'" data-parent="'.$obj->parent.'" data-child="'.$obj->child.'">'. Text::_($aff).'</option>';
-		        }
-		    }
-			$result .=  '</select>';
+			$result .=  '</p><joomla-field-fancy-select '.implode(' ', $attributes).'>';
+			$result .= HTMLHelper::_('select.groupedlist', $options, $name,  array('id'          => $name,'list.select' => null,'list.attr'   => implode(' ', $selectAttr)));
+			$result .= '</joomla-field-fancy-select></div>';
+						
 		}
 		return $result;
 	}
@@ -730,19 +763,15 @@ class IsotopeHelper
 	}
 // ==============================================    AJAX Request 	============================================================
 	public static function getAjax() {
-        $input = Factory::getApplication()->input;
-		$id = $input->get('id');
+	    $input = Factory::getApplication()->input->request;
+	    $id = $input->get('id');
 		$module = self::getModuleById($id);
-		$params = new JRegistry($module->params);  		
+		$params = new Registry($module->params);  		
 		if ($input->get('data') == "param") {
 			return self::getParams($params);
 		} elseif ($input->get('data') == "readmore") {
 			$articleId = $input->get('article');
-			if ($input->get('entree') == 'k2') {
-				return new JResponseJson(self::getArticleK2((int)$articleId,$params)); 
-			} else {
-				return new JResponseJson(self::getArticle((int)$articleId,$params)); 
-			}
+			return new JsonResponse(self::getArticle((int)$articleId,$params)); 
 		}
 		return false;
 	}
@@ -797,21 +826,10 @@ class IsotopeHelper
 				$default_cat  = $info_cat[0]->alias;
 			}
 		}
-		if ($iso_entree == "k2") {
-			$default_cat = $params->get('default_cat_k2','');
-			$default_tag = $params->get('default_tag_k2','');
-			if (($default_cat != "") && ($default_cat != "none"))  {
-				$default_cat = $cats_alias[$default_cat];
-			}
-			if (($default_tag != "") && ($default_tag != "none"))  {
-				$default_tag = $tags_alias[$default_tag];
-			}
-		} else {
-			$default_tag = $params->get('default_tag','');
-			if (( $default_tag != "") &&  ( $default_tag != "none")) {
-				$onetag = self::getTagTitle($default_tag);
-				$default_tag = $onetag[0]->alias;
-			}
+		$default_tag = $params->get('default_tag','');
+		if (( $default_tag != "") &&  ( $default_tag != "none")) {
+			$onetag = self::getTagTitle($default_tag);
+			$default_tag = $onetag[0]->alias;
 		}
 		if ($params->get('default_field','') == "") {
 			$default_field = "";
@@ -819,37 +837,7 @@ class IsotopeHelper
 			$onetag = self::getTagTitle($params->get('default_field'));
 			$default_field = $onetag[0]->alias;
 		}
-		if ($iso_entree == "k2") {
-			if ($article_cat_tag =="cat") {
-				$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
-			} else {
-				$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
-			}
-			$searchmultiex = "false";
-			if (  ( ($article_cat_tag == "tags") && ($displayfilter == "multiex")) 
-			|| ( ($article_cat_tag  == "cattags") && ($displayfilter == "multiex"))
-			|| ( ($article_cat_tag == "cat") && ($displayfiltercat == "multiex")) 
-			|| ( ($article_cat_tag  == "cattags") && ($displayfiltercat == "multiex"))){
-				$searchmultiex = "true";
-			}
-			if ($article_cat_tag =="cat") {
-				$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
-			} else {
-				$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
-			}
-			$ret = '{"entree":"'.$iso_entree.'","article_cat_tag":"'.$article_cat_tag.'","default_cat":"'.$default_cat.'",';
-		    $ret .='"default_tag":"'.$default_tag.'","layout":"'.$iso_layout.'","nbcol":"'.$iso_nbcol.'",';
-			$ret .= '"background":"'.$params->get("backgroundcolor","#eee").'",';
-			$ret .= '"imgmaxwidth":"'.$params->get('introimg_maxwidth','0').'",';
-			$ret .= '"imgmaxheight":"'.$params->get('introimg_maxheight','0').'",';
-			$ret .= '"sortby":"'.$sortBy.'","ascending":"'.$sortAscending.'",';
-			$ret .= '"searchmultiex":"'.$searchmultiex.'","liball":"'.Text::_('SSISO_LIBALL').'",';
-			$ret .= '"language_filter":"'.$language_filter.'",';
-			$ret .= '"displayfilter":"'.$displayfilter.'","displayfiltercat":"'.$displayfiltercat.'",';
-			$ret .= '"limit_items":"'.$params->get('limit_items','0').'",';
-			$ret .= '"readmore":"'.$params->get('readmore','false').'",';
-			$ret .= '"libmore":"'.Text::_('SSISO_LIBMORE').'","libless":"'.Text::_('SSISO_LIBLESS').'"}';
-		} elseif ($article_cat_tag == "fields") {
+		if ($article_cat_tag == "fields") {
 			$splitfields = $params->get('displayfiltersplitfields','false'); // 1.3.4 : new parameter
 			$displayfilterfields =  $params->get('displayfilterfields','button');
 			$searchmultiex = "false";
@@ -975,93 +963,4 @@ class IsotopeHelper
         }
 		return $arr;
 	}
-	//-----------------------One K2 article display------------------------------------------//
-	static function getArticleK2($id,$modparams) {
-
-		PluginHelper::importPlugin('content');
-		jimport('joomla.filesystem.file');
-		$application = Factory::getApplication();
-        $componentParams = ComponentHelper::getParams('com_k2');
-        $model = K2Model::getInstance('Item', 'K2Model');
-		
-		$limit = 1;
-		$cid = NULL;
-		$ordering = '';
-		$limitstart = 0;
-
-		$user = Factory::getUser();
-		$aid = $user->get('aid');
-		$db = Factory::getDbo();
-
-		$jnow = Factory::getDate();
-		$now = $jnow->toSql();
-                
-		$nullDate = $db->getNullDate();
-
-		$query = "SELECT i.*, c.name AS categoryname,c.id AS categoryid, c.alias AS categoryalias, c.params AS categoryparams 
-			FROM #__k2_items as i 
-			LEFT JOIN #__k2_categories c ON c.id = i.catid 
-			WHERE i.published = 1 ";
-		$query .= " AND i.access IN(".implode(',', $user->getAuthorisedViewLevels()).") ";
-		$query .= " AND i.trash = 0 AND c.published = 1 ";
-		$query .= " AND c.access IN(".implode(',', $user->getAuthorisedViewLevels()).") ";
-		$query .= " AND c.trash = 0 
-				AND ( i.publish_up = ".$db->Quote($nullDate)." OR i.publish_up <= ".$db->Quote($now)." ) 
-				AND ( i.publish_down = ".$db->Quote($nullDate)." OR i.publish_down >= ".$db->Quote($now)." ) 
-				AND i.id={$id}";
-		if ($application->getLanguageFilter())
-				{
-					$languageTag = Factory::getLanguage()->getTag();
-					$query .= " AND c.language IN (".$db->Quote($languageTag).", ".$db->Quote('*').") AND i.language IN (".$db->Quote($languageTag).", ".$db->Quote('*').")";
-				}
-		$db->setQuery($query);
-		$item = $db->loadObject();
-		        // Image K2
-	    if ($componentParams->get('imageTimestamp')) {
-            $date = Factory::getDate($item->modified);
-            $timestamp = '?t='.$date->toUnix();
-        } else {
-            $timestamp = '';
-        } 
-		$imageFilenamePrefix = md5("Image".$item->id);
-		$imagePathPrefix = JUri::base(true).'/media/k2/items/cache/'.$imageFilenamePrefix;
-		if (JFile::exists(JPATH_SITE.'/media/k2/items/cache/'.$imageFilenamePrefix.'_Generic.jpg')) {
-			$item->imageGeneric = $imagePathPrefix.'_Generic.jpg'.$timestamp;
-			$item->imageXSmall  = $imagePathPrefix.'_XS.jpg'.$timestamp;
-			$item->imageSmall   = $imagePathPrefix.'_S.jpg'.$timestamp;
-			$item->imageMedium  = $imagePathPrefix.'_M.jpg'.$timestamp;
-			$item->imageLarge   = $imagePathPrefix.'_L.jpg'.$timestamp;
-			$item->imageXLarge  = $imagePathPrefix.'_XL.jpg'.$timestamp;
-		}
-        $image = 'imageSmall';
-		$item->image = $item->$image; 
-	// Extra fields
-        JPluginHelper::importPlugin('content');
-        JPluginHelper::importPlugin('k2');
-        $dispatcher = JDispatcher::getInstance();
-        $item->extra_fields = $model->getItemExtraFields($item->extra_fields, $item);
-        if (is_array($item->extra_fields)) {
-            foreach ($item->extra_fields as $key => $extraField) {
-                if ($extraField->type == 'textarea' || $extraField->type == 'textfield') {
-                    $extraFieldTempText = new \stdClass;
-                    $extraFieldTempText->text = $extraField->value;
-                    $dispatcher->trigger('onContentPrepare', array(
-                                'mod_k2_content.item-extrafields',
-                                &$extraFieldTempText,
-                                &$params,
-                                $limitstart
-                    ));
-                    $dispatcher->trigger('onK2PrepareContent', array(
-                                 &$extraFieldTempText,
-                                 &$params,
-                                 $limitstart
-                    ));
-					$extraField->value = $extraFieldTempText->text;
-                }
-			}
-		}
-		$arr[0] = $item;			
-		return $arr;
-	}	
-	
 }

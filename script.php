@@ -102,7 +102,7 @@ class mod_simple_isotopeInstallerScript
 
 			Folder::delete($f);
 		}
-		$obsloteFiles = ["helper.php", "helper_k2.php", "depend.xml", "k2_sql.xml","layout.xml"];
+		$obsloteFiles = ["helper.php", "helper_k2.php", "depend.xml", "k2_sql.xml","layout.xml","tmpl/default_k2.php","src/Helper/helper_k2.php","src/Helper/IsotopeHelper.php"];
 		foreach ($obsloteFiles as $file)
 		{
 			$f = JPATH_SITE . '/modules/'.$this->extname.'/' . $file;
