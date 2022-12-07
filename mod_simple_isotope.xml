@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.1.1</version>
+	<version>4.1.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.1.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -14,6 +14,7 @@ use Joomla\CMS\Helper\ModuleHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Access\Access;
 
 $document 		= Factory::getDocument();
 
@@ -31,6 +32,13 @@ $article_cat_tag = $params->get('cat_or_tag',$iso_entree == "webLinks"?'cat':'ta
 $iso_layout = $params->get('iso_layout', 'fitRows');
 $iso_nbcol = $params->get('iso_nbcol',2);
 $tags_list = $params->get('tags');
+// check authorised tags
+$authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
+foreach ($tags_list as $key=>$atag) {
+	if (!IsotopeHelper::getTagAccess($atag,$authorised)) {
+		unset($tags_list[$key]); // not authorized : remove it
+	}
+}
 $fields_list = $params->get('displayfields');
 $iso_limit = $params->get('iso_limit','all');
 

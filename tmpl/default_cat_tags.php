@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.1.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -478,13 +478,15 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 					$img = "";
 					if ($tagsfilterimg == "true") {
 						if (array_key_exists($aff_alias,$tags_image)) { 
-							$tagimage  = json_decode($tags_image[$aff_alias]);	
-							if ($tagimage->image_intro != "") {
-								$img = '<img src="'.URI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
-								class="iso_tag_img" alt="'.$tagimage->image_intro_alt.'" title="'.$tagimage->image_intro_caption.'"/> ';
-							} elseif ($tagimage->image_fulltext != "") {
-								$img = '<img src="'.URI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
-								class="iso_tag_img" alt="'.$tagimage->image_fulltext_alt.'" title="'.$tagimage->image_fulltext_caption.'"/> ';
+							$tagimage  = json_decode($tags_image[$aff_alias]);
+							if (is_object($tagimage) && (property_exists($tagimage,'image_fulltext') || property_exists($tagimage,'image_intro'))) {
+								if ($tagimage->image_intro != "") {
+									$img = '<img src="'.URI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
+										class="iso_tag_img" alt="'.$tagimage->image_intro_alt.'" title="'.$tagimage->image_intro_caption.'"/> ';
+								} elseif ($tagimage->image_fulltext != "") {
+									$img = '<img src="'.URI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
+									class="iso_tag_img" alt="'.$tagimage->image_fulltext_alt.'" title="'.$tagimage->image_fulltext_caption.'"/> ';
+								}
 							}
 						}
 					}

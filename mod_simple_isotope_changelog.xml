@@ -2,6 +2,19 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.2</version>
+        <note>
+            <item>Update : 07/12/2022</item>
+        </note>
+		<fix>
+			<item>Tag image click in offcanvas => no button displayed</item>
+			<item>Check tags level</item>
+            <item>Tag's full text image not displayed</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.1</version>
         <note>
             <item>Update :30/11/2022</item>

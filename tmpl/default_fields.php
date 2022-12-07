@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.1.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -356,7 +356,7 @@ $filter_div = "";
 					$img = "";
 					if ($tagsfilterimg == "true") {
 						$tagimage  = json_decode($tags_image[$aff_alias]);
-						if (property_exists($tagimage,'image_image_fulltext') || property_exists($tagimage,'image_intro')) {
+						if ((is_object($tagimage) && property_exists($tagimage,'image_fulltext') || property_exists($tagimage,'image_intro'))) {
 							if ($tagimage->image_intro != "") {
 								$img = '<img src="'.JURI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
 								class="iso_tag_img" alt="'.$tagimage->image_intro_alt.'" title="'.$tagimage->image_intro_caption.'"/> ';

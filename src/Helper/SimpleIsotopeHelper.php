@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.1.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -166,8 +166,9 @@ class SimpleIsotopeHelper
 							}
 						}	
 					}
-				}					
-				$article_tags[$item->id] = self::getWebLinkTags($item->id); // article's tags
+				}
+				$authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));				
+				$article_tags[$item->id] = self::getWebLinkTags($item->id,$authorised); // article's tags
 				foreach ($article_tags[$item->id] as $tag) { 
 					if (!in_array($tag->tag, $tags)) {
 						$tags[]=$tag->tag;
@@ -352,7 +353,7 @@ class SimpleIsotopeHelper
 				}
 			}
 			$item->displayReadmore  = $item->alternative_readmore;
-			$article_tags[$item->id] = self::getArticleTags($item->id); // article's tags
+			$article_tags[$item->id] = self::getArticleTags($item->id,$authorised); // article's tags
 			foreach ($article_tags[$item->id] as $tag) { 
 				if (!in_array($tag->tag, $tags)) {
 					$tags[]=$tag->tag;
@@ -498,7 +499,18 @@ class SimpleIsotopeHelper
 		$db->setQuery($query);
 		return $db->loadObjectList();
 	}
-	public static function getArticleTags($id) {
+	public static function getTagAccess($id,$authorised) {
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		// Construct the query
+		$query->select('tags.title as tag')
+			->from('#__tags as tags')
+			->where('tags.id = '.(int)$id.' AND tags.access IN ('.implode(',',$authorised).')')
+			;
+		$db->setQuery($query);
+		return $db->loadResult();
+	}
+	public static function getArticleTags($id,$authorised) {
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, parent.title as parent_title, parent.alias as parent_alias')
@@ -506,12 +518,12 @@ class SimpleIsotopeHelper
 			->innerJoin('#__content as c on c.id = map.content_item_id') 
 			->innerJoin('#__tags as tags on tags.id = map.tag_id')
 			->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-			->where('c.id = '.(int)$id.' AND map.type_alias like "com_content%"')
+			->where('c.id = '.(int)$id.' AND map.type_alias like "com_content%" AND tags.access IN ('.implode(',',$authorised).')')
 			;
 		$db->setQuery($query);
 		return $db->loadObjectList();
 	}
-	public static function getWebLinkTags($id) {
+	public static function getWebLinkTags($id,$authorised) {
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, parent.title as parent_title, parent.alias as parent_alias ')
@@ -519,7 +531,7 @@ class SimpleIsotopeHelper
 			->innerJoin('#__weblinks as w on w.id = map.content_item_id') 
 			->innerJoin('#__tags as tags on tags.id = map.tag_id')
 			->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-			->where('w.id = '.(int)$id.' AND map.type_alias like "com_weblinks%"')
+			->where('w.id = '.(int)$id.' AND map.type_alias like "com_weblinks%" AND tags.access IN ('.implode(',',$authorised).')')
 			;
 		$db->setQuery($query);
 		return $db->loadObjectList();

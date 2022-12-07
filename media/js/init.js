@@ -1,6 +1,6 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.1
+* Version			: 4.1.2
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -991,7 +991,9 @@ function filter_list($this,evt,params) {
 					$buttons[i].remove(); 
 			}
 			if (sortValue != '*') { // don't clone all button
-				lib = evt.srcElement.innerHTML;
+				if (evt.srcElement.localName == "img")
+					lib = evt.srcElement.outerHTML+evt.srcElement.nextSibling.textContent;
+				else lib = evt.srcElement.innerHTML;
 				create_clone_button($parent,sortValue,lib,'button',child);
 				create_clone_listener(sortValue);
 			}
@@ -1174,7 +1176,12 @@ function create_clone_button($parent,$sel,$lib,$type,child) {
 	abutton.setAttribute('data-filter-group',$parent);
 	abutton.setAttribute('data-clone-type',$type);
 	if (child)	abutton.setAttribute('data-child',child);
-	abutton.title = $lib;
+	if ($lib.indexOf('img src') > 0) {// image in lib : remove it
+		abutton.title = $lib.substr($lib.indexOf(">") + 1)
+	}
+	else {
+		abutton.title = $lib;
+	}
 	abutton.innerHTML = $lib;
 	buttons.prepend(abutton);
 }
