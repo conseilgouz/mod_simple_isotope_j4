@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.4</version>
+        <note>
+            <item>Update : 07/12/2022</item>
+        </note>
+		<fix>
+			<item>missing mod_simple_isotope.php file update during install</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.3</version>
         <note>
             <item>Update : 07/12/2022</item>
