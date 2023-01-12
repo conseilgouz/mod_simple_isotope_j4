@@ -1,8 +1,8 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.3
+* Version			: 4.1.5
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -11,11 +11,12 @@
 
 	displayfiltertags => displayfilter dans module
 */
-var $close,grid_toggle,iso_article,iso,me,
+var $close,grid_toggle,iso_article,me,
 	empty_message,items_limit, sav_limit,
 	iso_height,iso_width,article_frame;
+var iso = [],filters = [],options = [],quicksearch;
 var resetToggle,options,myid;
-var qsRegex,$asc,$sortby,filters;
+var qsRegex,$asc,$sortby;
 var rangeSlider,range_init,range_sel,min_range,max_range;
 var cookie_name;
 var std_parents = ['cat','tags','lang','alpha'] // otherwise it's a custom field
@@ -28,37 +29,17 @@ for(var i=0; i<mains.length; i++) {
 	if (typeof Joomla === 'undefined' || typeof Joomla.getOptions === 'undefined') {
 		console.log('Simple Isotope : Joomla /Joomla.getOptions  undefined');
 	} else {
-		 options = Joomla.getOptions('mod_simple_isotope_'+myid);
+		 options[myid] = Joomla.getOptions('mod_simple_isotope_'+myid);
 	}
-	/*if (typeof options === 'undefined' ) { // cache Joomla problem
-		request = {
-			'option' : 'com_ajax',
-			'module' : 'simple_isotope',
-			'data'   : 'param',
-			'id'     : myid,
-			'format' : 'raw'
-			};
-			jQuery.ajax({
-				type   : 'POST',
-				data   : request,
-				success: function (response) {
-				    cookie_name = 'simple_isotope_'+myid;
-					options = JSON.parse(response);
-					iso_cat_k2($,myid,options); 
-					init_readmore($);
-					return true;
-				}
-			});
-	}*/
-	if (typeof options === 'undefined' ) {return false}
-    cookie_name = 'simple_isotope_'+myid;
-	iso_cat_k2(myid,options);
+	if (typeof options[myid] === 'undefined' ) {return false}
+    // cookie_name = 'simple_isotope_'+myid;
+	iso_cat_k2(myid,options[myid]);
 }
 grid_toggle = document.querySelector('.isotope_grid')
 iso_article = document.querySelector('.isotope_an_article')
 iso_div = document.querySelector('.isotope-main .isotope-div')
 article_frame=document.querySelector('iframe#isotope_article_frame')
-if ((options.readmore == 'ajax') || (options.readmore == 'iframe'))  {
+if ((options[myid].readmore == 'ajax') || (options[myid].readmore == 'iframe'))  {
 	iso_height = grid_toggle.offsetHeight;
 	iso_width = grid_toggle.offsetWidth;
 	readmoretitles =  document.querySelectorAll('.isotope-readmore-title');
@@ -74,7 +55,7 @@ if ((options.readmore == 'ajax') || (options.readmore == 'iframe'))  {
 				removeClass(iso_article,'isotope-hide');
 				iso_article.offsetHeight ='auto';
 				addClass(iso_article,'article-loading');
-				if (options.readmore == 'ajax') {
+				if (options[myid].readmore == 'ajax') {
 					document.querySelector("#isotope_an_article").innerHTML = '';
 					var mytoken = document.getElementById("token");
 					token = mytoken.getAttribute("name");
@@ -93,7 +74,7 @@ if ((options.readmore == 'ajax') || (options.readmore == 'iframe'))  {
 						},
 						onError: function(message) {console.log(message.responseText)}
 					}) 
-				} else if (options.readmore == 'iframe') {	
+				} else if (options[myid].readmore == 'iframe') {	
 	/* iFrame */
 					if (iso_height == 0) iso_height="100vh";
 					article_frame.style.height = 0;
@@ -151,10 +132,9 @@ if (article_frame) {
 		article_frame.style.width =iso_width+'px';
 		}); 
 }
-}) // end of ready --------------
+}) // end of DOMContentLoaded --------------
 function displayArticle(result) {
 	var html ='';
-	// Joomla 4.0 : replace result.data by result
     if (result.success) {
 		for (var i=0; i<result.data.length; i++) {
             html += '<h1>'+result.data[i].title+'<button type="button" class="close">X</button></h1>';
@@ -202,15 +182,15 @@ function displayArticle(result) {
 		}
 	}
 }
-function iso_cat_k2 (myid,options) {
+function iso_cat_k2 (myid) {
 	var parent = 'cat';
 	me = "#isotope-main-"+myid+" ";
-	items_limit = options.limit_items;
-	sav_limit = options.limit_items;
-	empty_message = (options.empty == "true");
-	filters = {};
-	asc = (options.ascending == "true");
-	sort_by = options.sortby;
+	items_limit = options[myid].limit_items;
+	sav_limit = options[myid].limit_items;
+	empty_message = (options[myid].empty == "true");
+	filters[myid] = {};
+	asc = (options[myid].ascending == "true");
+	sort_by = options[myid].sortby;
 	if (sort_by.indexOf("featured") !== -1) { // featured 
 		sortValue = sort_by.split(',');
 		asc = {};
@@ -218,37 +198,38 @@ function iso_cat_k2 (myid,options) {
 			if ( sortValue[i] == "featured"){  // featured always first
 				asc[sortValue[i]] = false ;
 			} else {
-				asc[sortValue[i]] = (options.ascending == "true");
+				asc[sortValue[i]] = (options[myid].ascending == "true");
 			}
 		}
 	}
-	if (options.limit_items == 0) { // no limit : hide show more button
+	if (options[myid].limit_items == 0) { // no limit : hide show more button
 		document.querySelector(me+'.iso_button_more').style.display = "none";
 	}
-	if ((options.default_cat == "") || (options.default_cat == null) || (typeof options.default_cat === 'undefined'))
-		filters['cat'] = ['*']
+	if ((options[myid].default_cat == "") || (options[myid].default_cat == null) || (typeof options[myid].default_cat === 'undefined'))
+		filters[myid]['cat'] = ['*']
 	else 
-		filters['cat'] = [options.default_cat];
-	if ((options.default_tag == "") || (options.default_tag == null) || (typeof options.default_tag === 'undefined'))
-		filters['tags'] = ['*']
+		filters[myid]['cat'] = [options[myid].default_cat];
+	if ((options[myid].default_tag == "") || (options[myid].default_tag == null) || (typeof options[myid].default_tag === 'undefined'))
+		filters[myid]['tags'] = ['*']
 	else 
-		filters['tags'] = [options.default_tag];
-	filters['lang'] = ['*'];
-	filters['alpha'] = ['*'];
+		filters[myid]['tags'] = [options[myid].default_tag];
+	filters[myid]['lang'] = ['*'];
+	filters[myid]['alpha'] = ['*'];
+	cookie_name = 'simple_isotope_'+myid;
 	var $cookie = getCookie(cookie_name);
 	if ($cookie != "") {
 		$arr = $cookie.split('&');
 		$arr.forEach(splitCookie);
 	}
-	if (options.displayrange == "true") {
+	if (options[myid].displayrange == "true") {
 		if (!min_range) {
-			min_range = parseInt(options.minrange);
-			max_range = parseInt(options.maxrange);
+			min_range = parseInt(options[myid].minrange);
+			max_range = parseInt(options[myid].maxrange);
 		}
 		rangeSlider = new rSlider({
 			target: '#rSlider',
-			values: {min:parseInt(options.minrange), max:parseInt(options.maxrange)},
-			step: parseInt(options.rangestep),
+			values: {min:parseInt(options[myid].minrange), max:parseInt(options[myid].maxrange)},
+			step: parseInt(options[myid].rangestep),
 			set: [min_range,max_range],
 			range: true,
 			tooltip: true,
@@ -261,10 +242,10 @@ function iso_cat_k2 (myid,options) {
 		sort_by = sort_by.split(',');
 	}
 	var grid = document.querySelector(me + '.isotope_grid');
-	iso = new Isotope(grid,{ 
+	iso[myid] = new Isotope(grid,{ 
 			itemSelector: 'none',
 			percentPosition: true,
-			layoutMode: options.layout,
+			layoutMode: options[myid].layout,
 			getSortData: {
 				title: '[data-title]',
 				category: '[data-category]',
@@ -278,15 +259,18 @@ function iso_cat_k2 (myid,options) {
 			sortBy: sort_by,
 			sortAscending: asc,
 			isJQueryFiltering : false,
-			filter: function(itemElem ){ if (itemElem) return grid_filter(itemElem)	}				
+			filter: function(itemElem ){
+				if (itemElem) 
+					return grid_filter(itemElem)
+				}				
 	}); // end of Isotope definition
 	imagesLoaded(grid, function() {
-		iso.options.itemSelector ='.isotope_item';
-		var $items = Array.prototype.slice.call(iso.element.querySelectorAll('.isotope_item'));
-		iso.appended($items );
-		updateFilterCounts();
+		iso[myid].options.itemSelector ='.isotope_item';
+		var $items = Array.prototype.slice.call(iso[myid].element.querySelectorAll('.isotope_item'));
+		iso[myid].appended($items );
+		updateFilterCounts(myid);
 		if (sort_by == "random") {
-			iso.shuffle();
+			iso[myid].shuffle();
 		}
 		if (typeof $toogle !== 'undefined') {
 			iso_width = grid_toggle.width();
@@ -295,12 +279,13 @@ function iso_cat_k2 (myid,options) {
 	});
 	iso_div = document.querySelector(me + '.isotope-div');
 	iso_div.addEventListener("refresh", function(){
- 	  iso.arrange();
+ 	  iso[myid].arrange();
 	});
-    if (options.pagination == 'infinite') { 
+	iso[myid].arrange();	
+    if (options[myid].pagination == 'infinite') { 
 		// --------------> infinite scroll <----------------
-		var elem = Isotope.data('.isotope_grid');
-		var infScroll = new InfiniteScroll('.isotope_grid',{
+		var elem = Isotope.data(me+'.isotope_grid');
+		var infScroll = new InfiniteScroll(me+'.isotope_grid',{
 			path: getPath,
 			append: '.isotope_item',
 			outlayer: elem,
@@ -310,12 +295,12 @@ function iso_cat_k2 (myid,options) {
         
 		function getPath() {
 			currentpage = this.loadCount;
-			return '?start='+(currentpage+1)*options.page_count;
+			return '?start='+(currentpage+1)*options[myid].page_count;
 		}
 		let more = document.querySelector(me+'.iso_button_more');		
-		if (options.infinite_btn == "true") {
+		if (options[myid].infinite_btn == "true") {
 			infScroll.option({button:'.iso_button_more',loadOnScroll: false});
-			let $viewMoreButton = document.querySelector('.iso_button_more');
+			let $viewMoreButton = document.querySelector(me+'.iso_button_more');
 			more.style.display = "block";
 			['click', 'touchstart'].forEach(type => {
 				$viewMoreButton.addEventListener( type, function(e) {
@@ -335,7 +320,7 @@ function iso_cat_k2 (myid,options) {
 		}
 		infScroll.on( 'append', function( body, path, items, response ) {
 			// console.log(`Appended ${items.length} items on ${path}`);
-			infinite_buttons(items);
+			infinite_buttons(myid,items);
 			// iso.arrange();
 		 });
 	}
@@ -364,18 +349,18 @@ function iso_cat_k2 (myid,options) {
 			})
 		})
 	// set default buttons in cloned area
-		if ( (filters['cat'][0] != '*') || (filters['tags'][0] != '*') ) { // default value set for tags or categories ?
+		if ( (filters[myid]['cat'][0] != '*') || (filters[myid]['tags'][0] != '*') ) { // default value set for tags or categories ?
 			grouptype = ['cat','tags']
-			optionstype = [options.displayfiltercat,options.displayfilter]
+			optionstype = [options[myid].displayfiltercat,options[myid].displayfilter]
 			for (var g = 0; g < grouptype.length;g++) {
-				if (filters[grouptype[g]][0] == "*") continue; // ignore 'all' value
-				clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[grouptype[g]]+'"]');
+				if (filters[myid][grouptype[g]][0] == "*") continue; // ignore 'all' value
+				clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[myid][grouptype[g]]+'"]');
 				if (!clone_exist) {
 					agroup = document.querySelectorAll(me+'.filter-button-group-'+grouptype[g]+' button'); 
 					for (var i=0; i< agroup.length;i++) {
-						if (agroup[i].getAttribute('data-sort-value') == filters[grouptype[g]]) {
-							create_clone_button(grouptype[g],filters[grouptype[g]],agroup[i].textContent,optionstype[g],'');
-							create_clone_listener(filters[grouptype[g]]);
+						if (agroup[i].getAttribute('data-sort-value') == filters[myid][grouptype[g]]) {
+							create_clone_button(grouptype[g],filters[myid][grouptype[g]],agroup[i].textContent,optionstype[g],'');
+							create_clone_listener(filters[myid][grouptype[g]]);
 						}
 					}
 				}
@@ -397,14 +382,17 @@ function iso_cat_k2 (myid,options) {
 		})
 	}
 // use value of search field to filter
-	var quicksearch = document.querySelector(me+'.quicksearch');
+	quicksearch = document.querySelector(me+'.quicksearch');
 	if (quicksearch) {
-		quicksearch.addEventListener('keyup',debounce( function() {
+		quicksearch.addEventListener('keyup',function() {
+			myid = getMyId(this);
+			me = "#isotope-main-"+myid+" ";
+			quicksearch = document.querySelector(me+'.quicksearch');
 			qsRegex = new RegExp( quicksearch.value, 'gi' );
 			CG_Cookie_Set(myid,'search',quicksearch.value);
-			iso.arrange();
-			updateFilterCounts();
-		}));
+			iso[myid].arrange();
+			updateFilterCounts(myid);
+		});
 	}
 //  clear search button + reset filter buttons
     var cancelsquarred = document.querySelectorAll(me+'.ison-cancel-squared');
@@ -413,6 +401,9 @@ function iso_cat_k2 (myid,options) {
 		cancelsquarred[cl].addEventListener( type, function(e) {
 			e.stopPropagation();
 			e.preventDefault();	
+			myid = getMyId(this);
+			me = "#isotope-main-"+myid+" ";
+			quicksearch = document.querySelector(me+'.quicksearch');
 			if (quicksearch) {
 				quicksearch.value = "";
 			}
@@ -424,10 +415,10 @@ function iso_cat_k2 (myid,options) {
 				rangeSlider.setValues(parseInt(ranges[0]),parseInt(ranges[1]));
 				CG_Cookie_Set(myid,'range',range_sel);
 			}
-			filters['cat'] = ['*']
-			filters['tags'] = ['*']
-			filters['lang'] = ['*']
-			filters['alpha'] = ['*']
+			filters[myid]['cat'] = ['*']
+			filters[myid]['tags'] = ['*']
+			filters[myid]['lang'] = ['*']
+			filters[myid]['alpha'] = ['*']
 			grouptype = ['cat','tags','alpha','fields']
 			for (var g = 0; g < grouptype.length;g++) {
 				agroup = document.querySelectorAll(me+'.filter-button-group-'+grouptype[g]+' button'); 
@@ -438,7 +429,7 @@ function iso_cat_k2 (myid,options) {
 					if (grouptype[g] == 'fields') {
 						removeClass(agroup[i],'iso_hide_elem');
 						myparent = agroup[i].parentNode.getAttribute('data-filter-group');
-						if (myparent) filters[myparent] = ['*'];
+						if (myparent) filters[myid][myparent] = ['*'];
 					}
 				}
 			}
@@ -455,66 +446,66 @@ function iso_cat_k2 (myid,options) {
 				var choicesInstance = elChoice.choicesInstance;
 				choicesInstance.removeActiveItems();
 				choicesInstance.setChoiceByValue('')
-				filters[myval] = ['*']
+				filters[myid][myval] = ['*']
 			};
 			$buttons = document.querySelectorAll('#clonedbuttons .is-checked');
 			for (var i=0; i< $buttons.length;i++) { // remove buttons
 				$buttons[i].remove(); 
 			}
-			update_cookie_filter(filters);
-			iso.arrange();
-			updateFilterCounts();
-			if (quicksearch) {
-				quicksearch.focus();
+			update_cookie_filter(myid,filters[myid]);
+			iso[myid].arrange();
+			updateFilterCounts(myid);
+			if (quicksearch[myid]) {
+				quicksearch[myid].focus();
 			}
 		});
 	})
 	}
-	if  (options.displayfilter == "listmulti") 	{ 
+	if  (options[myid].displayfilter == "listmulti") 	{ 
 		events_listmulti('tags');
 	}
-	if (options.displayfiltercat == "listmulti") {
+	if (options[myid].displayfiltercat == "listmulti") {
 		events_listmulti('cat');
 	}
-	if  (options.displayfilterfields == "listmulti")	{ 
+	if  (options[myid].displayfilterfields == "listmulti")	{ 
 		events_listmulti('fields');
 	}
-	if  ((options.displayfiltercat == "list") || (options.displayfiltercat == "listex")) { 
+	if  ((options[myid].displayfiltercat == "list") || (options[myid].displayfiltercat == "listex")) { 
 		events_list('cat');
 	} 
-	if  ((options.displayfilter == "list") || (options.displayfilter == "listex")) { 
+	if  ((options[myid].displayfilter == "list") || (options[myid].displayfilter == "listex")) { 
 		events_list('tags');
 	} 
-	if  ((options.displayfilterfields == "list") || (options.displayfilterfields == "listex")) { 
+	if  ((options[myid].displayfilterfields == "list") || (options[myid].displayfilterfields == "listex")) { 
 		events_list('fields');
 	} 
-	if ((options.displayfiltercat == "multi") || (options.displayfiltercat == "multiex")  ) {
+	if ((options[myid].displayfiltercat == "multi") || (options[myid].displayfiltercat == "multiex")  ) {
 		events_multibutton('cat')
 	}
-	if ((options.displayfilter == "multi") || (options.displayfilter == "multiex")  ) {
+	if ((options[myid].displayfilter == "multi") || (options[myid].displayfilter == "multiex")  ) {
 		events_multibutton('tags')
 	}
-	if ((options.displayfilterfields == "multi") || (options.displayfilterfields == "multiex")) { 
+	if ((options[myid].displayfilterfields == "multi") || (options[myid].displayfilterfields == "multiex")) { 
 		events_multibutton('fields');
 	}
-	if (options.language_filter == "multi") { 
+	if (options[myid].language_filter == "multi") { 
 		events_multibutton('lang')	}
-	if (options.displayalpha == "multi") { 
+	if (options[myid].displayalpha == "multi") { 
 		events_multibutton('alpha')
 	}
-	if (options.displayfiltercat == "button"){
+	if (options[myid].displayfiltercat == "button"){
 		events_button('cat');
 	}
-	if (options.displayfilter == "button") { 
+	if (options[myid].displayfilter == "button") { 
 		events_button('tags');
 	}
-	if (options.displayfilterfields == "button") { 
+	if (options[myid].displayfilterfields == "button") { 
 		events_button('fields');
 	}
-	if (options.language_filter == "button") { 
+	if (options[myid].language_filter == "button") { 
 		events_button('lang');
 	}
-	if (options.displayalpha == "button") { 
+	if (options[myid].displayalpha == "button") { 
 		events_button('alpha');
 	}
 	more = document.querySelector(me+'.iso_button_more');
@@ -525,12 +516,12 @@ function iso_cat_k2 (myid,options) {
 				e.preventDefault();		
 				if (items_limit > 0) {
 					items_limit = 0; // no limit
-					this.textContent = options.libless;
+					this.textContent = options[myid].libless;
 				} else {
-					items_limit = options.limit_items; // set limit
-					this.textContent = options.libmore;
+					items_limit = options[myid].limit_items; // set limit
+					this.textContent = options[myid].libmore;
 				}
-				updateFilterCounts();
+				updateFilterCounts(myid);
 			});
 		})
 	}
@@ -542,7 +533,7 @@ function iso_cat_k2 (myid,options) {
 			document.getElementsByClassName('isotope_grid')[0].classList.remove('isogrid75');
 			document.getElementsByClassName('isotope_grid')[0].classList.remove('offstart');
 			document.getElementsByClassName('isotope_grid')[0].classList.remove('offend');
-			iso.arrange();
+			iso[myid].arrange();
 		})
 		myOffcanvas.addEventListener('show.bs.offcanvas', function () {
 			document.getElementById('offcanvas_isotope').classList.add('offcanvas25');
@@ -550,7 +541,7 @@ function iso_cat_k2 (myid,options) {
 				document.getElementsByClassName('isotope_grid')[0].classList.add('offstart');
 			if (document.getElementById('offcanvas_isotope').classList.contains("offcanvas-end")) 
 				document.getElementsByClassName('isotope_grid')[0].classList.add('offend');
-			iso.arrange();
+			iso[myid].arrange();
 		})
 	}
 }// end of iso_cat_k2
@@ -558,7 +549,7 @@ function rangeUpdated(){
 	range_sel = rangeSlider.getValue();
 	range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
 	CG_Cookie_Set(myid,'range',range_sel);
-	iso.arrange();
+	iso[myid].arrange();
 }
 // create listmulti eventListeners
 function events_listmulti(component) {
@@ -571,18 +562,18 @@ function events_listmulti(component) {
 			filter_list_multi(this,evt,'remove');
 		});
 		$parent = agroup[i].parentElement.parentElement.parentElement.getAttribute('data-filter-group');
-		if (typeof filters[$parent] === 'undefined' ) { 
-			filters[$parent] = ['*'];
+		if (typeof filters[myid][$parent] === 'undefined' ) { 
+			filters[myid][$parent] = ['*'];
 		}			
 	};	
-	if ((filters[$parent][0] != '*') && (filters[$parent].length == 1)) {
+	if ((filters[myid][$parent][0] != '*') && (filters[myid][$parent].length == 1)) {
 		var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+component);
 		var choicesInstance = elChoice.choicesInstance;
-		var savefilter = filters[$parent][0];
+		var savefilter = filters[myid][$parent][0];
 		choicesInstance.removeActiveItemsByValue(''); // remove all 
 		choicesInstance.setChoiceByValue(savefilter);
 		if (elChoice.parentElement.parentElement.className == "offcanvas-body") { // need clone
-			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[component]+'"]');
+			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[myid][component]+'"]');
 			if (!clone_exist) { // create default button
 				sel = savefilter;
 				lib = choicesInstance.getValue()[0].label;
@@ -608,11 +599,11 @@ function events_list(component) {
 	var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+component);
 	if (!elChoice) return;
 	var choicesInstance = elChoice.choicesInstance;
-	choicesInstance.setChoiceByValue(filters[component]);
-	if ((elChoice.parentElement.parentElement.className == "offcanvas-body") && (filters[component] != '*')) { // need clone
+	choicesInstance.setChoiceByValue(filters[myid][component]);
+	if ((elChoice.parentElement.parentElement.className == "offcanvas-body") && (filters[myid][component] != '*')) { // need clone
 		clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[component]+'"]');
 		if (!clone_exist) { // create default button
-			sel = filters[component];
+			sel = filters[myid][component];
 			lib = choicesInstance.getValue().label;
 			child = null;
 			create_clone_button(component,sel,lib,'list',child);
@@ -660,10 +651,11 @@ function events_multibutton(component) {
 	};
 }	
 function update_sort_buttons($this) {
+	myid = getMyId($this);
 	var sortValue = $this.getAttribute('data-sort-value');
 	if (sortValue == "random") {
 		CG_Cookie_Set(myid,'sort',sortValue+'-');
-		iso.shuffle();
+		iso[myid].shuffle();
 		return;
 	} 
 	sens = $this.getAttribute('data-sens');
@@ -691,13 +683,13 @@ function update_sort_buttons($this) {
 		}
 	}
 	CG_Cookie_Set(myid,'sort',sortValue+'-'+asc);
-	iso.options.sortBy = sortValue;
-	iso.options.sortAscending = sortAsc;
-	iso.arrange();
+	iso[myid].options.sortBy = sortValue;
+	iso[myid].options.sortAscending = sortAsc;
+	iso[myid].arrange();
 }
 /*------- infinite scroll : update buttons list------------*/
-function infinite_buttons(appended_list) {
-	if (options.displayalpha != 'false') {
+function infinite_buttons(myid,appended_list) {
+	if (options[myid].displayalpha != 'false') {
 	// alpha buttons list
 		for (x=0;x < appended_list.length-1;x++) {
 			alpha = appended_list[x].attributes['data-alpha'].value;
@@ -706,7 +698,7 @@ function infinite_buttons(appended_list) {
 				buttons = document.querySelector(me+'.filter-button-group-alpha');
 				var abutton = document.createElement('button');
 				abutton.classList.add('btn');
-				abutton.classList.add(options.button_bootstrap.substr(4,100).trim());
+				abutton.classList.add(options[myid].button_bootstrap.substr(4,100).trim());
 				abutton.classList.add('iso_button_alpha_'+alpha);
 				abutton.setAttribute('data-sort-value',alpha);
 				abutton.title = alpha;
@@ -725,13 +717,14 @@ function grid_filter($this) {
 	var buttonResult = false;
 	var rangeResult = true;
 	var searchAlpha = true;
-	if (filters['alpha'].indexOf('*') == -1) {// alpha filter
+	myid = getMyId($this);
+	if (filters[myid]['alpha'].indexOf('*') == -1) {// alpha filter
 		alpha = $this.getAttribute('data-title').substring(0,1);
-		if (filters['alpha'].indexOf(alpha) == -1) return false;
+		if (filters[myid]['alpha'].indexOf(alpha) == -1) return false;
 	}
-	if (filters['lang'].indexOf('*') == -1) { 
+	if (filters[myid]['lang'].indexOf('*') == -1) { 
 		lalang = $this.getAttribute('data-lang') ;
-		if (filters['lang'].indexOf(lalang) == -1)  {
+		if (filters[myid]['lang'].indexOf(lalang) == -1)  {
 			return false;
 		}
 	}
@@ -742,54 +735,54 @@ function grid_filter($this) {
 			rangeResult = (parseInt(lerange) >= parseInt(ranges[0])) && (parseInt(lerange) <= parseInt(ranges[1]));
 		}
 	}
-	if ((options.article_cat_tag != "fields") && (options.article_cat_tag != "catfields") && (options.article_cat_tag != "tagsfields") && (options.article_cat_tag != "cattagsfields")) {
-		if ((filters['cat'].indexOf('*') != -1) && (filters['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
+	if ((options[myid].article_cat_tag != "fields") && (options[myid].article_cat_tag != "catfields") && (options[myid].article_cat_tag != "tagsfields") && (options[myid].article_cat_tag != "cattagsfields")) {
+		if ((filters[myid]['cat'].indexOf('*') != -1) && (filters[myid]['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
 		count = 0;
-		if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-			if (filters['cat'].indexOf(lacat) == -1)  {
+		if (filters[myid]['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if (filters[myid]['cat'].indexOf(lacat) == -1)  {
 				return false; // n'appartient pas à la bonne classe: on ignore
 			} else { count = 1; } // on a trouvé la catégorie
 		}
-		if (filters['tags'].indexOf('*') != -1) { // tous les tags
+		if (filters[myid]['tags'].indexOf('*') != -1) { // tous les tags
 			return searchResult && rangeResult && true;
 		}
 		for (var i in lescles) {
-			if  (filters['tags'].indexOf(lescles[i]) != -1) {
+			if  (filters[myid]['tags'].indexOf(lescles[i]) != -1) {
 				buttonResult = true;
 				count += 1;
 			}
 		}
-		if (options.searchmultiex == "true")	{
-			lgth = filters['cat'].length + filters['tags'].length;
-			if ((filters['tags'].indexOf('*') != -1) || (filters['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
+		if (options[myid].searchmultiex == "true")	{
+			lgth = filters[myid]['cat'].length + filters[myid]['tags'].length;
+			if ((filters[myid]['tags'].indexOf('*') != -1) || (filters[myid]['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
 			return searchResult && rangeResult && (count == lgth) ;
 		} else { 
 			return searchResult && rangeResult && buttonResult;
 		}
 	} else { // fields
 		ix = 0;
-		if (typeof filters === 'undefined' ) { // aucun filtre: on passe
+		if (typeof filters[myid] === 'undefined' ) { // aucun filtre: on passe
 			return searchResult && rangeResult && true;
 		}
 		// combien de filtres diff. tout ?
 		filterslength = 0;
-		for (x in filters) {
+		for (x in filters[myid]) {
 			if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags') ) continue; 
 			filterslength++;
-			if (filters[x].indexOf('*') != -1) ix++; 
+			if (filters[myid][x].indexOf('*') != -1) ix++; 
 		}
 		catok = false;
-		if (filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-			if (filters['cat'].indexOf(lacat) == -1)  {
+		if (filters[myid]['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if (filters[myid]['cat'].indexOf(lacat) == -1)  {
 				return false; // n'appartient pas à la bonne classe: on ignore
 			} else { catok = true; } // on a trouvé la catégorie
 		} else {
 			catok = true;
 		}
 		tagok = false;
-		if (filters['tags'].indexOf('*') == -1) { // on a demandé un tag
+		if (filters[myid]['tags'].indexOf('*') == -1) { // on a demandé un tag
 			for (var i in lescles) {
-				if  (filters['tags'].indexOf(lescles[i]) != -1) {
+				if  (filters[myid]['tags'].indexOf(lescles[i]) != -1) {
 					tagok = true;
 				//	filterslength++;
 				}
@@ -800,20 +793,20 @@ function grid_filter($this) {
 		if ( (ix == filterslength) && catok && tagok) return searchResult && rangeResult && true;
 		count = 0;
 		for ( var j in lescles) {
-			for (x in filters) {
+			for (x in filters[myid]) {
 				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags'))continue; 
-				if  (filters[x].indexOf(lescles[j]) != -1) { 
+				if  (filters[myid][x].indexOf(lescles[j]) != -1) { 
 					// buttonResult = true;
 					count += 1;
 				}
 			}
 		}
-		if (options.searchmultiex == "true")	{ // multi-select on grouped buttons
+		if (options[myid].searchmultiex == "true")	{ // multi-select on grouped buttons
 			lgth = 0;
-			for (x in filters) {
+			for (x in filters[myid]) {
 				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') ||(x == 'tags')) continue;
-				lgth = lgth + filters[x].length;
-				if (filters[x].indexOf('*') != -1) lgth = lgth - 1;
+				lgth = lgth + filters[myid][x].length;
+				if (filters[myid][x].indexOf('*') != -1) lgth = lgth - 1;
 			}
 			return searchResult && rangeResult && (count == lgth) && tagok;
 		} else  {
@@ -823,6 +816,7 @@ function grid_filter($this) {
 } 
 // ---- Filter List 
 function filter_list($this,evt,params) {
+	myid = getMyId($this);
 	$parent = $this.getAttribute('data-filter-group');
 	$isclone = false;
 	if ($this.parentNode.id == "clonedbuttons") { // clone 
@@ -843,32 +837,32 @@ function filter_list($this,evt,params) {
 		$needclone = true;
 	}
 	if (params == 'remove' && $needclone) { // remove item from offcanvas => remove button
-		removeFilter( filters, $parent, evt.detail.value );
+		removeFilter( filters[myid], $parent, evt.detail.value );
 		myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+evt.detail.value+'"]')
 		if (myclone) myclone.remove();
-		if (filters[$parent].length == 0) {
-			filters[$parent] = ['*'] ;
+		if (filters[myid][$parent].length == 0) {
+			filters[myid][$parent] = ['*'] ;
 			choicesInstance.setChoiceByValue('')
-			update_cookie_filter(filters);
+			update_cookie_filter(myid,filters[myid]);
 		}	
 		return;
 	}
 	if (sortValue == '')   {
 		choicesInstance.removeActiveItems();
 		choicesInstance.setChoiceByValue('')		
-		filters[$parent] = ['*'];
+		filters[myid][$parent] = ['*'];
 		$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 		for (var i=0; i< $buttons.length;i++) { // remove buttons
 			$buttons[i].remove(); 
 		}
 	} else { 
-		filters[$parent] = [sortValue];
+		filters[myid][$parent] = [sortValue];
 		if ($needclone) { // clone
 			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< $buttons.length;i++) { // remove buttons
 				$buttons[i].remove(); 
 			}
-			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[$parent]+'"]');
+			clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[myid][$parent]+'"]');
 			if (!clone_exist) {
 				lib = evt.detail.choice.label;
 				create_clone_button($parent,sortValue,lib,'list','');
@@ -876,12 +870,13 @@ function filter_list($this,evt,params) {
 			}
 		}
 	}
-	update_cookie_filter(filters);
-	iso.arrange(); 
-	updateFilterCounts();
+	update_cookie_filter(myid,filters[myid]);
+	iso[myid].arrange(); 
+	updateFilterCounts(myid);
 }
 	// ----- Filter MultiSelect List
 	function filter_list_multi($this,evt,params) {
+		myid = getMyId($this);
 		$evnt = evt;
 		$params = params;
 		$isclone = false;
@@ -893,30 +888,30 @@ function filter_list($this,evt,params) {
 			$parent = $this.parentNode.parentNode.parentNode.getAttribute('data-filter-group')
 			$selectid = $this.getAttribute('id');
 		}
-		if (typeof filters[$parent] === 'undefined' ) { 
-			filters[$parent] = [];
+		if (typeof filters[myid][$parent] === 'undefined' ) { 
+			filters[myid][$parent] = [];
 		}
 		var elChoice = document.querySelector('joomla-field-fancy-select#'+$selectid);
 		var choicesInstance = elChoice.choicesInstance;
 		
 		if ($params == "remove") { // deselect element except all
 			if ($isclone) {
-				removeFilter( filters, $parent, $this.getAttribute('data-sort-value') );
-				savfilter = JSON.parse(JSON.stringify(filters));
+				removeFilter( filters[myid], $parent, $this.getAttribute('data-sort-value') );
+				savfilter = JSON.parse(JSON.stringify(filters[myid]));
 				choicesInstance.removeActiveItems();
-				filters = JSON.parse(JSON.stringify(savfilter));
+				filters[myid] = JSON.parse(JSON.stringify(savfilter));
 				choicesInstance.removeActiveItemsByValue('');
-				for (var i = 0; i < filters[$parent].length; i++) {
-					remval = filters[$parent][i];
+				for (var i = 0; i < filters[myid][$parent].length; i++) {
+					remval = filters[myid][$parent][i];
 					choicesInstance.setChoiceByValue(remval);
 				}
 			} else {
-				removeFilter( filters, $parent, $evnt.detail.value );
+				removeFilter( filters[myid], $parent, $evnt.detail.value );
 				myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+$evnt.detail.value+'"]')
 				if (myclone) myclone.remove();
 			}
-			if (filters[$parent].length == 0) {
-				filters[$parent] = ['*'] ;
+			if (filters[myid][$parent].length == 0) {
+				filters[myid][$parent] = ['*'] ;
 				choicesInstance.setChoiceByValue('')
 			}
 		}
@@ -929,7 +924,7 @@ function filter_list($this,evt,params) {
 			sel = $evnt.detail.choice.value;
 			lib = $evnt.detail.choice.label;
 			if (sel == '') {// all
-				filters[$parent] = ['*'];
+				filters[myid][$parent] = ['*'];
 				choicesInstance.removeActiveItems();
 				choicesInstance.setChoiceByValue('');
 				$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
@@ -937,28 +932,30 @@ function filter_list($this,evt,params) {
 					$buttons[i].remove(); 
 				}
 			} else {
-				if (filters[$parent].indexOf('*') != -1) { // was all
+				if (filters[myid][$parent].indexOf('*') != -1) { // was all
 					choicesInstance.removeActiveItemsByValue('')
-					filters[$parent] = []; // remove it
+					filters[myid][$parent] = []; // remove it
 				}
 				if ($needclone) {
-					clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[$parent]+'"]');
+					clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+filters[myid][$parent]+'"]');
 					if (!clone_exist) {
 						create_clone_button($parent,sel,lib,'list_multi','');
 						create_clone_listener(sel);
 					}
 				}
-				addFilter( filters, $parent, sel );
+				addFilter( filters[myid], $parent, sel );
 			}
 			choicesInstance.hideDropdown();
 		}
-		update_cookie_filter(filters);
-		iso.arrange(); 
-		updateFilterCounts();
+		update_cookie_filter(myid,filters[myid]);
+		iso[myid].arrange(); 
+		updateFilterCounts(myid);
 	}
      
 	function filter_button($this,evt) {
 		if (hasClass($this,'disabled')) return; //ignore disabled buttons
+		myid = getMyId($this);
+		$this.parentElement.parentElement.parentElement.getAttribute
 		$parent = $this.parentNode.getAttribute('data-filter-group');
 		child =  $this.getAttribute('data-child'); // child group number
 		var sortValue = $this.getAttribute('data-sort-value');
@@ -976,8 +973,8 @@ function filter_list($this,evt,params) {
 			toggleClass(abutton,'is-checked'); // all button
 			$isclone = true;
 		} 		
-		if (typeof filters[$parent] === 'undefined' ) { 
-			filters[$parent] = {};
+		if (typeof filters[myid][$parent] === 'undefined' ) { 
+			filters[myid][$parent] = {};
 		}
 		$needclone = false;
 		$grdparent = $this.parentNode.parentNode;
@@ -999,7 +996,7 @@ function filter_list($this,evt,params) {
 			}
 		}
 		if (sortValue == '*') {
-			filters[$parent] = ['*'];
+			filters[myid][$parent] = ['*'];
 			if ($isclone) {
 				$this.remove;
 			}
@@ -1007,16 +1004,17 @@ function filter_list($this,evt,params) {
 				set_family_all(me,child,'button');
 			}
 		} else { 
-			filters[$parent]= [sortValue];
+			filters[myid][$parent]= [sortValue];
 			if (child) {
 				set_family(me,'',child,sortValue,'button');
 			}
 		}
-		update_cookie_filter(filters);
-		iso.arrange(); 
-		updateFilterCounts();
+		update_cookie_filter(myid,filters[myid]);
+		iso[myid].arrange(); 
+		updateFilterCounts(myid);
 	}
 	function filter_multi($this,evt) {
+		myid = getMyId($this);
 		var sortValue = $this.getAttribute('data-sort-value');
 		child =  $this.getAttribute('data-child'); // child group number
 		$isclone = false;
@@ -1053,11 +1051,11 @@ function filter_list($this,evt,params) {
 			}
 		}
 		// end of cloning
-		if (typeof filters[$parent] === 'undefined' ) { 
-			filters[$parent] = [];
+		if (typeof filters[myid][$parent] === 'undefined' ) { 
+			filters[myid][$parent] = [];
 		}
 		if (sortValue == '*') {
-			filters[$parent] = ['*'];
+			filters[myid][$parent] = ['*'];
 			clones = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< clones.length;i++) { 
 				clones[i].remove(); // remove other cloned buttons
@@ -1066,24 +1064,24 @@ function filter_list($this,evt,params) {
 				set_family_all(me,child,'button')
 			}
 		} else { 
-			removeFilter(filters, $parent,'*');
-			removeFilter(filters, $parent,'none');
+			removeFilter(filters[myid], $parent,'*');
+			removeFilter(filters[myid], $parent,'none');
 			if ( isChecked ) {
-				addFilter( filters, $parent,sortValue );
+				addFilter( filters[myid], $parent,sortValue );
 				if (child) {
 					set_family(me,$parent,child,sortValue,'button')
 				}
 			} else {
-				removeFilter( filters, $parent, sortValue );
-				if (filters[$parent].length == 0) {// no more selection
-					filters[$parent] = ['*'];
+				removeFilter( filters[myid], $parent, sortValue );
+				if (filters[myid][$parent].length == 0) {// no more selection
+					filters[myid][$parent] = ['*'];
 					if ($isclone) {
 						aclone = document.querySelector('.filter-button-group-'+$parent+' [data-sort-value="*"]');
 						addClass(aclone,'is-checked');
 					}
 				}
 				if (child) {
-					if (filters[$parent] == ['*']) {// no more selection
+					if (filters[myid][$parent] == ['*']) {// no more selection
 						set_family_all(me,child,'button')
 					} else { // remove current selection
 						del_family(me,$parent,child,sortValue,'button')
@@ -1091,11 +1089,12 @@ function filter_list($this,evt,params) {
 				}
 			}	
 		}
-		update_cookie_filter(filters);
-		iso.arrange(); 
-		updateFilterCounts();
+		update_cookie_filter(myid,filters[myid]);
+		iso[myid].arrange(); 
+		updateFilterCounts(myid);
 	}
 	function set_buttons_multi($this) {
+		myid = getMyId($this);
 		$parent = $this.parentNode.getAttribute('data-filter-group');
 		if ($this.getAttribute('data-sort-value') == '*') { // on a cliqué sur tout => on remet le reste à blanc
 			buttons = $this.parentNode.querySelectorAll('button.is-checked');
@@ -1104,12 +1103,12 @@ function filter_list($this,evt,params) {
 			}
 			addClass($this,'is-checked');
 		} else { // on a cliqué sur un autre bouton : uncheck le bouton tout
-			if ((filters[$parent].length == 0) || (filters[$parent] == '*')) {// plus rien de sélectionné : on remet tout actif
+			if ((filters[myid][$parent].length == 0) || (filters[myid][$parent] == '*')) {// plus rien de sélectionné : on remet tout actif
 				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
 				addClass(button_all,'is-checked');
-				filters[$parent] = ['*'];
-				update_cookie_filter(filters);
-				iso.arrange();
+				filters[myid][$parent] = ['*'];
+				update_cookie_filter(filters[myid]);
+				iso[myid].arrange();
 			}
 			else {
 				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
@@ -1119,10 +1118,11 @@ function filter_list($this,evt,params) {
 	}
 	//
 	// check items limit and hide unnecessary items
-	function updateFilterCounts() {
+	function updateFilterCounts(myid) {
+		me = "#isotope-main-"+myid+" ";
 		var items = document.querySelectorAll(me + '.isotope_item');
 		var more = document.querySelector(me+'.iso_button_more')
-		var itemElems = iso.getFilteredItemElements();
+		var itemElems = iso[myid].getFilteredItemElements();
 		var count_items = itemElems.length;
 		var divempty = document.querySelector(me + '.iso_div_empty')
 		for (var i=0;i < items.length;i++) {
@@ -1145,14 +1145,14 @@ function filter_list($this,evt,params) {
 					addClass(items[index],'iso_hide_elem');
 				}
 			};
-			if (index < items_limit && options.pagination != 'infinite') { // unnecessary button
+			if (index < items_limit && options[myid].pagination != 'infinite') { // unnecessary button
 				addClass(more,'iso_hide_elem');
 			} else { // show more button required
 				removeClass(more,'iso_hide_elem');
 			}
 		} 
 		// hide show see less button
-		if ((items_limit == 0) && (sav_limit > 0) && options.pagination != 'infinite') { 
+		if ((items_limit == 0) && (sav_limit > 0) && options[myid].pagination != 'infinite') { 
 			for(var index=0;index < itemElems.length;index++) {
 				if (hasClass(itemElems[index],'iso_hide_elem')) {
 					count_items -=1;
@@ -1164,7 +1164,7 @@ function filter_list($this,evt,params) {
 				addClass(more,'iso_hide_elem');
 			}
 		}
-		iso.arrange();
+		iso[myid].arrange();
 	}
 // -- Create a clone button
 function create_clone_button($parent,$sel,$lib,$type,child) {
@@ -1228,7 +1228,7 @@ function removeFilter( filters, $parent, filter ) {
 		filters[$parent].splice( index, 1 );
 	}
 }	
-function update_cookie_filter(filters) {
+function update_cookie_filter(id,filters) {
 	$filter_cookie = "";
 	for (x in filters) {
 		if (x == "null") continue;
@@ -1236,7 +1236,7 @@ function update_cookie_filter(filters) {
 		$filter_cookie += x+'<'+filters[x].toString();
 	}
 	if ($filter_cookie.length > 0) $filter_cookie += ">";
-	CG_Cookie_Set(myid,'filter',$filter_cookie);
+	CG_Cookie_Set(id,'filter',$filter_cookie);
 }
 function getCookie(name) {
   let matches = document.cookie.match(new RegExp(
@@ -1248,6 +1248,7 @@ function CG_Cookie_Set(id,param,b) {
 	var expires = "";
 	$secure = "";
 	if (window.location.protocol == "https:") $secure="secure;"; 
+	cookie_name = 'simple_isotope_'+id;
 	lecookie = getCookie(cookie_name);
 	$val = param+':'+b;
 	$cook = $val;
@@ -1322,10 +1323,10 @@ function splitCookie(item) {
 			for (x=0;x < val.length-1;x++) {
 				values = val[x].split("<");
 				if (std_parents.indexOf(values[0]) != -1) { // not a custom field
-					if ( (values[0] == "tags" && options.displayfilter == 'listmulti') || (values[0] == "cat" && options.displayfiltercat == 'listmulti')) { // liste multi select	
+					if ( (values[0] == "tags" && options[myid].displayfilter == 'listmulti') || (values[0] == "cat" && options[myid].displayfiltercat == 'listmulti')) { // liste multi select	
 						var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
 						var choicesInstance = elChoice.choicesInstance;
-						filters[values[0]] = values[1].split(',');
+						filters[myid][values[0]] = values[1].split(',');
 						if (values[1] == '*') {
 							choicesInstance.setChoiceByValue('')
 						} else {
@@ -1346,7 +1347,7 @@ function splitCookie(item) {
 						}
 					} else {
 						if (values[1] != '*') { // !tout
-							filters[values[0]] = values[1].split(',');
+							filters[myid][values[0]] = values[1].split(',');
 							if (values[0] == 'lang') {
 								filterButtons = document.querySelectorAll(me+'.iso_lang button.is-checked');
 							} else {
@@ -1355,44 +1356,45 @@ function splitCookie(item) {
 							for(f=0;f < filterButtons.length;f++) {
 								filterButtons[f].classList.remove('is-checked');
 							}
-							for(v=0;v < filters[values[0]].length;v++) {
-								if ( ((values[0] == "tags") && (options.displayfilter == 'list') ) ||
-									((values[0] == "cat") && (options.displayfiltercat == 'list')) ) {
+							for(v=0;v < filters[myid][values[0]].length;v++) {
+								if ( ((values[0] == "tags") && (options[myid].displayfilter == 'list') ) ||
+									((values[0] == "cat") && (options[myid].displayfiltercat == 'list')) ) {
 									var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
 									var choicesInstance = elChoice.choicesInstance;
-									choicesInstance.setChoiceByValue(filters[values[0]][v]);
+									choicesInstance.setChoiceByValue(filters[myid][values[0]][v]);
 									if (elChoice.parentElement.parentElement.className == "offcanvas-body")  { // need clone
 										var choicesInstance = elChoice.choicesInstance;
-										sel = filters[values[0]][v];
+										sel = filters[myid][values[0]][v];
 										lib = choicesInstance.getValue().label;
 										child = null;
 										create_clone_button(values[0],sel,lib,'list',child);
 										create_clone_listener(sel);
 									}
 								} else {
-									$button =  document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]);
+									$button =  document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[myid][values[0]][v]);
+									if (!$button)  continue;
 									addClass($button,'is-checked');
 									if (hasClass($button.parentNode.parentNode,"offcanvas-body"))  { // need clone
 										$type ='button'; // assume button
-										if ((values[0] == "cat" && (options.displayfiltercat == "multi" || options.displayfiltercat == "multiex")) ||
-										    (values[0] == "tags" && (options.displayfilter == "multi" || options.displayfiltercat == "multiex")) || 
-											(values[0] == "alpha" && (options.displayalpha == "multi" || options.displayalpha == "multiex")) ) {
+										if ((values[0] == "cat" && (options[myid].displayfiltercat == "multi" || options[myid].displayfiltercat == "multiex")) ||
+										    (values[0] == "tags" && (options[myid].displayfilter == "multi" || options[myid].displayfiltercat == "multiex")) || 
+											(values[0] == "alpha" && (options[myid].displayalpha == "multi" || options[myid].displayalpha == "multiex")) ) {
 												$type = 'multi';
 										}
 										child = null;
 										lib = $button.innerHTML;
-										create_clone_button(values[0],filters[values[0]][v],lib,$type,child);
-										create_clone_listener(filters[values[0]][v]);
+										create_clone_button(values[0],filters[myid][values[0]][v],lib,$type,child);
+										create_clone_listener(filters[myid][values[0]][v]);
 									}
 								}
 							};
 						}
 					}
 				} else { //fields
-					if (options.displayfilterfields == 'listmulti') { // liste multi select		
+					if (options[myid].displayfilterfields == 'listmulti') { // liste multi select		
 						var elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
 						var choicesInstance = elChoice.choicesInstance;
-						filters[values[0]] = values[1].split(',');
+						filters[myid][values[0]] = values[1].split(',');
 						if (values[1] == '*') {
 							choicesInstance.setChoiceByValue('')
 						} else {
@@ -1416,12 +1418,12 @@ function splitCookie(item) {
 						for(l=0;l < alist.length;l++) {
 								alist[l].classList.remove('is-checked');
 						}
-						filters[values[0]] = values[1].split(',');
-						for(v=0;v < filters[values[0]].length;v++) {
-							if ((options.displayfilterfields == 'list') ||(options.displayfilterfields == 'listex')) {
+						filters[myid][values[0]] = values[1].split(',');
+						for(v=0;v < filters[myid][values[0]].length;v++) {
+							if ((options[myid].displayfilterfields == 'list') ||(options[myid].displayfilterfields == 'listex')) {
 								elChoice = document.querySelector('joomla-field-fancy-select#isotope-select-'+values[0]);
 								choicesInstance = elChoice.choicesInstance;
-								filters[values[0]] = values[1].split(',');
+								filters[myid][values[0]] = values[1].split(',');
 								if (values[1] == '*') {
 									choicesInstance.setChoiceByValue('')
 								} else {
@@ -1436,7 +1438,7 @@ function splitCookie(item) {
 									}
 								}
 							} else {
-								$this = document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[values[0]][v]);
+								$this = document.querySelector( me+'.iso_button_'+values[0]+'_'+ filters[myid][values[0]][v]);
 								addClass($this,'is-checked');		
 								child =  $this.getAttribute('data-child'); // child group number
 								if (child) {
@@ -1446,8 +1448,8 @@ function splitCookie(item) {
 								if (hasClass($this.parentNode.parentNode.parentNode,"offcanvas-body"))  { // need clone
 									$type ='button'; 
 									lib = $this.innerHTML;
-									create_clone_button(values[0],filters[values[0]][v],lib,$type,child);
-									create_clone_listener(filters[values[0]][v]);
+									create_clone_button(values[0],filters[myid][values[0]][v],lib,$type,child);
+									create_clone_listener(filters[myid][values[0]][v]);
 								}
 							}
 						};
@@ -1483,7 +1485,7 @@ function set_family(me,$parent,child,sortValue,$type) {
 		} else { // button
 			$myparent = document.querySelector(me+'.filter-button-group-fields').parentNode;
 			$this = $myparent.querySelector('[data-group-id="'+child+'"]');
-			if (($parent == "") || (($parent != "") && (filters[$parent].length == 1) && (filters[$parent] != '*'))) { // multi-select
+			if (($parent == "") || (($parent != "") && (filters[myid][$parent].length == 1) && (filters[myid][$parent] != '*'))) { // multi-select
 				buttons = $this.querySelectorAll('button');
 				for (var i=0;i< buttons.length;i++) {
 					if (!hasClass(buttons[i],'iso_hide_elem'))	addClass(buttons[i],'iso_hide_elem')
@@ -1537,7 +1539,7 @@ function set_family(me,$parent,child,sortValue,$type) {
 			parents = newparents;
 		}
 		childstr = $this.getAttribute('data-filter-group');
-		filters[childstr] = ['*'];
+		filters[myid][childstr] = ['*'];
 		sortValue = '';
 	}
 }
@@ -1593,7 +1595,7 @@ function del_family(me,$parent,child,sortValue,$type) {
 			parents = newparents;
 		}
 		childstr = $this.getAttribute('data-filter-group');
-		filters[childstr] = ['*'];
+		filters[myid][childstr] = ['*'];
 		sortValue = '';
 	}
 }
@@ -1632,7 +1634,7 @@ function set_family_all(me,child,$type) {
 			child = $mychild_all.getAttribute('data-child'); 
 		}
 		childstr = $this.getAttribute('data-filter-group');
-		filters[childstr] = ['*'];
+		filters[myid][childstr] = ['*'];
 	}
 }
 function go_click($entree,$link) {
@@ -1643,6 +1645,16 @@ function go_click($entree,$link) {
 		location=$link;
 	}
 }
+/* get myid from isotope-main */
+getMyId = function($this) {
+	$parent = $this.parentNode;
+	while (!hasClass($parent,'isotope-main')) {
+		$parent = $parent.parentNode;
+	}
+	myid = $parent.getAttribute("data");
+	return myid; 
+}
+
 // from https://code.tutsplus.com/tutorials/from-jquery-to-javascript-a-reference--net-23703
 hasClass = function (el, cl) {
     var regex = new RegExp('(?:\\s|^)' + cl + '(?:\\s|$)');

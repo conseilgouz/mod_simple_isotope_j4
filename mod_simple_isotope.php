@@ -1,9 +1,9 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.2
+* Version			: 4.1.5
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -31,7 +31,7 @@ $iso_entree = $params->get('iso_entree', 'webLinks');
 $article_cat_tag = $params->get('cat_or_tag',$iso_entree == "webLinks"?'cat':'tags'); 
 $iso_layout = $params->get('iso_layout', 'fitRows');
 $iso_nbcol = $params->get('iso_nbcol',2);
-$tags_list = $params->get('tags');
+$tags_list = $params->get('tags',array());
 // check authorised tags
 $authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
 foreach ($tags_list as $key=>$atag) {

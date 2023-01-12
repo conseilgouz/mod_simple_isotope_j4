@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.5</version>
+        <note>
+            <item>Update : 12/01/2023</item>
+        </note>
+		<fix>
+			<item>Multiple isotope modules on a single page</item>
+			<item>Suppress notice if no tag defined</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.4</version>
         <note>
             <item>Update : 07/12/2022</item>
