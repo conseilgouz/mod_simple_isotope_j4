@@ -2,22 +2,22 @@
 * Simple isotope module  - Joomla Module 
 * Version			: 4.1.5
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
 
-/* note : diffrence entre module et composant
-
+/* note : difference entre module et composant
+	module id 
 	displayfiltertags => displayfilter dans module
 */
 var $close,grid_toggle,iso_article,me,
 	empty_message,items_limit, sav_limit,
 	iso_height,iso_width,article_frame;
-var iso = [],filters = [],options = [],quicksearch;
+var iso = [],filters = [],options = [],rangeSlider = [],quicksearch;
 var resetToggle,options,myid;
 var qsRegex,$asc,$sortby;
-var rangeSlider,range_init,range_sel,min_range,max_range;
+var range_init,range_sel,min_range,max_range;
 var cookie_name;
 var std_parents = ['cat','tags','lang','alpha'] // otherwise it's a custom field
 
@@ -226,8 +226,8 @@ function iso_cat_k2 (myid) {
 			min_range = parseInt(options[myid].minrange);
 			max_range = parseInt(options[myid].maxrange);
 		}
-		rangeSlider = new rSlider({
-			target: '#rSlider',
+		rangeSlider[myid] = new rSlider({
+			target: '#rSlider_'+myid,
 			values: {min:parseInt(options[myid].minrange), max:parseInt(options[myid].maxrange)},
 			step: parseInt(options[myid].rangestep),
 			set: [min_range,max_range],
@@ -339,7 +339,7 @@ function iso_cat_k2 (myid) {
 							waitForEl(callback, maxTimes);
 						}, 100);
 					} else {
-						if (typeof rangeSlider !== 'undefined')	rangeSlider.onResize();
+						if (typeof rangeSlider[myid] !== 'undefined')	rangeSlider[myid].onResize();
 						callback();
 					}
 				};
@@ -385,7 +385,7 @@ function iso_cat_k2 (myid) {
 	quicksearch = document.querySelector(me+'.quicksearch');
 	if (quicksearch) {
 		quicksearch.addEventListener('keyup',function() {
-			myid = getMyId(this);
+			this.parentNode.getAttribute('data-module-id');
 			me = "#isotope-main-"+myid+" ";
 			quicksearch = document.querySelector(me+'.quicksearch');
 			qsRegex = new RegExp( quicksearch.value, 'gi' );
@@ -401,7 +401,7 @@ function iso_cat_k2 (myid) {
 		cancelsquarred[cl].addEventListener( type, function(e) {
 			e.stopPropagation();
 			e.preventDefault();	
-			myid = getMyId(this);
+			myid = this.parentNode.getAttribute('data-module-id');
 			me = "#isotope-main-"+myid+" ";
 			quicksearch = document.querySelector(me+'.quicksearch');
 			if (quicksearch) {
@@ -409,10 +409,10 @@ function iso_cat_k2 (myid) {
 			}
 			qsRegex = new RegExp( "", 'gi' );
 			CG_Cookie_Set(myid,'search',"");
-			if (rangeSlider) {
+			if (rangeSlider[myid]) {
 				range_sel = range_init;
 				ranges = range_sel.split(",");
-				rangeSlider.setValues(parseInt(ranges[0]),parseInt(ranges[1]));
+				rangeSlider[myid].setValues(parseInt(ranges[0]),parseInt(ranges[1]));
 				CG_Cookie_Set(myid,'range',range_sel);
 			}
 			filters[myid]['cat'] = ['*']
@@ -512,6 +512,7 @@ function iso_cat_k2 (myid) {
 	if (more) {
 		['click', 'touchstart'].forEach(type => {
 			more.addEventListener(type, function(e) {
+				myid = this.parentNode.getAttribute('data-module-id');
 				e.stopPropagation();
 				e.preventDefault();		
 				if (items_limit > 0) {
@@ -546,8 +547,13 @@ function iso_cat_k2 (myid) {
 	}
 }// end of iso_cat_k2
 function rangeUpdated(){
-	range_sel = rangeSlider.getValue();
-	range_init = rangeSlider.conf.values[0]+','+rangeSlider.conf.values[rangeSlider.conf.values.length - 1];
+	target = this.target.split('_');;
+	myid = target[1];
+	if (typeof rangeSlider[myid] === 'undefined') {// wrong myid
+			return;
+	}
+	range_sel = rangeSlider[myid].getValue();
+	range_init = rangeSlider[myid].conf.values[0]+','+rangeSlider[myid].conf.values[rangeSlider[myid].conf.values.length - 1];
 	CG_Cookie_Set(myid,'range',range_sel);
 	iso[myid].arrange();
 }
@@ -651,7 +657,7 @@ function events_multibutton(component) {
 	};
 }	
 function update_sort_buttons($this) {
-	myid = getMyId($this);
+	myid = $this.parentNode.getAttribute('data-module-id');
 	var sortValue = $this.getAttribute('data-sort-value');
 	if (sortValue == "random") {
 		CG_Cookie_Set(myid,'sort',sortValue+'-');
@@ -717,7 +723,7 @@ function grid_filter($this) {
 	var buttonResult = false;
 	var rangeResult = true;
 	var searchAlpha = true;
-	myid = getMyId($this);
+	myid = $this.parentNode.getAttribute('data-module-id');
 	if (filters[myid]['alpha'].indexOf('*') == -1) {// alpha filter
 		alpha = $this.getAttribute('data-title').substring(0,1);
 		if (filters[myid]['alpha'].indexOf(alpha) == -1) return false;
@@ -728,7 +734,7 @@ function grid_filter($this) {
 			return false;
 		}
 	}
-	if 	(rangeSlider) {
+	if 	(rangeSlider[myid]) {
 		var lerange = $this.getAttribute('data-range');
 		if (range_sel != range_init) {
 			ranges = range_sel.split(",");
@@ -816,7 +822,7 @@ function grid_filter($this) {
 } 
 // ---- Filter List 
 function filter_list($this,evt,params) {
-	myid = getMyId($this);
+	myid = $this.getAttribute('data-module-id');
 	$parent = $this.getAttribute('data-filter-group');
 	$isclone = false;
 	if ($this.parentNode.id == "clonedbuttons") { // clone 
@@ -876,7 +882,7 @@ function filter_list($this,evt,params) {
 }
 	// ----- Filter MultiSelect List
 	function filter_list_multi($this,evt,params) {
-		myid = getMyId($this);
+		myid = $this.getAttribute('data-module-id');
 		$evnt = evt;
 		$params = params;
 		$isclone = false;
@@ -954,7 +960,7 @@ function filter_list($this,evt,params) {
      
 	function filter_button($this,evt) {
 		if (hasClass($this,'disabled')) return; //ignore disabled buttons
-		myid = getMyId($this);
+		myid = $this.parentNode.getAttribute('data-module-id');
 		$this.parentElement.parentElement.parentElement.getAttribute
 		$parent = $this.parentNode.getAttribute('data-filter-group');
 		child =  $this.getAttribute('data-child'); // child group number
@@ -1014,7 +1020,7 @@ function filter_list($this,evt,params) {
 		updateFilterCounts(myid);
 	}
 	function filter_multi($this,evt) {
-		myid = getMyId($this);
+		myid = $this.parentNode.getAttribute('data-module-id');
 		var sortValue = $this.getAttribute('data-sort-value');
 		child =  $this.getAttribute('data-child'); // child group number
 		$isclone = false;
@@ -1094,7 +1100,7 @@ function filter_list($this,evt,params) {
 		updateFilterCounts(myid);
 	}
 	function set_buttons_multi($this) {
-		myid = getMyId($this);
+		myid = $this.parentNode.getAttribute('data-module-id');
 		$parent = $this.parentNode.getAttribute('data-filter-group');
 		if ($this.getAttribute('data-sort-value') == '*') { // on a cliqué sur tout => on remet le reste à blanc
 			buttons = $this.parentNode.querySelectorAll('button.is-checked');
@@ -1645,16 +1651,6 @@ function go_click($entree,$link) {
 		location=$link;
 	}
 }
-/* get myid from isotope-main */
-getMyId = function($this) {
-	$parent = $this.parentNode;
-	while (!hasClass($parent,'isotope-main')) {
-		$parent = $parent.parentNode;
-	}
-	myid = $parent.getAttribute("data");
-	return myid; 
-}
-
 // from https://code.tutsplus.com/tutorials/from-jquery-to-javascript-a-reference--net-23703
 hasClass = function (el, cl) {
     var regex = new RegExp('(?:\\s|^)' + cl + '(?:\\s|$)');

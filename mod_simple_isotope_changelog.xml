@@ -9,6 +9,7 @@
 		<fix>
 			<item>Multiple isotope modules on a single page</item>
 			<item>Suppress notice if no tag defined</item>
+			<item>Missing LanguageHelper class</item>
 		</fix>
 	</changelog>
 	<changelog>
