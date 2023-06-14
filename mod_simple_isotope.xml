@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>January 2023</creationDate>
+	<creationDate>2023/06/14</creationDate>
 	<copyright>Copyright (C) 2023 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.1.5</version>
+	<version>4.1.6</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -36,6 +36,7 @@
 		<fields name="params">
 			<fieldset name="basic" 
 			addfieldprefix="ConseilGouz\Module\SimpleIsotope\Site\Field">
+			<field name="version" type="version"  margintop="-3em" extension="mod_simple_isotope"/>
 <field	name="notegeneralinfo"	type="note" label="CG_ISO_GENERALINFONOTE" class="alert-success clear half"/>
 				<field name="iso_entree" type="radio"	default="articles"	class="btn-group half left"
 					label="SSISO_ENTREE" description="SSISO_ENTREEDESC" >

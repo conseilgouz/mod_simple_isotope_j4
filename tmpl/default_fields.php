@@ -565,6 +565,7 @@ $filter_div = "";
 			ksort($group,  SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL ); 
 		}
 		if ($width <	12) {
+			$group_lib= 'fields';
 			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-module-id="'.$module->id.'">';
 		}
 		foreach ($group as $group_lib => $onegroup) {

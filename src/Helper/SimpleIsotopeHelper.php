@@ -469,7 +469,8 @@ class SimpleIsotopeHelper
 		}
 		$params_links = $params->get('fieldslinks');
 		if ($params_links) { // fields links
-		  $model = JModelLegacy::getInstance('Field', 'FieldsModel', array('ignore_request' => true));
+	  	  $model = Factory::getApplication()->bootComponent('com_fields')
+			->getMVCFactory()->createModel('Field', 'Administrator', ['ignore_request' => true]);
 		  $obj->parent = "";
 		  $obj->child="";
 		  foreach ($params_links as $key=>$value) {

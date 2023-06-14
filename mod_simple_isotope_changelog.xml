@@ -2,6 +2,21 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.6</version>
+        <note>
+            <item>Update : 14/06/2023</item>
+        </note>
+		<fix>
+			<item>Fields : js error if group buttons per field option is set</item>
+			<item>Fields links : JModelLegacy not defined</item>
+		</fix>
+		<addition>
+			<item>get module's version from xml file</item>
+		</addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.5</version>
         <note>
             <item>Update : 12/01/2023</item>

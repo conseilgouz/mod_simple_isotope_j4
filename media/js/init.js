@@ -1,8 +1,8 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.5
+* Version			: 4.1.6
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -961,6 +961,7 @@ function filter_list($this,evt,params) {
 	function filter_button($this,evt) {
 		if (hasClass($this,'disabled')) return; //ignore disabled buttons
 		myid = $this.parentNode.getAttribute('data-module-id');
+		if (!myid) myid = $this.parentNode.parentNode.getAttribute('data-module-id'); 
 		$this.parentElement.parentElement.parentElement.getAttribute
 		$parent = $this.parentNode.getAttribute('data-filter-group');
 		child =  $this.getAttribute('data-child'); // child group number
