@@ -1,8 +1,8 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.6
+* Version			: 4.1.5
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -724,6 +724,7 @@ function grid_filter($this) {
 	var rangeResult = true;
 	var searchAlpha = true;
 	myid = $this.parentNode.getAttribute('data-module-id');
+	if (!myid) myid = $this.parentNode.parentNode.getAttribute('data-module-id'); 
 	if (filters[myid]['alpha'].indexOf('*') == -1) {// alpha filter
 		alpha = $this.getAttribute('data-title').substring(0,1);
 		if (filters[myid]['alpha'].indexOf(alpha) == -1) return false;
