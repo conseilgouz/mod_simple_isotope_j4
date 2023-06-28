@@ -240,9 +240,10 @@ class SimpleIsotopeHelper
 		$articles->setState('list.start', $start);
 		$articles->setState('list.limit', $limit);
 		$articles->setState('filter.published', 1);
-		$access     = ComponentHelper::getParams('com_content')->get('show_noauth');
+		$access     = true; // check user access level
 		$authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
 		$articles->setState('filter.access', $access);
+		$articles->setState('filter.viewlevels', $authorised);
 		$catids = $categories;
 		$articles->setState('filter.category_id', $catids);		
 		$articles->setState('filter.category_id.include', (bool) $params->get('category_filtering_type', 1));
