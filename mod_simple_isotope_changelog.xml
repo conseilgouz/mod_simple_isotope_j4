@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.1.8</version>
+        <note>
+            <item>Update : 01/07/2023</item>
+        </note>
+		<addition>
+			<item>New parameter : cookie duration</item>
+		</addition>
+		<fix>
+			<item>Tags parent : 'all' button missing => js error</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.1.7</version>
         <note>
             <item>Update : 28/06/2023</item>

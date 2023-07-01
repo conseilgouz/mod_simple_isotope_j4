@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.5
+* Version			: 4.1.8
 * Package			: Joomla 4.x.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -222,7 +222,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
 			  'empty' => $params->get("empty","false"),
 			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
-			  'button_bootstrap' => $button_bootstrap));
+			  'button_bootstrap' => $button_bootstrap, 'cookieduration' => $params->get('cookieduration','0')));
 } else {
 	if ($article_cat_tag =="cat") {
 		$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
@@ -260,7 +260,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
 			  'empty' => $params->get("empty","false"),
 			  'pagination' => $params->get('pagination','false'),'page_count' => $params->get('page_count','0'),'infinite_btn' => $params->get("infinite_btn","false"),
-			  'button_bootstrap' => $button_bootstrap));
+			  'button_bootstrap' => $button_bootstrap, 'cookieduration' => $params->get('cookieduration','0')));
 }
 
 if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields")) {

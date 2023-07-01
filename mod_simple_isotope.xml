@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2023/06/28</creationDate>
+	<creationDate>2023/07/01</creationDate>
 	<copyright>Copyright (C) 2023 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.1.7</version>
+	<version>4.1.8</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -175,10 +175,20 @@
 					showon="cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:webLinks"
 				/>		
 				<field	name="empty"
-					type="radio" class="btn-group btn-group-yesno" default="false"
+					type="radio" class="btn-group btn-group-yesno left half" default="false"
 					label="SSISO_DISPLAYEMPTY" description="SSISO_DISPLAYEMPTYDESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
+				</field>
+				<field	name="cookieduration"
+					type="list" class="btn-group right half" default="0"
+					label="SSISO_COOKIEDURATION" description="SSISO_COOKIEDURATIONDESC" >
+					<option value="-1">JNONE</option> 
+					<option value="0">JSESSION</option>
+					<option value="1d">SSISO_COOKIE_1D</option>
+					<option value="1w">SSISO_COOKIE_1W</option>
+					<option value="1m">SSISO_COOKIE_1M</option>
+					
 				</field>
 <field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 
@@ -197,21 +207,7 @@
 					<option value="">SSISO_LIBALL</option>
 					<option value="none">SSISO_LIBNONE</option>
 				</field>
-				<field name="tags" 
-					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
-					type="tag" 
-					label="SSISO_TAGS" description="SSISO_TAGSDESC" remote-search="false"
-					mode="nested" multiple="true" custom="deny"/>
-				<field
-				    showon="cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:articles"
-					name="displayfields"
-					type="sql"	multiple="true"
-					query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0"
-					key_field="id"	value_field="value"
-					label="SSISO_FIELDS" description="SSISO_FIELDSDESC"
-					layout="joomla.form.field.list-fancy-select"
-				/>
-<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success"/>
+<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 				<field
 					name="displayfiltercattags"
 					showon="cat_or_tag:cattags,catfields"
@@ -249,6 +245,11 @@
 					<option value="false">JNO</option>
 				</field>
 <field	name="notefiltertagsinfo"	type="note" label="CG_ISO_FILTERTAGSINFONOTE" showon="cat_or_tag:tags,cattags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
+				<field name="tags" 
+					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
+					type="tag" 
+					label="SSISO_TAGS" description="SSISO_TAGSDESC" remote-search="false"
+					mode="nested" multiple="true" custom="deny"/>
 				<field name="default_tag"	
 					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
 					type="tag" 	mode="nested" custom="deny"	default="" remote-search="false"
@@ -299,6 +300,15 @@
 				<option value="false">JNO</option>
 				</field>
 <field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>
+				<field
+				    showon="cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:articles"
+					name="displayfields"
+					type="sql"	multiple="true"
+					query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0"
+					key_field="id"	value_field="value"
+					label="SSISO_FIELDS" description="SSISO_FIELDSDESC"
+					layout="joomla.form.field.list-fancy-select"
+				/>
 				<field
 					name="displayfilterfields"
 					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
@@ -609,5 +619,4 @@
 	<updateservers>
 	<server type="extension" name="Simple Isotope" priority="1">https://raw.githubusercontent.com/conseilgouz/updates_github/master/simple_isotope_update.xml</server>
 	</updateservers>
-	
 </extension>

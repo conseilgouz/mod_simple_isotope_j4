@@ -1,8 +1,8 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.5
+* Version			: 4.1.8
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -1113,14 +1113,14 @@ function filter_list($this,evt,params) {
 		} else { // on a cliqué sur un autre bouton : uncheck le bouton tout
 			if ((filters[myid][$parent].length == 0) || (filters[myid][$parent] == '*')) {// plus rien de sélectionné : on remet tout actif
 				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
-				addClass(button_all,'is-checked');
+				if (button_all) addClass(button_all,'is-checked');
 				filters[myid][$parent] = ['*'];
 				update_cookie_filter(filters[myid]);
 				iso[myid].arrange();
 			}
 			else {
 				button_all = $this.parentNode.querySelector('[data-sort-value="*"]');
-				removeClass(button_all,'is-checked');
+				if (button_all)	removeClass(button_all,'is-checked');
 			}
 		}
 	}
@@ -1253,7 +1253,23 @@ function getCookie(name) {
   return matches ? decodeURIComponent(matches[1]) : '';
 }
 function CG_Cookie_Set(id,param,b) {
-	var expires = "";
+	var expires;
+	duration = options[myid].cookieduration;
+    var d = new Date();
+	if( (typeof duration === 'undefined') || (duration == 0) ) expires = ""; // default duration : session
+	else if (duration == '-1') expires = ";Max-Age=0;"; // no cookie
+	else if (duration == '1d') { // 1 day
+		d.setTime(d.getTime() + (1*24*60*60*1000));
+		expires = ";expires="+ d.toUTCString();
+	} 
+	else if (duration == '1w') { // 1 week
+		d.setTime(d.getTime() + (7*24*60*60*1000));
+		expires = ";expires="+ d.toUTCString();
+	}
+	else if (duration == '1m') { // 1 month
+		d.setTime(d.getTime() + (30*24*60*60*1000));
+		expires = ";expires="+ d.toUTCString();
+	}
 	$secure = "";
 	if (window.location.protocol == "https:") $secure="secure;"; 
 	cookie_name = 'simple_isotope_'+id;
