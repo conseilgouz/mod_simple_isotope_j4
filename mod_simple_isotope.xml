@@ -184,7 +184,7 @@
 					type="list" class="btn-group right half" default="0"
 					label="SSISO_COOKIEDURATION" description="SSISO_COOKIEDURATIONDESC" >
 					<option value="-1">JNONE</option> 
-					<option value="0">JSESSION</option>
+					<option value="0">SSISO_COOKIE_SESSION</option>
 					<option value="1d">SSISO_COOKIE_1D</option>
 					<option value="1w">SSISO_COOKIE_1W</option>
 					<option value="1m">SSISO_COOKIE_1M</option>
