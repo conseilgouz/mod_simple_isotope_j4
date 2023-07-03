@@ -11,6 +11,7 @@
 		</addition>
 		<fix>
 			<item>Tags parent : 'all' button missing => js error</item>
+			<item>Tags parent : suppress php notices</item>
 		</fix>
 	</changelog>
 	<changelog>

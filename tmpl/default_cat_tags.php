@@ -1,9 +1,9 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.2
+* Version			: 4.1.8
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -436,7 +436,8 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 		} else {
 			foreach ($tags as $key=>$value) {
 				if ($tagsfilterparent == "true") {
-					$sortFilter[] = $tags_parent_alias[$value]."&".$value;
+					if (array_key_exists($value,$tags_parent_alias))
+						$sortFilter[] = $tags_parent_alias[$value]."&".$value;
 				} else {
 					$sortFilter[] = "&".$value;
 				}
@@ -465,12 +466,14 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 				$res = explode("&",$aval);
 				$filter = $res[1];
 				$parent = $res[0];
+				if (!in_array($filter,$tags)) continue; // no article for this tag : ignore it
 				if (($tagsfilterparent == "true") && ($cur_parent != $parent) )  {
 					if ($cur_parent != '') $filter_tag_div .= "</div>";
 					$cur_parent = $parent;
 					$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags" data-filter-group="tags" data-module-id="'.$module->id.'">';
 					if ($tagsfilterparentlabel == "true") { // display tag parent label 
-						$filter_tag_div .= '<p class="iso_tags_parent_title">'.$tags_parent[$alias[$filter]].'</p>';
+					    if (array_key_exists($alias[$filter],$tags_parent)) 
+							$filter_tag_div .= '<p class="iso_tags_parent_title">'.$tags_parent[$alias[$filter]].'</p>';
 					}
 				}
 			    $aff = $filter; 
@@ -497,7 +500,7 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
 					$filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$one_title.'"/>'.$img.Text::_($aff).'</button>'; 
 				}
 			}
-			if ($tagsfilterparent == "true") $filter_tag_div .= '</div>';
+			if ( ($tagsfilterparent == "true") && ($cur_parent != "") ) $filter_tag_div .= '</div>'; // close parent name div
 			$filter_tag_div .= '</div>';
 		}   else  {	// affichage Liste
 			Text::script('JGLOBAL_SELECT_PRESS_TO_SELECT');
@@ -570,7 +573,7 @@ foreach ($list as $key=>$category) {
 		    $tag_display =  $iso_entree == "webLinks"? $cats_alias[$item->catid] : $item->category_alias;
 		}
 		$cat_params = json_decode($cats_params[$item->catid]);
-		if (($cat_params) && ($cat_params->image != "")) {
+		if (($cat_params) && (isset($cat_params->image) ) && ($cat_params->image != "")) {
 			$cat_img = "<img src='".URI::root().$cat_params->image."' alt='".$cat_params->image_alt."' class='iso_cat_img_art'/>";
 		}
 		$field_value = "";
