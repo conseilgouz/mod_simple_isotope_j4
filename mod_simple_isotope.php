@@ -1,8 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.8
-* Package			: Joomla 4.x.x
+* Version			: 4.1.9
+* Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
@@ -15,6 +15,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Access\Access;
+use Joomla\CMS\Uri\Uri;
 
 $document 		= Factory::getDocument();
 
@@ -126,7 +127,7 @@ if ($params->get('customjs')) $wa->addInlineScript($params->get('customjs'));
 
 $min = ".min";
 if ((bool)Factory::getConfig()->get('debug')) { // Mode debug
-	$document->addScript(''.JURI::base(true).'/media/mod_simple_isotope/js/init.js'); 
+	$document->addScript(''.URI::base(true).'/media/mod_simple_isotope/js/init.js'); 
 } else {
 	$wa->registerAndUseScript('cgisotope',$modulefield.'js/init.min.js');
 }

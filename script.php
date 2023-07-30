@@ -1,9 +1,9 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.4
-* Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* Version			: 4.1.9
+* Package			: Joomla 4.x/5.x
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -11,9 +11,9 @@
 defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Filesystem\Folder;
+use Joomla\Filesystem\Folder;
 use Joomla\CMS\Version;
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 
 class mod_simple_isotopeInstallerScript
 {
@@ -77,10 +77,10 @@ class mod_simple_isotopeInstallerScript
 		}
 		
         switch ($type) {
-            case 'install': $message = JText::_('ISO_POSTFLIGHT_INSTALLED'); break;
-            case 'uninstall': $message = JText::_('ISO_POSTFLIGHT_UNINSTALLED'); break;
-            case 'update': $message = JText::_('ISO_POSTFLIGHT_UPDATED'); break;
-            case 'discover_install': $message = JText::_('ISO_POSTFLIGHT_DISC_INSTALLED'); break;
+            case 'install': $message = Text::_('ISO_POSTFLIGHT_INSTALLED'); break;
+            case 'uninstall': $message = Text::_('ISO_POSTFLIGHT_UNINSTALLED'); break;
+            case 'update': $message = Text::_('ISO_POSTFLIGHT_UPDATED'); break;
+            case 'discover_install': $message = Text::_('ISO_POSTFLIGHT_DISC_INSTALLED'); break;
         }
 
 		// Uninstall this installer
@@ -149,7 +149,7 @@ class mod_simple_isotopeInstallerScript
 		if (version_compare(JVERSION, $this->min_joomla_version, '<'))
 		{
 			Factory::getApplication()->enqueueMessage(
-				JText::sprintf(
+				Text::sprintf(
 					'NOT_COMPATIBLE_UPDATE',
 					'<strong>' . JVERSION . '</strong>',
 					'<strong>' . $this->min_joomla_version . '</strong>'
@@ -170,7 +170,7 @@ class mod_simple_isotopeInstallerScript
 		if (version_compare(PHP_VERSION, $this->min_php_version, 'l'))
 		{
 			Factory::getApplication()->enqueueMessage(
-				JText::sprintf(
+				Text::sprintf(
 					'NOT_COMPATIBLE_PHP',
 					'<strong>' . PHP_VERSION . '</strong>',
 					'<strong>' . $this->min_php_version . '</strong>'
@@ -186,7 +186,7 @@ class mod_simple_isotopeInstallerScript
 	
 	private function uninstallInstaller()
 	{
-		if ( ! JFolder::exists(JPATH_PLUGINS . '/system/' . $this->installerName)) {
+		if ( ! is_dir(JPATH_PLUGINS . '/system/' . $this->installerName)) {
 			return;
 		}
 		$this->delete([
