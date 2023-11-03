@@ -1,10 +1,10 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.9
+* Version			: 4.2.0
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
-* license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+* license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
 defined('_JEXEC') or die;
@@ -255,7 +255,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
 			  'sortby' => $sortBy, 'ascending' => $sortAscending,
 			  'searchmultiex' => $searchmultiex, 'liball' => Text::_('SSISO_LIBALL'),
 			  'language_filter' => $language_filter,
-			  'displayfilter'=> $displayfilter, 'displayfiltercat' => $displayfiltercat,
+			  'displayfiltertags'=> $displayfilter, 'displayfiltercat' => $displayfiltercat,
 			  'displayrange'=>$displayrange,'rangestep'=>$rangestep, 'minrange'=>$minrange,'maxrange'=>$maxrange,			  
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),
