@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.2.0
+* Version			: 4.2.1
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -83,11 +83,13 @@ function CGIsotope(isoid,options) {
 	if (this.options.limit_items == 0) { // no limit : hide show more button
 		document.querySelector(this.me+'.iso_button_more').style.display = "none";
 	}
-	if ((this.options.default_cat == "") || (this.options.default_cat == null) || (typeof this.options.default_cat === 'undefined'))
+	// don't set up default cat if you don't display categories
+	if ((this.options.default_cat == "") || (this.options.default_cat == null) || (typeof this.options.default_cat === 'undefined') || (this.options.article_cat_tag.indexOf("cat") === -1))
 		this.filters['cat'] = ['*']
 	else 
 		this.filters['cat'] = [this.options.default_cat];
-	if ((this.options.default_tag == "") || (this.options.default_tag == null) || (typeof this.options.default_tag === 'undefined'))
+	// don't set up default cat if you don't display tags
+	if ((this.options.default_tag == "") || (this.options.default_tag == null) || (typeof this.options.default_tag === 'undefined') || (this.options.article_cat_tag.indexOf("tags") === -1))
 		this.filters['tags'] = ['*']
 	else 
 		this.filters['tags'] = [this.options.default_tag];
