@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.2.1</version>
+	<version>4.3.0</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -42,8 +42,16 @@
 					label="SSISO_ENTREE" description="SSISO_ENTREEDESC" >
 					<option value="webLinks">SSISO_ENTREEWEBLINKS</option> 
 					<option value="articles">SSISO_ENTREEARTICLES</option> 
-					
+					<option value="cgisotope">CG Isotope</option> 
 				</field>
+				<field name="iso_id" type="sql" default=""  showon="iso_entree:cgisotope"
+					label="SSISO_ISO_ID_LABEL" 
+					description="SSISO_ISO_ID_LABEL_DESC" 
+					query="SELECT id, title FROM #__cgisotope_page WHERE state=1" 
+					key_field="id" 
+					value_field="title" 
+				/>
+
 				<field showon="iso_entree:articles"
 				name="categories" type="category"	multiple="true"	extension="com_content" 
 				label="SSISO_CAT" description="SSISO_CATDESC" class="half right"
@@ -55,8 +63,8 @@
 				label="SSISO_CAT" description="SSISO_WLCATDESC" 
 				layout="joomla.form.field.list-fancy-select"
 				/>
-<field	name="notesortinfo"	type="note" label="CG_ISO_SORTINFONOTE" class="alert-success clear half"/>
-				<field
+<field	name="notesortinfo" showon="iso_entree!:cgisotope"	type="note" label="CG_ISO_SORTINFONOTE" class="alert-success clear half"/>
+				<field showon="iso_entree!:cgisotope"
 					name="displaysort"
 					type="radio" class="btn-group btn-group-yesno clear left half"	default="show"
 					label="SSISO_DISPLAYSORT"	description="SSISO_DISPLAYSORTDESC" >
@@ -64,7 +72,7 @@
 					<option value="hide">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btndate"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btndate"
 					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNDATE" description="SSISO_DISPLAYBTNDATEDESC" >
 					<option value="true">SSISO_ASC</option> 
@@ -72,7 +80,7 @@
 					<option value="false">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btncat"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btncat"
 					type="radio" class="btn-group half left" default="ASC"
 					label="SSISO_DISPLAYBTNCAT" 	description="SSISO_DISPLAYBTNCATDESC" >
 					<option value="true">SSISO_ASC</option> 
@@ -80,7 +88,7 @@
 					<option value="false">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btnalpha"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnalpha"
 					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNALPHA" description="SSISO_DISPLAYBTNALPHADESC">
 					<option value="true">SSISO_ASC</option> 
@@ -88,7 +96,7 @@
 					<option value="false">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btnvisit"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnvisit"
 					type="radio" class="btn-group half left"	default="true"
 					label="SSISO_DISPLAYBTNVISIT" description="SSISO_DISPLAYBTNVISITDESC">
 					<option value="true">SSISO_ASC</option> 
@@ -96,7 +104,7 @@
 					<option value="false">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btnrating"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnrating"
 					type="radio" class="btn-group half right" default="true"
 					label="SSISO_DISPLAYBTNRATING" description="SSISO_DISPLAYBTNRATINGDESC" >
 					<option value="true">SSISO_ASC</option> 
@@ -104,27 +112,27 @@
 					<option value="false">JNO</option> 
 				</field>
 				<field
-					showon="displaysort:show" name="btnid"
+					showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnid"
 					type="radio" class="btn-group half left" default="false"
 					label="SSISO_DISPLAYBTNID" description="SSISO_DISPLAYBTNIDDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field	showon="displaysort:show" name="btnblog"
+				<field	showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnblog"
 					type="radio" class="btn-group half right" default="false"
 					label="SSISO_DISPLAYBTNBLOG" description="SSISO_DISPLAYBTNBLOGDESC" >
 					<option value="true">SSISO_ASC</option> 
 					<option value="DESC">SSISO_DESC</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field	showon="displaysort:show" name="btnrandom"
+				<field	showon="iso_entree!:cgisotope[AND]displaysort:show" name="btnrandom"
 					type="radio" class="btn-group half left" default="false"
 					label="SSISO_DISPLAYBTNRANDOM" description="SSISO_DISPLAYBTNRANDOMDESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field	showon="iso_entree:articles,webLinks" name="btnfeature"
+				<field	showon="iso_entree!:cgisotope[AND]iso_entree:articles,webLinks" name="btnfeature"
 					type="radio" class="btn-group half right" default="false"
 					label="CG_ISO_DISPLAYBTNFEATURED" description="CG_ISO_DISPLAYBTNFEATUREDDESC" >
 					<option value="true">JYES</option> 
@@ -141,7 +149,7 @@
 					<option value="publish_up">SSISO_DATECHOICEPUBLISH</option> 
 					<option value="modified">SSISO_DATECHOICEMODIF</option> 
 				</field>
-				<field name="defaultdisplay" 
+				<field name="defaultdisplay" showon="iso_entree!:cgisotope"
 					type="list" default="date_desc" 
 					label="SSISO_DEFDISPLAY"	description="SSISO_DEFDISPLAYDESC" class="btn-group clear">				
 					<option value="date_asc">SSISO_DEFDISPLAYOLDERDATE</option> 
@@ -158,8 +166,8 @@
 					<option value="blog_desc">SSISO_DEFDISPLAYBLOGREV</option> 
 					<option value="random">SSISO_DEFDISPLAYRANDOM</option> 
 				</field>				
-<field	name="notefilterinfo"	type="note" label="CG_ISO_FILTERINFONOTE" class="alert-success clear half"/>
-  				<field name="cat_or_tag" 
+<field	name="notefilterinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_FILTERINFONOTE" class="alert-success clear half"/>
+  				<field name="cat_or_tag" showon="iso_entree!:cgisotope"
 				type="radio" class="btn-group clear"
 				label="SSISO_CAT_TAGS" description="SSISO_CAT_TAGS_DESC"
 				default="cat">
@@ -172,15 +180,15 @@
 				</field>
 				<field name="note24" type="note" class="alert alert-error" 
 					label="ISO_ERRINCCOMPATIBLITY"
-					showon="cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:webLinks"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:webLinks"
 				/>		
-				<field	name="empty"
+				<field	name="empty" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group btn-group-yesno left half" default="false"
 					label="SSISO_DISPLAYEMPTY" description="SSISO_DISPLAYEMPTYDESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field	name="cookieduration"
+				<field	name="cookieduration" showon="iso_entree!:cgisotope"
 					type="list" class="btn-group right half" default="0"
 					label="SSISO_COOKIEDURATION" description="SSISO_COOKIEDURATIONDESC" >
 					<option value="-1">JNONE</option> 
@@ -190,10 +198,10 @@
 					<option value="1m">SSISO_COOKIE_1M</option>
 					
 				</field>
-<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
+<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 
 				<field name="default_cat"	
-					showon="cat_or_tag:cat,cattags,catfields[AND]iso_entree:articles"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags,catfields[AND]iso_entree:articles"
 					type="category" multiple="false" extension="com_content" 
 					label="SSISO_DEFAULT_CAT" description="SSISO_DEFAULT_CATDESC" 
 					default="">
@@ -201,16 +209,16 @@
 					<option value="none">SSISO_LIBNONE</option>
 				</field>
 				<field name="default_cat_wl"	
-					showon="cat_or_tag:cat,cattags[AND]iso_entree:webLinks"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags[AND]iso_entree:webLinks"
 					type="category" multiple="false" extension="com_weblinks" default=""
 					label="SSISO_DEFAULT_CAT" 	description="SSISO_DEFAULT_CATDESC" >
 					<option value="">SSISO_LIBALL</option>
 					<option value="none">SSISO_LIBNONE</option>
 				</field>
-<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
+<field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 				<field
 					name="displayfiltercattags"
-					showon="cat_or_tag:cattags,catfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,catfields"
 					type="radio" default="button" class="btn-group"
 					label="SSISO_DISPLAYFILTERCAT"	description="SSISO_DISPLAYFILTERCATDESC" 	>
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
@@ -218,7 +226,7 @@
 				</field>
 				<field
 					name="displayfiltercat"
-					showon="cat_or_tag:cat"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cat"
 					type="radio" default="button" class="btn-group"
 					label="SSISO_DISPLAYFILTERCAT" description="SSISO_DISPLAYFILTERCATDESC" 	>
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
@@ -228,7 +236,7 @@
 					<option value="hide">SSISO_DISPLAYFILTERHIDE</option>
 				</field>
 				<field
-					showon="cat_or_tag:cattags,cat,catfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,cat,catfields"
 					name="catfilteralias"
 					type="radio" class="btn-group half left" default="false" 
 					label="SSISO_CATFILTERALIAS" description="SSISO_CATFILTERALIASDESC">
@@ -237,21 +245,21 @@
 					<option value="order">SSISO_KEEP</option>
 				</field>
 				<field
-					showon="cat_or_tag:cattags,cat,catfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,cat,catfields"
 					name="catsfilterimg"
 					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_CATSFILTERIMG" description="SSISO_CATSFILTERIMGDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-<field	name="notefiltertagsinfo"	type="note" label="CG_ISO_FILTERTAGSINFONOTE" showon="cat_or_tag:tags,cattags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
+<field	name="notefiltertagsinfo"	type="note" label="CG_ISO_FILTERTAGSINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:tags,cattags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
 				<field name="tags" 
-					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
 					type="tag" 
 					label="SSISO_TAGS" description="SSISO_TAGSDESC" remote-search="false"
 					mode="nested" multiple="true" custom="deny"/>
 				<field name="default_tag"	
-					showon="cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:tags,cattags,tagsfields[AND]iso_entree:articles,webLinks"
 					type="tag" 	mode="nested" custom="deny"	default="" remote-search="false"
 					label="SSISO_DEFAULT_TAG" 	description="SSISO_DEFAULT_TAGDESC" 
 					>
@@ -259,7 +267,7 @@
 					<option value="none">SSISO_LIBNONE</option>
 				</field>
 				<field	name="displayfilter"
-					showon="cat_or_tag:tags,cattags,tagsfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:tags,cattags,tagsfields"
 					type="radio" default="button" class="btn-group"
 					label="SSISO_DISPLAYFILTER"	description="SSISO_DISPLAYFILTERDESC" 	>
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
@@ -268,20 +276,20 @@
 					<option value="list">SSISO_DISPLAYFILTERLIST</option> 
 					<option value="hide">SSISO_DISPLAYFILTERHIDE</option>
 				</field>
-				<field	showon="cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks" name="tagsfilterparent"
+				<field	showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks" name="tagsfilterparent"
 					type="radio" class="btn-group btn-group-yesno half left" default="false" 
 					label="SSISO_TAGSFILTERPARENT" description="SSISO_TAGSFILTERPARENTDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-				<field	showon="cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks[AND]tagsfilterparent:true" name="tagsfilterparentlabel"
+				<field	showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields[AND]iso_entree:articles,webLinks[AND]tagsfilterparent:true" name="tagsfilterparentlabel"
 					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_TAGSFILTERPARENTLABEL" description="SSISO_TAGSFILTERPARENTLABELDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field
-					showon="cat_or_tag:cattags,tags,tagsfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields"
 					name="tagsfilterorder"
 					type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
 					label="SSISO_TAGSFILTERORDER" description="SSISO_TAGSFILTERORDERDESC"
@@ -290,7 +298,7 @@
 				<option value="false">JNO</option>
 				</field>
 				<field
-					showon="cat_or_tag:cattags,tags,tagsfields"
+					showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields"
 					name="tagsfilterimg"
 					type="radio" class="btn-group btn-group-yesno half right" default="false" 
 					label="SSISO_TAGSFILTERIMG" 
@@ -299,9 +307,9 @@
 				<option value="true">JYES</option>
 				<option value="false">JNO</option>
 				</field>
-<field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>
+<field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>
 				<field
-				    showon="cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:articles"
+				    showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:articles"
 					name="displayfields"
 					type="sql"	multiple="true"
 					query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0"
@@ -311,7 +319,7 @@
 				/>
 				<field
 					name="displayfilterfields"
-					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
+					showon="iso_entree!:cgisotope[AND]iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
 					type="radio" default="button" class="btn-group"
 					label="SSISO_DISPLAYFILTERFIELDS"	description="SSISO_DISPLAYFILTERFIELDSDESC" 	>
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
@@ -323,7 +331,7 @@
 				</field>
 				<field
 					name="displayfiltersplitfields"
-					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
+					showon="iso_entree!:cgisotope[AND]iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
 					type="radio" default="false" class="btn-group half left"
 					label="SSISO_DISPLAYFILTERSPLITFIELDS" description="SSISO_DISPLAYFILTERSPLITFIELDSDESC" >
 					<option value="true">JYES</option>
@@ -331,14 +339,14 @@
 				</field>
 				<field
 					name="splitfieldstitle"
-					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields[AND]displayfiltersplitfields:true"
+					showon="iso_entree!:cgisotope[AND]iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields[AND]displayfiltersplitfields:true"
 					type="radio" default="false" class="btn-group half right"
 					label="SSISO_SPLITFIELDSTITLE"	description="SSISO_SPLITFIELDSTITLEDESC" 	>
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-<field	name="noteotherfilterinfo"	type="note" label="CG_ISO_DISPLAYOTHERFILTERNOTE" class="alert-success clear half"/>
-				<field name="language_filter"
+<field	name="noteotherfilterinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_DISPLAYOTHERFILTERNOTE" class="alert-success clear half"/>
+				<field name="language_filter" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group"
 					label="SSISO_LANGUAGE_FILTER" description="SSISO_LANGUAGE_FILTER_DESC"
 					default="false">
@@ -347,7 +355,7 @@
 					<option value="multi">SSISO_DISPLAYFILTERMULTIBUTTON</option> 
 				</field>
 				<field	name="displayrange"
-					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
+					showon="iso_entree:articles"
 					type="radio" class="btn-group btn-group-yesno" default="false"
 					label="SSISO_DISPLAYRANGE" description="SSISO_DISPLAYRANGEDESC" >
 					<option value="true">JYES</option> 
@@ -374,14 +382,14 @@
 					<option value="500">500</option>
 					<option value="1000">1000</option>
 				</field>
-				<field	name="displayalpha"
+				<field	name="displayalpha" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group" default="false"
 					label="SSISO_DISPLAYALPHA" description="SSISO_DISPLAYALPHADESC" >
 					<option value="false">JNO</option> 
 					<option value="button">SSISO_DISPLAYFILTERBUTTON</option> 
 					<option value="multi">SSISO_DISPLAYFILTERMULTIBUTTON</option> 
 				</field>	
-			<field	name="displayoffcanvas"
+			<field	name="displayoffcanvas" showon="iso_entree!:cgisotope"
 				type="radio" class="btn-group clear" default="false"
 				label="CG_ISO_DISPLAYOFFCANVAS" description="CG_ISO_DISPLAYOFFCANVASDESC" >
 				<option value="false">JNO</option> 
@@ -389,7 +397,7 @@
 				<option value="text">CG_ISO_DISPLAYOFFTEXTBUTTON</option> 
 			</field>
 			<field name="offcanvaspos" 		
-				showon="displayoffcanvas:hamburger,text"
+				showon="iso_entree!:cgisotope[AND]displayoffcanvas:hamburger,text"
 				type="radio" class="btn-group half left" default="start"
 				label="CG_ISO_DISPLAYOFFCANVASPOS" description="CG_ISO_DISPLAYOFFCANVASPOSDESC" >
 				<option value="start">CG_ISO_DISPLAYOFFSTART</option> 
@@ -398,7 +406,7 @@
 				<option value="bottom">CG_ISO_DISPLAYOFFBOTTOM</option> 
 			</field>
 			<field name="offcanvasbtnpos" 		
-				showon="displayoffcanvas:hamburger"
+				showon="iso_entree!:cgisotope[AND]displayoffcanvas:hamburger"
 				type="radio" class="btn-group half right" default="leave"
 				label="CG_ISO_DISPLAYOFFCANVASBTNPOS" description="CG_ISO_DISPLAYOFFCANVASBTNPOSDESC" >
 				<option value="leave">CG_ISO_DISPLAYOFFHAMBURGERLEAVE</option> 
@@ -406,16 +414,16 @@
 				<option value="right">CG_ISO_DISPLAYOFFHAMBURGERRIGHT</option> 
 			</field>
 				
-<field	name="notedisplayinfo"	type="note" label="CG_ISO_DISPLAYINFONOTE" class="alert-success clear half"/>
+<field	name="notedisplayinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_DISPLAYINFONOTE" class="alert-success clear half"/>
 				<field
-					name="bootstrapbutton"
+					name="bootstrapbutton" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group btn-group-yesno clear half left"	default="false" 
 					label="SSISO_BOOTSTRAP" description="SSISO_BOOTSTRAPDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field
-					name="displaysearch"
+					name="displaysearch" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group btn-group-yesno half right" default="false"
 					label="SSISO_DISPLAYSEARCH" description="SSISO_DISPLAYSEARCHDESC" >
 					<option value="true">JYES</option> 
@@ -470,7 +478,7 @@
 				</field>
  
 				<field
-					name="iso_layout"
+					name="iso_layout" showon="iso_entree!:cgisotope"
 					type="radio" default="fitRows" class="btn-group clear half left"
 					label="SSISO_DISPLAYTYPE" description="SSISO_DISPLAYTYPEDESC">
 					<option value="fitRows">SSISO_DISPLAYTYPELINES</option> 
@@ -479,13 +487,13 @@
 					<option value="packery">SSISO_DISPLAYTYPEPACKERY</option>
 				</field>
 				<field
-					showon="iso_layout:masonry,fitRows,packery"
+					showon="iso_entree!:cgisotope[AND]iso_layout:masonry,fitRows,packery"
 					name="iso_nbcol" class="third right"
 					type="number"	default="2"	min="1"	max="10" step="1"
 					label="SSISO_NBCOL"	description="SSISO_NBCOLDESC" 
 				/>				
-<field	name="notearticleinfo"	type="note" label="CG_ISO_DISPLAYARTICLENOTE" class="alert-success clear half"/>
-				<field name="backgroundcolor"  class="half left"
+<field	name="notearticleinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_DISPLAYARTICLENOTE" class="alert-success clear half"/>
+				<field name="backgroundcolor"  class="half left" showon="iso_entree!:cgisotope"
 					type="color" default="#eee"
 					label="SSISO_BACKGD" description="SSISO_BACKGDDESC" />	
 				
@@ -504,35 +512,35 @@
 				type="checkbox" default="0" 
 				label="SSISO_LEAVE_TAGS" description="SSISO_LEAVE_TAGS_DESC"
 				/>
-   				<field name="introtext_img" 
+   				<field name="introtext_img"  showon="iso_entree!:cgisotope"
 				type="radio" class="btn-group btn-group-yesno clear half left"	default="true" 
 				label="SSISO_SHOWIMG" 	description="SSISO_SHOWIMGDESC"	>
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
    				<field name="introtext_img_link" 
-				showon="introtext_img:true"
+				showon="iso_entree!:cgisotope[AND]introtext_img:true"
 				type="radio" class="btn-group btn-group-yesno half right"	default="false" 
 				label="SSISO_SHOWIMGLINK" 	description="SSISO_SHOWIMGLINKDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
 				<field name="introimg_maxwidth"
-				showon="introtext_img:true" class="half left"
+				showon="iso_entree!:cgisotope[AND]introtext_img:true" class="half left"
 				type="number" default="0" min="0" max="100" step="10"
                 label="SSISO_MAXIMGWIDTH" description="SSISO_MAXIMGWIDTHDESC" />
 				<field name="introimg_maxheight" class="half right"
-				showon="introtext_img:true"
+				showon="iso_entree!:cgisotope[AND]introtext_img:true"
 				type="number" default="0" min="0" max="1000" step="10"
                 label="SSISO_MAXIMGHEIGHT" description="SSISO_MAXIMGHEIGHTDESC" />
 				
-   				<field name="blocklink" 
+   				<field name="blocklink" showon="iso_entree!:cgisotope"
 				type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
 				label="SSISO_BLOCKLINK" description="SSISO_BLOCKLINKDESC">
 					<option value="true">JYES</option>
 					<option value="false">JNO</option>
 				</field>
-   				<field name="titlelink" 
+   				<field name="titlelink" showon="iso_entree!:cgisotope"
 				type="radio" class="btn-group btn-group-yesno half right" default="true" 
 				label="SSISO_TITLELINK" description="SSISO_TITLELINKDESC">
 					<option value="true">JYES</option>
@@ -549,43 +557,43 @@
 				</field>
 			</fieldset>
 			<fieldset name="perso" label="SSISO_CSS_PERSO" class="mt-2">
-				<field type="note" name="note0" label="SSISO_NOTE0" heading="p"/>
-				<field	name="btnsubtitle"
+				<field showon="iso_entree!:cgisotope" type="note" name="note0" label="SSISO_NOTE0" heading="p"/>
+				<field showon="iso_entree!:cgisotope"	name="btnsubtitle"
 					type="radio" class="btn-group btn-group-yesno" default="false"
 					label="SSISO_SUBTITLE" description="SSISO_SUBTITLE_DESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field	name="btnnew"
+				<field showon="iso_entree!:cgisotope"	name="btnnew"
 					type="radio" class="btn-group btn-group-yesno" default="false"
 					label="SSISO_NEW" description="SSISO_NEW_DESC" >
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-				<field name="new_limit" showon="btnnew:true"
+				<field showon="iso_entree!:cgisotope[AND]btnnew:true" name="new_limit" 
 					type="number" default="30" min="0" max="500" step="20"
 					label="SSISO_NEWLIMIT" description="SSISO_NEWLIMIT_DESC"	 />
-				<field type="note" name="notedate" label="SSISO_NOTE_DATE" heading="p"/>
-				<field name="formatsortdate" type="text" label="SSISO_FORMAT_SORTDATE" description ="SSISO_FORMAT_SORTDATE_DESC" 
+				<field showon="iso_entree!:cgisotope" type="note" name="notedate" label="SSISO_NOTE_DATE" heading="p"/>
+				<field showon="iso_entree!:cgisotope" name="formatsortdate" type="text" label="SSISO_FORMAT_SORTDATE" description ="SSISO_FORMAT_SORTDATE_DESC" 
 					default="d/m/Y"  />
-				<field name="formatotherdate" type="text" label="SSISO_FORMAT_OTHERDATE" description ="SSISO_FORMAT_OTHERDATE_DESC" 
+				<field showon="iso_entree!:cgisotope" name="formatotherdate" type="text" label="SSISO_FORMAT_OTHERDATE" description ="SSISO_FORMAT_OTHERDATE_DESC" 
 					default="d/m/Y"  />
-			    <field type="note" name="note1" label="SSISO_NOTE1" heading="p" />
-				<field name="perso" type="textarea" label="SSISO_PERSO" description="SSISO_PERSO_DESC" cols="400" rows="4" filter="raw" 
+			    <field showon="iso_entree!:cgisotope" type="note" name="note1" label="SSISO_NOTE1" heading="p" />
+				<field showon="iso_entree!:cgisotope" name="perso" type="textarea" label="SSISO_PERSO" description="SSISO_PERSO_DESC" cols="400" rows="4" filter="raw" 
 					default="{title}&lt;br&gt;{date} - {cat} - {visit} visites&lt;br&gt;{intro}"
 					/>			
-				<field name="css" type="textarea" label="SSISO_CSS" description="SSISO_CSS_DESC" cols="400" rows="4" filter="raw" 
+				<field showon="iso_entree!:cgisotope" name="css" type="textarea" label="SSISO_CSS" description="SSISO_CSS_DESC" cols="400" rows="4" filter="raw" 
 					default="@media screen and (max-width: 600px) {.isotope_item img{max-width:100% !important} .isotope_item {width: 100% !important;}} .iso_fields_title{} .isotope_grid .isotope_item {padding: 0 15px 5px;box-shadow: 0 10px 6px -6px #777;}"	
 				/>	
 
 			</fieldset>
 			<fieldset name="layout">
-				<field type="note" name="note1" label="CG_NOTE1" class="alert-success"/>			 
-				<field name="layouts" label="" type="subform" multiple ="true" 
+				<field showon="iso_entree!:cgisotope" type="note" name="note1" label="CG_NOTE1" class="alert-success"/>			 
+				<field showon="iso_entree!:cgisotope" name="layouts" label="" type="subform" multiple ="true" 
 					formsource="/modules/mod_simple_isotope/src/form/layout.xml" />
 			</fieldset>
 			<fieldset name="depend_tab" label="SSISO_DEPEND_TAB">
-				<field type="note" name="notedepend" label="SSISO_NOTE_DEPEND" class="alert-success"/>		
+				<field showon="iso_entree!:cgisotope" type="note" name="notedepend" label="SSISO_NOTE_DEPEND" class="alert-success"/>		
 				<field name="fieldslinks" label="SSISO_FIELDSDEPEND" type="subform" multiple ="true" 
 					showon="iso_entree:articles[AND]cat_or_tag:fields,catfields,tagsfields"
 					formsource="/modules/mod_simple_isotope/src/form/depend.xml"  />

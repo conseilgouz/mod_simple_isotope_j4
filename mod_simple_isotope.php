@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.2.0
+* Version			: 4.3.0
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -16,11 +16,21 @@ use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeH
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Access\Access;
 use Joomla\CMS\Uri\Uri;
+use ConseilGouz\Component\CGIsotope\Site\Helper\CGHelper;
+use ConseilGouz\Component\CGIsotope\Site\Controller\PageController;
 
 $document 		= Factory::getDocument();
 
 $modulefield	= 'media/mod_simple_isotope/';
-
+$iso_entree = $params->get('iso_entree', 'webLinks');
+$is_component = false;
+if ($iso_entree == 'cgisotope') {
+    $id = $params->get('iso_id', 0);
+    $controller = new PageController();
+    $model = $controller->getModel();
+    $params = CGHelper::getParams($id,$model);
+    $is_component = true;
+}
 $moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx',''));
 
 $limitstart = 0;

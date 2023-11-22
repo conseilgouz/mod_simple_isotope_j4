@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.2.0
+* Version			: 4.3.0
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -19,17 +19,15 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Language\LanguageHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
+use ConseilGouz\Component\CGIsotope\Site\Helper\CGHelper;
 
 $uri = Uri::getInstance();
 $user = Factory::getUser();
 
-$defaultdisplay = $params->get('defaultdisplay', 'date_desc');
 $displaysortinfo = $params->get('displaysortinfo', 'show');
-$article_cat_tag = $params->get('cat_or_tag',$iso_entree == "webLinks"?'cat':'tags'); 
-$displayfilter =  $params->get('displayfilter','button');
+
 $tagsfilterorder = $params->get('tagsfilterorder','false');
 $tagsfilterimg =  $params->get('tagsfilterimg','false');
-$language_filter=$params->get('language_filter','false');
 $tagsfilterparent =  $params->get('tagsfilterparent','false');
 $tagsfilterparentlabel =  $params->get('tagsfilterparentlabel','false');
 $catsfilterimg =  $params->get('catsfilterimg','false');
@@ -41,9 +39,8 @@ if ($article_cat_tag =="cat") {
     $displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
 }
 $displaysort =  $params->get('displaysort','show');  
-$displaybootstrap = $params->get('bootstrapbutton','false'); 
+
 $displaysearch=$params->get('displaysearch','false');  
-$displayalpha = $params->get('displayalpha','false');  
 
 $displayoffcanvas =  $params->get('displayoffcanvas','text');
 $offcanvaspos = $params->get('offcanvaspos','start');
@@ -53,8 +50,6 @@ if  ($displayoffcanvas == "hamburger") {
 }
 $filtersoffcanvas = $params->get('offcanvas','false');
 
-$imgmaxwidth = $params->get('introimg_maxwidth','0'); 
-$imgmaxheight = $params->get('introimg_maxheight','0'); 
 $button_bootstrap = "isotope_button";
 if ($displaybootstrap == 'true') { 
 	HTMLHelper::_('bootstrap.button', '.selector');
@@ -62,12 +57,16 @@ if ($displaybootstrap == 'true') {
 }
 $params_fields = $params->get('displayfields',array());
 $languagelist = array();
-if ($params->get('language_filter','false') != 'false') { // language filter
+if ($language_filter != 'false') { // language filter
 	$languagelist = LanguageHelper::getLanguages();
 }
 
 //==============================LAYOUTS======================================//
-$layouts_prm = $params->get('layouts');
+if ($is_component) {// coming from CG Isotope
+    $layouts_prm = json_decode($params->get('layouts'));
+} else {
+    $layouts_prm = $params->get('layouts');
+}
 $layouts = [];
 $layouts_order = [];
 // Default values 
@@ -235,7 +234,23 @@ $libotherdateformat = $params->get('formatotherdate',Text::_('SSISO_DATEFORMAT')
 $libsearch = Text::_('SSISO_LIBSEARCH');
 $libmore = Text::_('SSISO_LIBMORE');
 $libsearchclear = Text::_('SSISO_SEARCHCLEAR');
+if ($is_component && $params->get('show_page_heading')) {
+	echo "<h1>";
+	echo $this->escape($params->get('page_heading')); 
+	echo "</h1>";
+}
+if ($is_component && $params->get('intro') && (strlen(trim($params->get('intro',''))) > 0) ){
+	// apply content plugins on weblinks
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('intro');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$intro = 	$item_cls->text;	
+	echo $intro; 
+}
 ?>
+
 <div id="isotope-main-<?php echo $module->id;?>" data="<?php echo $module->id;?>" class="isotope-main" ismodule="true">
 <div class="isotope-div fg-row" >
 <?php 
@@ -548,7 +563,18 @@ if (($displayfilter != "hide") || ($displayfiltercat != "hide")) {
  }
 //============================= isotope grid =============================================//
 $width = $layouts["iso"]->div_width;
-$isotope_grid_div = '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data-module-id="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
+$isotope_grid_div = "";
+if ($is_component && $params->get('middle') && (strlen(trim($params->get('middle',''))) > 0) ){
+	// apply content plugins 
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('middle');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$isotope_grid_div = 	$item_cls->text;	
+}
+
+$isotope_grid_div .= '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data-module-id="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
 foreach ($list as $key=>$category) {
   if (is_array($category)) { // check category contains items
 	foreach ($category as $item) {
@@ -856,3 +882,17 @@ if ($params->get('readmore','false') =='iframe') {
   <p class="infinite-scroll-error"><?php echo Text::_('CG_ISO_NO_MORE_PAGE'); ?></p>
 </div>
 <?php } ?>
+<?php if ($is_component && (strlen(trim($params->get('bottom',''))) > 0)) {
+	// apply content plugins on weblinks
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('bottom');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$bottom = 	$item_cls->text;	
+    $bottom = str_replace('{cg-version}',CGHelper::getCGVersion(), $bottom);
+    $bottom = str_replace('{cg-name}',CGHelper::getCGName(), $bottom);
+	echo $bottom; 
+	}
+?>
+

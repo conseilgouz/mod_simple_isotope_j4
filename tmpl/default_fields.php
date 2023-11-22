@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.2.0
+* Version			: 4.3.0
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -208,7 +208,21 @@ $libotherdateformat = $params->get('formatotherdate',Text::_('SSISO_DATEFORMAT')
 $libsearch = Text::_('SSISO_LIBSEARCH');
 $libmore = Text::_('SSISO_LIBMORE');
 $libsearchclear = Text::_('SSISO_SEARCHCLEAR');
-
+if ($is_component && $params->get('show_page_heading')) {
+	echo "<h1>";
+	echo $this->escape($params->get('page_heading')); 
+	echo "</h1>";
+}
+if ($is_component && $params->get('intro') && (strlen(trim($params->get('intro',''))) > 0) ){
+	// apply content plugins on weblinks
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('intro');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$intro = 	$item_cls->text;	
+	echo $intro; 
+}
 ?>
 <div id="isotope-main-<?php echo $module->id;?>" data="<?php echo $module->id;?>" class="isotope-main" ismodule="true">
 <div class="isotope-div fg-row" >
@@ -591,7 +605,17 @@ $filter_div = "";
  } 
 //============================= isotope grid =============================================// 
 $width = $layouts["iso"]->div_width;
-$isotope_grid_div = '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data-module-id="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
+$isotope_grid_div = "";
+if ($is_component && $params->get('middle') && (strlen(trim($params->get('middle',''))) > 0) ){
+	// apply content plugins
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('middle');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$isotope_grid_div = 	$item_cls->text;	
+}
+$isotope_grid_div .= '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data-module-id="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
 foreach ($list as $key=>$category) {
 	foreach ($category as $item) {
 		$tag_display = "";
@@ -877,3 +901,17 @@ if ($params->get('readmore','false') =='iframe') {
   <p class="infinite-scroll-error"><?php echo Text::_('CG_ISO_NO_MORE_PAGE'); ?></p>
 </div>
 <?php } ?>
+<?php if ($is_component && (strlen(trim($params->get('bottom',''))) > 0)) {
+	// apply content plugins on weblinks
+	$item_cls = new stdClass;
+	$item_cls->text = $params->get('bottom');
+	$item_cls->params = $params;
+    $item_cls->id= $com_id;
+	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
+	$bottom = 	$item_cls->text;	
+    $bottom = str_replace('{cg-version}',CGHelper::getCGVersion(), $bottom);
+    $bottom = str_replace('{cg-name}',CGHelper::getCGName(), $bottom);
+	echo $bottom; 
+	}
+?>
+

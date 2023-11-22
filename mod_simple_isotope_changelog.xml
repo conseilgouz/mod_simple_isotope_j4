@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.0</version>
+        <note>
+            <item>Update : 22/11/2023</item>
+        </note>
+		<addition>
+			<item>Info to display : CG Isotope page</item>
+		</addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.2.1</version>
         <note>
             <item>Update : 06/11/2023</item>
