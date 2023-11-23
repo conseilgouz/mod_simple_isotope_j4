@@ -17,6 +17,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\Component\Modules\Administrator\Helper\ModulesHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
+use ConseilGouz\Component\CGIsotope\Site\Helper\CGHelper;
 
 $uri = Uri::getInstance();
 $user = Factory::getUser();
@@ -168,6 +169,18 @@ if ($displayalpha != "false") {
 	$values->offcanvas = "false";
 	$layouts['alpha'] = $values;
 }
+if ($language_filter != "false") { // php 8
+	$values = new stdClass();
+	$values->div = "lang";
+	$line +=1;
+	$values->div_line = $line;
+	$values->div_pos = "1";
+	$values->div_width = "12";
+	$values->div_align="";
+	$values->offcanvas = "false";
+	$layouts['lang'] = $values;
+}
+
 $values = new stdClass();
 $values->div = "iso";
 $line +=1;
@@ -373,11 +386,11 @@ $filter_div = "";
 						$tagimage  = json_decode($tags_image[$aff_alias]);
 						if ((is_object($tagimage) && property_exists($tagimage,'image_fulltext') || property_exists($tagimage,'image_intro'))) {
 							if ($tagimage->image_intro != "") {
-								$img = '<img src="'.JURI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
+								$img = '<img src="'.URI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
 								class="iso_tag_img" alt="'.$tagimage->image_intro_alt.'" title="'.$tagimage->image_intro_caption.'"/> ';
                                                     } 
 							elseif ($tagimage->image_fulltext != "") {
-							$img = '<img src="'.JURI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
+							$img = '<img src="'.URI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
 							class="iso_tag_img" alt="'.$tagimage->image_fulltext_alt.'" title="'.$tagimage->image_fulltext_caption.'"/> ';
 							}
 						}
@@ -477,7 +490,7 @@ $filter_div = "";
 					if ($catsfilterimg == "true") {
 						$catparam  = json_decode($cats_params[$key]);	
 						if ($catparam->image != "") {
-							$img = '<img src="'.JURI::root().$catparam->image.'"  
+							$img = '<img src="'.URI::root().$catparam->image.'"  
 							class="iso_cat_img" alt="'.$catparam->image_alt.'" /> '; // pascal
 						}
 					}
@@ -628,10 +641,10 @@ foreach ($list as $key=>$category) {
 				if (!$tagimage) continue;
                 if ((!property_exists($tagimage,'image_fulltext')) || ($tagimage->image_fulltext == "") && ($tagimage->image_intro == ""))  continue;
         		if ($tagimage->image_intro != "") {
-					$tag_img .= '<img src="'.JURI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
+					$tag_img .= '<img src="'.URI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
 						class="iso_tag_img_art" alt="'.$tagimage->image_intro_alt.'" title="'.$tagimage->image_intro_caption.'"/> ';
 				} elseif ($tagimage->image_fulltext != "") {
-					$tag_img .=  '<img src="'.JURI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
+					$tag_img .=  '<img src="'.URI::root().$tagimage->image_fulltext.'" style="float:'.$tagimage->float_fulltext.'" 
 						class="iso_tag_img_art" alt="'.$tagimage->image_fulltext_alt.'" title="'.$tagimage->image_fulltext_caption.'"/> ';
 				};
 			}
@@ -774,7 +787,7 @@ if ($displayrange == "true") {
 	if (!property_exists($layouts["range"],'offcanvas')) $layouts["range"]->offcanvas = "false";
 	if ($layouts["range"]->offcanvas == "true") $awidth = 12;
     $isotope_range_div = '<div class="iso_range col-md-'.$awidth.' col-12 '.$layouts["range"]->div_align.'" data="'.$module->id.'">';
-    $isotope_range_div .= '<div class="col-12"><label title="'.$rangedesc.'">'.$rangelabel.'</label></div><div class="col-12 col-md-12"><input type="text" id="rSlider_'.$module->id.'" data-module-id="'.$module->id.'"/></div>';
+    $isotope_range_div .= '<div class="col-12"><label title="'.$rangedesc.'">'.$rangelabel.'</label></div><div class="col-12 col-md-12"><input type="text" id="rSlider" data="'.$module->id.'"/></div>';
     $isotope_range_div .= '</div>';
 }
 // ============================alpha div ==============================================//

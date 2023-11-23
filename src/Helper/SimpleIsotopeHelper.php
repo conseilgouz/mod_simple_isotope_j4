@@ -1,8 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.2
-* Package			: Joomla 4.x.x
+* Version			: 4.3.0
+* Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
@@ -464,7 +464,9 @@ class SimpleIsotopeHelper
 		if ($field->type == 'color') {
 			$obj->render = $value;
 		} elseif (!is_array($field->value)) { 
-			$obj->render = '<span class="iso_field_'.$field_alias.'">'.Factory::getApplication()->triggerEvent('onCustomFieldsPrepareField', array ($context, $item,$field))[0].'</span>';
+		    $tmp = Factory::getApplication()->triggerEvent('onCustomFieldsPrepareField', array ($context, $item,$field))[0];
+		    if (!$tmp) $tmp = $field->value;
+			$obj->render = '<span class="iso_field_'.$field_alias.'">'.$tmp.'</span>';
 		} else { 
 		    $obj->render = $value;
 		}
@@ -694,7 +696,7 @@ class SimpleIsotopeHelper
 					$first_time = false;
 				 }				 
 		         $aff_alias = $obj->alias;
-		         $aff = $obj->render;
+	             $aff = $obj->render;
 		         if (!is_null($aff)) {
 		             $result .=  '<button class="'.$button_bootstrap.'  iso_button_'.$group_lib.'_'.$aff_alias.'" data-sort-value="'.$aff_alias.'" data-parent="'.$obj->parent.'" data-child="'.$obj->child.'"/>'. Text::_($aff).'</button>';
 		         }

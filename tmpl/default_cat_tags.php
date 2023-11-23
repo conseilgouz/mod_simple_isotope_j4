@@ -755,7 +755,7 @@ if ($displayrange == "true") {
 	if (!property_exists($layouts["range"],'offcanvas')) $layouts["range"]->offcanvas = "false";
 	if ($layouts["range"]->offcanvas == "true") $awidth = 12;
     $isotope_range_div = '<div class="iso_range col-md-'.$awidth.' col-12 '.$layouts["range"]->div_align.'" data-module-id="'.$module->id.'">';
-    $isotope_range_div .= '<div class="col-12"><label title="'.$rangedesc.'">'.$rangelabel.'</label></div><div class="col-12 col-md-12"><input type="text" id="rSlider_'.$module->id.'" data="'.$module->id.'"/></div>';
+    $isotope_range_div .= '<div class="col-12"><label title="'.$rangedesc.'">'.$rangelabel.'</label></div><div class="col-12 col-md-12"><input type="text" id="rSlider" data="'.$module->id.'"/></div>';
     $isotope_range_div .= '</div>';
 }
 // ============================alpha div ==============================================//

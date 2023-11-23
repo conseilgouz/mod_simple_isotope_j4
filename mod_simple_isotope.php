@@ -197,6 +197,11 @@ if ($iso_entree == "webLinks") {
 		$default_tag = $onetag[0]->alias;
 	}
 }	
+if (($displayrange == "true") && ($rangestep == "auto")) { 
+	$step = ((int)$maxrange - (int)$minrange) / 5 ; // PHP 8
+	if ($step < 1) $step = 1;
+	$rangestep = $step;
+}
 $default_field = "";
 if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($article_cat_tag == "tagsfields") || ($article_cat_tag == "cattagsfields") ) {
 	$splitfields = $params->get('displayfiltersplitfields','false'); 

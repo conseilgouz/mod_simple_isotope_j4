@@ -9,6 +9,10 @@
 		<addition>
 			<item>Info to display : CG Isotope page</item>
 		</addition>
+		<fix>
+			<item>Slider display</item>
+			<item>Fields : JUri -> Uri</item>
+		</fix>
 	</changelog>
 	<changelog>
 		<element>mod_simple_isotope</element>
