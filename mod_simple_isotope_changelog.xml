@@ -12,6 +12,7 @@
 		<fix>
 			<item>Slider display</item>
 			<item>Fields : JUri -> Uri</item>
+			<item>Fields : Offcanvas</item>
 		</fix>
 	</changelog>
 	<changelog>

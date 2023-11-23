@@ -28,6 +28,12 @@ $catsfilterimg =  $params->get('catsfilterimg','false');
 $displayfilter =  $params->get('displayfilter_f','button');
 $tagsfilterorder = $params->get('tagsfilterorder','false');
 $tagsfilterparent =  $params->get('tagsfilterparent','false');
+$displayoffcanvas =  $params->get('displayoffcanvas','text');
+$offcanvaspos = $params->get('offcanvaspos','start');
+$offcanvasbtnpos = "leave";
+if  ($displayoffcanvas == "hamburger") {
+    $offcanvasbtnpos =  $params->get('offcanvasbtnpos','leave');
+}
 $filtersoffcanvas = $params->get('offcanvas','false');
 
 $tagsfilterimg =  $params->get('tagsfilterimg','false');
@@ -60,7 +66,11 @@ if ($displaybootstrap == 'true') {
 	$button_bootstrap = "btn btn-sm ";
 }
 //==============================LAYOUTS======================================//
-$layouts_prm = $params->get('layouts');
+if ($is_component) {// coming from CG Isotope
+    $layouts_prm = json_decode($params->get('layouts'));
+} else {
+    $layouts_prm = $params->get('layouts');
+}
 $layouts = [];
 $layouts_order = [];
 // Default values 
@@ -212,7 +222,7 @@ $libcreated=Text::_('SSISO_LIBCREATED');
 $libpublished = Text::_('SSISO_LIBPUBLISHED'); 
 $libupdated=Text::_('SSISO_LIBUPDATED');
 $librandom=Text::_('SSISO_RANDOM');
-$libfilter=Text::_('CG_ISO_LIBFILTER');  
+$libfilter=Text::_('SSISO_LIBFILTER');  
 
 $libblog= Text::_('SSISO_LIBBLOG');
 $libfilter=Text::_('SSISO_LIBFILTER');  
@@ -814,13 +824,14 @@ if (($language_filter == "button") || ($language_filter == "multi")){
 ksort($layouts_order,  SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL ); // order
 $val = 0;
 $line = 0;
+$offcanvas = false;
 $offcanvasopened = false;
 foreach ($layouts_order as $layout) {
     $key = (string)$layout;
     $obj = $layouts[$key];
 	$val = $obj->div_width;
 	$line = $obj->div_line;
-		if (!property_exists($layouts[$key],'offcanvas')) {
+	if (!property_exists($layouts[$key],'offcanvas')) {
 		$layouts[$key]->offcanvas = "false";
 		$obj->offcanvas = "false";
 	}
@@ -844,11 +855,11 @@ foreach ($layouts_order as $layout) {
 		if ($displayoffcanvas == 'hamburger') {
 			echo '<span class="navbar-toggler-icon"></span>';
 		} else {
-			echo '<span class="navbar-toggler-text">'.Text::_('CG_ISO_LIBFILTER').'</span>';
+			echo '<span class="navbar-toggler-text">'.Text::_('SSISO_LIBFILTER').'</span>';
 		}
 		echo '</a><div id="clonedbuttons"></div></div>';
 	    echo '<div class="offcanvas offcanvas-'.$offcanvaspos.'" tabindex="-1" id="offcanvas'.$obj->div.'" aria-labelledby="offcanvas'.$obj->div.'Label" data-bs-scroll="true">';
-		$liboff = Text::_('CG_ISO_LIBFILTER');
+		$liboff = Text::_('SSISO_LIBFILTER');
 		echo '<div class="offcanvas-header"><h5 class="offcanvas-title" id="offcanvas'.$obj->div.'Label">'.$liboff.'</h5>';
 	    echo '<button type="button" class="btn ison-cancel-squared" title="'.Text::_('CG_ISO_CLEAR_FILTER').'" data="'.$module->id.'">'.Text::_('CG_ISO_CLEAR_FILTER').'</button>';
 	    echo '<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" title="'.Text::_('CG_ISO_CLOSE').'"></button>';
