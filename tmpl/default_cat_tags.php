@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.1
+* Version			: 4.3.2
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -582,11 +582,12 @@ foreach ($list as $key=>$category) {
 		$tag_img = "";
 		$cat_img = "";
 		if (($article_cat_tag  == "tags") || ($article_cat_tag  == "cattags")) { // filtre tag
-		    $isdefined = true; // supposed ok
+		    $isdefined = false; // supposed not found
+		    if ($params->get('tagsmissinghidden','false') == 'false') $isdefined = true; // don't check => ok 
 			foreach ($article_tags[$item->id] as $tag) {
 			    // ignore tags not defined in the tags list if tagsmissinghidden param is set
-			    if ($tags_list && (count($tags_list) > 0) && $params->get('tagsmissinghidden',false)) {
-			         $isdefined = SimpleIsotopeHelper::checkTagSet($tag->tag,$filters['tags']);
+			    if ($tags_list && (count($tags_list) > 0) && ($params->get('tagsmissinghidden','false') == 'true')) {
+			         $isdefined = SimpleIsotopeHelper::checkTagSet($tag->tag,$filters['tags']) || $isdefined;
 			    }
 			    $tag_display .= " ".$tags_alias[$tag->tag];
 				$tagimage  = json_decode($tags_image[$tags_alias[$tag->tag]]);

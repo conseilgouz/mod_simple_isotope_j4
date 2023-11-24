@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.2</version>
+        <note>
+            <item>Update : 24/11/2023</item>
+        </note>
+		<fix>
+			<item>Tags missing hidden parameter error</item>
+			<item>CG Isotope page : check component is installed/enabled </item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.1</version>
         <note>
             <item>Update : 24/11/2023</item>

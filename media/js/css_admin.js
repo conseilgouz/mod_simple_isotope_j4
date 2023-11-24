@@ -1,10 +1,9 @@
 /* 
-/**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.0.2
-* Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
-* license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+* Version			: 4.3.2
+* Package			: Joomla 4.x/5.x
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 *
 * this js updates mod_simple_isotope parameters so that leave_formatting_tags parameter is displayed right from intro text limit parameter
@@ -35,4 +34,7 @@ jQuery(document).ready(function(){
 	jQuery( ".half" ).parent('.form-check').parent('.controls').parent(".control-group").css({"width":"50%"});
 	jQuery( ".left" ).parent('.form-check').parent('.controls').parent(".control-group").css({"float":"left"});
 	jQuery( ".right" ).parent('.form-check').parent('.controls').parent(".control-group").css({"float":"right"});
+	
+	jQuery( ".hidden" ).parent('.controls').parent(".control-group").css({"display":"none"});
+	
 });

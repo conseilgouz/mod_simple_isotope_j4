@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.3.1</version>
+	<version>4.3.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -44,12 +44,15 @@
 					<option value="articles">SSISO_ENTREEARTICLES</option> 
 					<option value="cgisotope">CG Isotope</option> 
 				</field>
-				<field name="iso_id" type="sql" default=""  showon="iso_entree:cgisotope"
-					label="SSISO_ISO_ID_LABEL" 
-					description="SSISO_ISO_ID_LABEL_DESC" 
+				<field name="cgisotope" type="sql" default="0"
+					query="select enabled from #__extensions where element = 'com_cgisotope'"
+					key_field="enabled"	key_value="enabled"	class="hidden" 
+				/>
+<field	name="notecgisotope" showon="iso_entree:cgisotope[AND]cgisotope!:1"	type="note" label="SSISO_CGISO_NOT_INSTALLED" class="alert-success  half right"/>
+				<field name="iso_id" type="sql" default=""  showon="iso_entree:cgisotope[AND]cgisotope:1"
+					label="SSISO_ISO_ID_LABEL" 	description="SSISO_ISO_ID_LABEL_DESC" 
 					query="SELECT id, title FROM #__cgisotope_page WHERE state=1" 
-					key_field="id" 
-					value_field="title" 
+					key_field="id" value_field="title" 
 				/>
 
 				<field showon="iso_entree:articles"
