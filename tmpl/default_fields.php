@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.0
+* Version			: 4.3.1
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -10,7 +10,6 @@
 defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Language\Helper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -646,6 +645,12 @@ foreach ($list as $key=>$category) {
 		$cat_img = "";
 		if (($article_cat_tag  == "tagsfields") || ($article_cat_tag  == "cattagsfields")) { // filtre 
 			foreach ($article_tags[$item->id] as $tag) {
+		    $isdefined = true; // supposed ok
+			foreach ($article_tags[$item->id] as $tag) {
+			    // ignore tags not defined in the tags list if tagsmissinghidden param is set
+			    if ($tags_list && (count($tags_list) > 0) && $params->get('tagsmissinghidden',false)) {
+			         $isdefined = SimpleIsotopeHelper::checkTagSet($tag->tag,$filters['tags']);
+			    }
 				$tag_display .= " ".$tags_alias[$tag->tag];
 				$tagimage  = json_decode($tags_image[$tags_alias[$tag->tag]]);
 				if (!$tagimage) continue;
@@ -658,6 +663,7 @@ foreach ($list as $key=>$category) {
 						class="iso_tag_img_art" alt="'.$tagimage->image_fulltext_alt.'" title="'.$tagimage->image_fulltext_caption.'"/> ';
 				};
 			}
+			if (!$isdefined) continue; // not in list : ignore it
 		} 		
 		$cat_params = json_decode($cats_params[$item->catid]);
 		if (($cat_params) && ($cat_params->image != "")) {

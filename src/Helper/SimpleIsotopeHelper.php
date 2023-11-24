@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.0
+* Version			: 4.3.1
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
@@ -666,7 +666,12 @@ class SimpleIsotopeHelper
 		}
 		return $perso;
 	}
-//-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
+	public static function checkTagSet($tag,$filter) {
+		foreach($filter as $onefilter) {
+			if ($onefilter[0]->tag == $tag) return true;
+		}
+		return false;
+	}//-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
 	public static function create_buttons($fields, $group_lib,$onefilter,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_title) {
 	    $params_fields = $params->get('displayfields');
 	    $libfilter=Text::_('SSISO_LIBFILTER');		

@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2023/11/06</creationDate>
+	<creationDate>2023/11/24</creationDate>
 	<copyright>Copyright (C) 2023 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.3.0</version>
+	<version>4.3.1</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -265,6 +265,12 @@
 					>
 					<option value="">SSISO_LIBALL</option>
 					<option value="none">SSISO_LIBNONE</option>
+				</field>
+				<field	showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields,cattagsfields[AND]iso_entree:articles,webLinks" 
+				name="tagsmissinghidden" type="radio" class="btn-group btn-group-yesno " default="false" 
+				label="SSISO_TAGSMISSINGHIDDEN" description="SSISO_TAGSMISSINGHIDDENDESC">
+					<option value="true">JYES</option>
+					<option value="false">JNO</option>
 				</field>
 				<field	name="displayfilter"
 					showon="iso_entree!:cgisotope[AND]cat_or_tag:tags,cattags,tagsfields"
