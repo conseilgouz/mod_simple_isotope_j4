@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.0
+* Version			: 4.3.3
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -254,11 +254,8 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
 		|| ( ($article_cat_tag  == "cattags") && ($displayfiltercat == "multiex"))){
 		$searchmultiex = "true";
 	}
-	if ($article_cat_tag =="cat") {
-		$displayfiltercat = $params->get('displayfiltercat',$displayfilter);
-	} else {
-		$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
-	}
+	$displayfiltertags = $params->get('displayfiltertags',$displayfilter);
+	
 	$document->addScriptOptions('mod_simple_isotope_'.$module->id, 
 		array('entree' => $iso_entree,'article_cat_tag' => $article_cat_tag,
 			  'default_cat' => $default_cat,
@@ -270,7 +267,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
 			  'sortby' => $sortBy, 'ascending' => $sortAscending,
 			  'searchmultiex' => $searchmultiex, 'liball' => Text::_('SSISO_LIBALL'),
 			  'language_filter' => $language_filter,
-			  'displayfiltertags'=> $displayfilter, 'displayfiltercat' => $displayfiltercat,
+			  'displayfiltertags'=> $displayfiltertags, 'displayfiltercat' => $displayfiltercat,
 			  'displayrange'=>$displayrange,'rangestep'=>$rangestep, 'minrange'=>$minrange,'maxrange'=>$maxrange,			  
 			  'limit_items' => $params->get('limit_items','0'),'displayalpha'=>$displayalpha,
 			  'libmore' => Text::_('SSISO_LIBMORE'), 'libless' => Text::_('SSISO_LIBLESS'), 'readmore' => $params->get("readmore","false"),

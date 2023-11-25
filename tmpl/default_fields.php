@@ -41,8 +41,11 @@ $splitfieldstitle = $params->get('splitfieldstitle','false');
 $blocklink =  $params->get('blocklink','false'); 
 $titlelink =  $params->get('titlelink','true'); 
 $language_filter=$params->get('language_filter','false');
+
 $displayfilterfields =  $params->get('displayfilterfields','button');
-$displayfiltercat = $params->get('displayfiltercattags',$displayfilter);
+$displayfiltercat = $params->get('displayfiltercatcat',$displayfilter);
+$displayfiltertags = $params->get('displayfiltercattags',$displayfilter);
+
 $displaysort =  $params->get('displaysort','show');  
 $displaybootstrap = $params->get('bootstrapbutton','false'); 
 $displaysearch=$params->get('displaysearch','false');  
@@ -369,7 +372,7 @@ $filter_div = "";
 				$checked = "is-checked";
 			}
 			if ($tagsfilterparent != "true") {
-        		$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags col-md-'.$awidth.' col-12 '.$layouts["tag"]->div_align.'" data-filter-group="tags" data-module-id="'.$module->id.'">';
+        		$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags col-md-'.$awidth.' col-12 '.$layouts["tag"]->div_align.'" data-filter-group="tags" data="'.$module->id.'">';
 				$filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_tout '.$checked.'" data-sort-value="*" />'.$liball.'</button>';
 			} else {
         		$filter_tag_div .= '<div class="col-md-'.$layouts["tag"]->div_width.' col-12 '.$layouts["tag"]->div_align.'">';
@@ -382,7 +385,7 @@ $filter_div = "";
 				if (($tagsfilterparent == "true") && ($cur_parent != $parent) )  {
 					if ($cur_parent != '') $filter_tag_div .= "</div>";
 					$cur_parent = $parent;
-					$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags" data-filter-group="tags" data-module-id="'.$module->id.'">';
+					$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags" data-filter-group="tags" data="'.$module->id.'">';
 					if ($tagsfilterparentlabel == "true") {
 						$filter_tag_div .= '<p class="iso_tags_parent_title">'.$tags_parent[$alias[$filter]].'</p>';
 					}
@@ -429,7 +432,7 @@ $filter_div = "";
 				$multiple = "  place-placeholder='".$libmulti."'";
 				$selectAttr[] = ' multiple';
 			}
-			$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags col-md-'.$layouts["tag"]->div_width.' col-12 '.$layouts["tag"]->div_align.'" data-filter-group="tags" data-module-id="'.$module->id.'">';
+			$filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags col-md-'.$layouts["tag"]->div_width.' col-12 '.$layouts["tag"]->div_align.'" data-filter-group="tags" data="'.$module->id.'">';
 			$filter_tag_div .= '<p class="hidden-phone" >'.$libfilter.' : </p>';
 			$name = 'isotope-select-tags';
 			$options = array();
@@ -483,7 +486,7 @@ $filter_div = "";
 			$awidth = $layouts["cat"]->div_width;
 			if (!property_exists($layouts["cat"],'offcanvas')) $layouts["cat"]->offcanvas = "false";
 			if ($layouts["cat"]->offcanvas == "true") $awidth = 12;
-    	    $filter_cat_div .= '<div class="isotope_button-group filter-button-group-cat col-md-'.$awidth.' col-12 '.$layouts["cat"]->div_align.'" data-filter-group="cat" data-module-id="'.$module->id.'">';
+    	    $filter_cat_div .= '<div class="isotope_button-group filter-button-group-cat col-md-'.$awidth.' col-12 '.$layouts["cat"]->div_align.'" data-filter-group="cat" data="'.$module->id.'">';
 			$checked = "";
 			if ($default_cat == "") {
 				$checked = "is-checked";
@@ -528,7 +531,7 @@ $filter_div = "";
 			$awidth = $layouts["cat"]->div_width;
 			if (!property_exists($layouts["cat"],'offcanvas')) $layouts["cat"]->offcanvas = "false";
 			if ($layouts["cat"]->offcanvas == "true") $awidth = 12;
-		    $filter_cat_div .= '<div class="isotope_button-group filter-button-group-cat col-md-'.$awidth.' col-12 '.$layouts["cat"]->div_align.'" data-filter-group="cat" data-module-id="'.$module->id.'">';
+		    $filter_cat_div .= '<div class="isotope_button-group filter-button-group-cat col-md-'.$awidth.' col-12 '.$layouts["cat"]->div_align.'" data-filter-group="cat" data="'.$module->id.'">';
 		    $filter_cat_div .= '<p class="hidden-phone" >'.$libfilter.' : </p>';
 			$name = 'isotope-select-cat';
 			$options = array();
@@ -602,13 +605,13 @@ $filter_div = "";
 		}
 		if ($width <	12) {
 			$group_lib= 'fields';
-			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-module-id="'.$module->id.'">';
+			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
 		}
 		foreach ($group as $group_lib => $onegroup) {
 			
 		    $first =  array_key_first($onegroup);
 			$group_id = $onegroup[$first]->field_id;
-			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'" data-module-id="'.$module->id.'">';
+			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'" data="'.$module->id.'">';
 			
 			$filter_div .= IsotopeHelper::create_buttons( $fields,$group_lib,$onegroup,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_label[$group_lib],$group_id);
 			$filter_div .= "</div>";
@@ -620,7 +623,7 @@ $filter_div = "";
 		$group_lib= 'fields';
 		$width = $layouts['field']->div_width;
 		$col_width = "col-md-".$width." col-12";
-	    $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-module-id="'.$module->id.'">';
+	    $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
 	    $filter_div .=  IsotopeHelper::create_buttons( $fields,'fields',$fields,$params,$col_width,$button_bootstrap,'false','fields');
 		$filter_div .= "</div>";
 	}
@@ -637,7 +640,7 @@ if ($is_component && $params->get('middle') && (strlen(trim($params->get('middle
 	Factory::getApplication()->triggerEvent('onContentPrepare', array ('com_cgisotope.content', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
 	$isotope_grid_div = 	$item_cls->text;	
 }
-$isotope_grid_div .= '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data-module-id="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
+$isotope_grid_div .= '<div class="isotope_grid col-md-'.$width.' col-12" style="padding:0" data="'.$module->id.'">'; // bootstrap : suppression du padding pour isotope
 foreach ($list as $key=>$category) {
 	foreach ($category as $item) {
 		$tag_display = "";
@@ -813,7 +816,7 @@ if ($displayalpha != "false") {
 	$awidth = $layouts["alpha"]->div_width;
 	if (!property_exists($layouts["alpha"],'offcanvas')) $layouts["alpha"]->offcanvas = "false";
 	if ($layouts["alpha"]->offcanvas == "true") $awidth = 12;
-    $isotope_alpha_div = '<div class="isotope_button-group filter-button-group-alpha iso_alpha col-md-'.$awidth.' col-12 '.$layouts["alpha"]->div_align.'" data-filter-group="alpha" data-module-id="'.$module->id.'">';
+    $isotope_alpha_div = '<div class="isotope_button-group filter-button-group-alpha iso_alpha col-md-'.$awidth.' col-12 '.$layouts["alpha"]->div_align.'" data-filter-group="alpha" data="'.$module->id.'">';
 	$isotope_alpha_div .= IsotopeHelper::create_alpha_buttons($alpha,$button_bootstrap);
     $isotope_alpha_div .= '</div>';
 }
@@ -823,7 +826,7 @@ if (($language_filter == "button") || ($language_filter == "multi")){
 	$awidth = $layouts["lang"]->div_width;
 	if (!property_exists($layouts["lang"],'offcanvas')) $layouts["lang"]->offcanvas = "false";
 	if ($layouts["lang"]->offcanvas == "true") $awidth = 12;
-    $isotope_lang_div = '<div class="isotope_button-group iso_lang col-md-'.$awidth.' col-12 '.$layouts["lang"]->div_align.'" data-filter-group="lang" data-module-id="'.$module->id.'">';
+    $isotope_lang_div = '<div class="isotope_button-group iso_lang col-md-'.$awidth.' col-12 '.$layouts["lang"]->div_align.'" data-filter-group="lang" data="'.$module->id.'">';
 	$isotope_lang_div .= IsotopeHelper::create_language_buttons($languagelist,$button_bootstrap);
     $isotope_lang_div .= '</div>';
 }
@@ -911,7 +914,7 @@ if ($params->get('readmore','false') =='iframe') {
 	<?php echo Text::_('SSISO_EMPTY'); ?>
 </div>
 <div class="iso_div_more">
-<button class="<?php echo $button_bootstrap;?> iso_button_more" data-module-id="<?php echo $module->id;?>"><?php echo $libmore;?></button>
+<button class="<?php echo $button_bootstrap;?> iso_button_more" data="<?php echo $module->id;?>"><?php echo $libmore;?></button>
 </div>
 </div>
 	<?php if (($iso_entree != "webLinks") && ($params->get('pagination','true') == 'true')) {?> 

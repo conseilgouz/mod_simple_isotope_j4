@@ -1,8 +1,8 @@
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.0
+* Version			: 4.3.3
 * Package			: Joomla 4.x.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -372,3 +372,28 @@ div.itemExtraFields ul li span.itemExtraFieldsLabel {
 	.offstart{ right:-25%}
 	
 }
+.isotope-main .choices__button_joomla {
+  position: relative;
+  padding: 0 10px;
+  color: inherit;
+  text-indent: -9999px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  opacity: 0.5;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.isotope-main .choices__button_joomla:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    text-align: center;
+    text-indent: 0;
+    content: "X";
+}
+.isotope-main .choices__inner input{min-width:10ch!important}

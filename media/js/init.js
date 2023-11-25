@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.2.1
+* Version			: 4.3.3
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -181,36 +181,36 @@ function CGIsotope(isoid,options) {
 }
 CGIsotope.prototype.goisotope = function(isoid) {
 	$myiso = cgisotope[isoid];
-	this.cookie = this.getCookie(this.cookie_name);
-	if (this.cookie != "") {
-		let $arr = this.cookie.split('&');
+	$myiso.cookie = $myiso.getCookie($myiso.cookie_name);
+	if ($myiso.cookie != "") {
+		let $arr = $myiso.cookie.split('&');
 		for (let index = 0; index < $arr.length; ++index) {
-			this.splitCookie(this.isoid,$arr[index]);
+			$myiso.splitCookie($myiso.isoid,$arr[index]);
 		}
 	}
-	$items = document.querySelectorAll('#isotope-main-' + this.isoid + ' .isotope_item');
+	$items = document.querySelectorAll('#isotope-main-' + $myiso.isoid + ' .isotope_item');
 	for (var i=0; i< $items.length;i++) {
-		if ((this.options.layout == "masonry") || (this.options.layout == "fitRows") || (this.options.layout == "packery"))
-			$items[i].style.width = (100 / parseInt(this.options.nbcol)-2)+"%" ;
-		if (this.options.layout == "vertical") 
+		if (($myiso.options.layout == "masonry") || ($myiso.options.layout == "fitRows") || ($myiso.options.layout == "packery"))
+			$items[i].style.width = (100 / parseInt($myiso.options.nbcol)-2)+"%" ;
+		if ($myiso.options.layout == "vertical") 
 			$items[i].style.width = "100%";
-		$items[i].style.background = this.options.background;
+		$items[i].style.background = $myiso.options.background;
 	}
-	$imgs = document.querySelectorAll('#isotope-main-' + this.isoid + ' .isotope_item img');
+	$imgs = document.querySelectorAll('#isotope-main-' + $myiso.isoid + ' .isotope_item img');
 	for (var i=0; i< $imgs.length;i++) {
-		if (parseInt(this.options.imgmaxheight) > 0) 
-			$imgs[i].style.maxHeight = this.options.imgmaxheight + "px";
-		if (parseInt(this.options.imgmaxwidth) > 0) 
-			$imgs[i].style.maxWidth = this.options.imgmaxwidth + "px";
+		if (parseInt($myiso.options.imgmaxheight) > 0) 
+			$imgs[i].style.maxHeight = $myiso.options.imgmaxheight + "px";
+		if (parseInt($myiso.options.imgmaxwidth) > 0) 
+			$imgs[i].style.maxWidth = $myiso.options.imgmaxwidth + "px";
 	}
-    if (typeof this.sort_by === 'string') {
-		this.sort_by = this.sort_by.split(',');
+    if (typeof $myiso.sort_by === 'string') {
+		$myiso.sort_by = $myiso.sort_by.split(',');
 	}
-	var grid = document.querySelector(this.me + '.isotope_grid');
-	this.iso = new Isotope(grid,{ 
-			itemSelector: 'none',
+	var grid = document.querySelector($myiso.me + '.isotope_grid');
+	$myiso.iso = new Isotope(grid,{ 
+			itemSelector: $myiso.me+'.isotope_item',
 			percentPosition: true,
-			layoutMode: this.options.layout,
+			layoutMode: $myiso.options.layout,
 			getSortData: {
 				title: '[data-title]',
 				category: '[data-category]',
@@ -220,16 +220,20 @@ CGIsotope.prototype.goisotope = function(isoid) {
 				id: '[data-id] parseInt',
 				featured: '[data-featured] parseInt'
 			},
-			sortBy: this.sort_by,
-			sortAscending: this.asc,
+			sortBy: $myiso.sort_by,
+			sortAscending: $myiso.asc,
 			isJQueryFiltering : false,
-			filter: function(itemElem ){ if (itemElem) return $myiso.grid_filter(itemElem)	}				
+			filter: function(itemElem ){ 
+				if (itemElem) {
+					$id = itemElem.parentNode.getAttribute('data');
+					return cgisotope[$id].grid_filter($id,itemElem)	
+				}
+				return false;
+			}
 	}); // end of Isotope definition
 	imagesLoaded(grid, function() {
-		$myiso.iso.options.itemSelector ='.isotope_item';
-		var $items = Array.prototype.slice.call($myiso.iso.element.querySelectorAll('.isotope_item'));
-		$myiso.iso.appended($items );
-		$myiso.updateFilterCounts();
+		$myiso = cgisotope[this.elements[0].getAttribute('data')];
+		$myiso.iso.arrange();
 		if ($myiso.sort_by == "random") {
 			$myiso.iso.shuffle();
 		}
@@ -237,29 +241,30 @@ CGIsotope.prototype.goisotope = function(isoid) {
 			$myiso.iso_width = $myiso.grid_toggle.width();
 			$myiso.iso_height = $myiso.grid_toggle.height();
 		}
-	});
-	if (this.options.displayrange == "true") {
-		if (!this.min_range) {
-			this.min_range = parseInt(this.options.minrange);
-			this.max_range = parseInt(this.options.maxrange);
+	}); 
+
+	if ($myiso.options.displayrange == "true") {
+		if (!$myiso.min_range) {
+			$myiso.min_range = parseInt($myiso.options.minrange);
+			$myiso.max_range = parseInt($myiso.options.maxrange);
 		}
-		this.rangeSlider = new rSlider({
+		$myiso.rangeSlider = new rSlider({
 			target: '#rSlider',
-			values: {min:parseInt(this.options.minrange), max:parseInt(this.options.maxrange)},
-			step: parseInt(this.options.rangestep),
-			set: [this.min_range,this.max_range],
+			values: {min:parseInt($myiso.options.minrange), max:parseInt($myiso.options.maxrange)},
+			step: parseInt($myiso.options.rangestep),
+			set: [$myiso.min_range,$myiso.max_range],
 			range: true,
 			tooltip: true,
 			scale: true,
 			labels: true,
-			onChange: this.rangeUpdated,
+			onChange: $myiso.rangeUpdated,
 		});
 	}		
-	iso_div = document.querySelector(this.me + '.isotope-div');
+	iso_div = document.querySelector($myiso.me + '.isotope-div');
 	iso_div.addEventListener("refresh", function(){
- 	  this.iso.arrange();
+ 	  $myiso.iso.arrange();
 	});
-    if (this.options.pagination == 'infinite') { 
+    if ($myiso.options.pagination == 'infinite') { 
 		// --------------> infinite scroll <----------------
 		var elem = Isotope.data('.isotope_grid');
 		var infScroll = new InfiniteScroll('.isotope_grid',{
@@ -274,8 +279,8 @@ CGIsotope.prototype.goisotope = function(isoid) {
 			currentpage = this.loadCount;
 			return '?start='+(currentpage+1)*$myiso.options.page_count; 
 		}
-		let more = document.querySelector(this.me+'.iso_button_more');		
-		if (this.options.infinite_btn == "true") {
+		let more = document.querySelector($myiso.me+'.iso_button_more');		
+		if ($myiso.options.infinite_btn == "true") {
 			infScroll.option({button:'.iso_button_more',loadOnScroll: false});
 			let $viewMoreButton = document.querySelector('.iso_button_more');
 			more.style.display = "block";
@@ -326,28 +331,28 @@ CGIsotope.prototype.goisotope = function(isoid) {
 			})
 		})
 	// set default buttons in cloned area
-		if ( (this.filters['cat'][0] != '*') || (this.filters['tags'][0] != '*') ) { // default value set for tags or categories ?
+		if ( ($myiso.filters['cat'][0] != '*') || ($myiso.filters['tags'][0] != '*') ) { // default value set for tags or categories ?
 			grouptype = ['cat','tags']
 			optionstype = [options.displayfiltercat,options.displayfiltertags]
 			for (var g = 0; g < grouptype.length;g++) {
-				if (this.filters[grouptype[g]][0] == "*") continue; // ignore 'all' value
-				clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+this.filters[grouptype[g]]+'"]');
+				if ($myiso.filters[grouptype[g]][0] == "*") continue; // ignore 'all' value
+				clone_exist = document.querySelector($myiso.me+'#clonedbuttons button[data-sort-value="'+$myiso.filters[grouptype[g]]+'"]');
 				if (!clone_exist) {
-					agroup = document.querySelectorAll(this.me+'.filter-button-group-'+grouptype[g]+' button'); 
+					agroup = document.querySelectorAll($myiso.me+'.filter-button-group-'+grouptype[g]+' button'); 
 					for (var i=0; i< agroup.length;i++) {
-						if (agroup[i].getAttribute('data-sort-value') == this.filters[grouptype[g]]) {
-							this.create_clone_button(grouptype[g],this.filters[grouptype[g]],agroup[i].textContent,optionstype[g],'');
-							this.create_clone_listener(this.filters[grouptype[g]]);
+						if (agroup[i].getAttribute('data-sort-value') == $myiso.filters[grouptype[g]]) {
+							$myiso.create_clone_button(grouptype[g],$myiso.filters[grouptype[g]],agroup[i].textContent,optionstype[g],'');
+							$myiso.create_clone_listener($myiso.filters[grouptype[g]]);
 						}
 					}
 				}
 			}
 		}
 	}
-	var sortbybutton = document.querySelectorAll(this.me+'.sort-by-button-group button');
+	var sortbybutton = document.querySelectorAll($myiso.me+'.sort-by-button-group button');
 	for (var i=0; i< sortbybutton.length;i++) {
 		['click', 'touchstart'].forEach(type => {
-			sortbybutton[i].addEventListener(type,function(e) {
+			sortbybutton[i].addEventListener(type,e => {
 				let isoid = this.parentNode.getAttribute('data'); // get isotope component id
 				let isoobj = cgisotope[isoid]; // get isotope object
 				e.stopPropagation();
@@ -361,17 +366,17 @@ CGIsotope.prototype.goisotope = function(isoid) {
 		})
 	}
 // use value of search field to filter
-	this.quicksearch = document.querySelector(this.me+'.quicksearch');
-	if (this.quicksearch) {
-		this.quicksearch.addEventListener('keyup',this.debounce( function() {
-			$myiso.qsRegex = new RegExp( $myiso.quicksearch.value, 'gi' );
-			$myiso.CG_Cookie_Set($myiso.isoid,'search',$myiso.quicksearch.value);
-			$myiso.iso.arrange();
-			$myiso.updateFilterCounts();
-		}));
+	$myiso.quicksearch = document.querySelector($myiso.me+'.quicksearch');
+	if ($myiso.quicksearch) {
+		$myiso.quicksearch.addEventListener('keyup',e => {
+			this.qsRegex = new RegExp( this.quicksearch.value, 'gi' );
+			this.CG_Cookie_Set(this.isoid,'search',this.quicksearch.value);
+			this.iso.arrange();
+			this.updateFilterCounts();
+		});
 	}
 //  clear search button + reset filter buttons
-    var cancelsquarred = document.querySelectorAll(this.me+'.ison-cancel-squared');
+    var cancelsquarred = document.querySelectorAll($myiso.me+'.ison-cancel-squared');
 	for (var cl=0; cl< cancelsquarred.length;cl++) {
 	['click', 'touchstart'].forEach(type => {
 		cancelsquarred[cl].addEventListener( type, function(e) {
@@ -437,55 +442,55 @@ CGIsotope.prototype.goisotope = function(isoid) {
 		});
 	})
 	}
-	if  (this.options.displayfiltertags == "listmulti") 	{ 
-		this.events_listmulti('tags');
+	if  ($myiso.options.displayfiltertags == "listmulti") 	{ 
+		$myiso.events_listmulti('tags');
 	}
-	if (this.options.displayfiltercat == "listmulti") {
-		this.events_listmulti('cat');
+	if ($myiso.options.displayfiltercat == "listmulti") {
+		$myiso.events_listmulti('cat');
 	}
-	if  (this.options.displayfilterfields == "listmulti")	{ 
-		this.events_listmulti('fields');
+	if  ($myiso.options.displayfilterfields == "listmulti")	{ 
+		$myiso.events_listmulti('fields');
 	}
-	if  ((this.options.displayfiltercat == "list") || (this.options.displayfiltercat == "listex")) { 
-		this.events_list('cat');
+	if  (($myiso.options.displayfiltercat == "list") || ($myiso.options.displayfiltercat == "listex")) { 
+		$myiso.events_list('cat');
 	} 
-	if  ((this.options.displayfiltertags == "list") || (this.options.displayfiltertags == "listex")) { 
-		this.events_list('tags');
+	if  (($myiso.options.displayfiltertags == "list") || ($myiso.options.displayfiltertags == "listex")) { 
+		$myiso.events_list('tags');
 	} 
-	if  ((this.options.displayfilterfields == "list") || (this.options.displayfilterfields == "listex")) { 
-		this.events_list('fields');
+	if  (($myiso.options.displayfilterfields == "list") || ($myiso.options.displayfilterfields == "listex")) { 
+		$myiso.events_list('fields');
 	} 
-	if ((this.options.displayfiltercat == "multi") || (this.options.displayfiltercat == "multiex")  ) {
-		this.events_multibutton('cat')
+	if (($myiso.options.displayfiltercat == "multi") || ($myiso.options.displayfiltercat == "multiex")  ) {
+		$myiso.events_multibutton('cat')
 	}
-	if ((this.options.displayfiltertags == "multi") || (this.options.displayfiltertags == "multiex")  ) {
-		this.events_multibutton('tags')
+	if (($myiso.options.displayfiltertags == "multi") || ($myiso.options.displayfiltertags == "multiex")  ) {
+		$myiso.events_multibutton('tags')
 	}
-	if ((this.options.displayfilterfields == "multi") || (this.options.displayfilterfields == "multiex")) { 
-		this.events_multibutton('fields');
+	if (($myiso.options.displayfilterfields == "multi") || ($myiso.options.displayfilterfields == "multiex")) { 
+		$myiso.events_multibutton('fields');
 	}
-	if (this.options.language_filter == "multi") { 
-		this.events_multibutton('lang')	
+	if ($myiso.options.language_filter == "multi") { 
+		$myiso.events_multibutton('lang')	
 	}
-	if (this.options.displayalpha == "multi") { 
-		this.events_multibutton('alpha')
+	if ($myiso.options.displayalpha == "multi") { 
+		$myiso.events_multibutton('alpha')
 	}
-	if (this.options.displayfiltercat == "button"){
-		this.events_button('cat');
+	if ($myiso.options.displayfiltercat == "button"){
+		$myiso.events_button('cat');
 	}
-	if (this.options.displayfiltertags == "button") { 
-		this.events_button('tags');
+	if ($myiso.options.displayfiltertags == "button") { 
+		$myiso.events_button('tags');
 	}
-	if (this.options.displayfilterfields == "button") { 
-		this.events_button('fields');
+	if ($myiso.options.displayfilterfields == "button") { 
+		$myiso.events_button('fields');
 	}
-	if (this.options.language_filter == "button") { 
-		this.events_button('lang');
+	if ($myiso.options.language_filter == "button") { 
+		$myiso.events_button('lang');
 	}
-	if (this.options.displayalpha == "button") { 
-		this.events_button('alpha');
+	if ($myiso.options.displayalpha == "button") { 
+		$myiso.events_button('alpha');
 	}
-	more = document.querySelector(this.me+'.iso_button_more');
+	more = document.querySelector($myiso.me+'.iso_button_more');
 	if (more) {
 		['click', 'touchstart'].forEach(type => {
 			more.addEventListener(type, function(e) {
@@ -586,10 +591,10 @@ CGIsotope.prototype.rangeUpdated = function(){
 CGIsotope.prototype.events_listmulti = function(component) {
 	agroup= document.querySelectorAll(this.me+'select[id^="isotope-select-'+component+'"]');
 	for (var i=0; i< agroup.length;i++) {
-		agroup[i].addEventListener('choice',function(evt, params) {
+		agroup[i].addEventListener('choice',(evt, params) => {
 			$myiso.filter_list_multi(this,evt,'choice');
 		});
-		agroup[i].addEventListener('removeItem',function(evt, params) {
+		agroup[i].addEventListener('removeItem',(evt, params) => {
 			$myiso.filter_list_multi(this,evt,'remove');
 		});
 		$parent = agroup[i].parentElement.parentElement.parentElement.getAttribute('data-filter-group');
@@ -619,10 +624,10 @@ CGIsotope.prototype.events_listmulti = function(component) {
 CGIsotope.prototype.events_list = function(component) {
 	agroup= document.querySelectorAll(this.me+'.filter-button-group-'+component);
 	for (var i=0; i< agroup.length;i++) {
-		agroup[i].addEventListener('choice',function(evt, params) {
+		agroup[i].addEventListener('choice',(evt, params) => {
 			$myiso.filter_list(this,evt,'choice')
 			});
-		agroup[i].addEventListener('removeItem',function(evt, params) {
+		agroup[i].addEventListener('removeItem',(evt, params) => {
 			$myiso.filter_list(this,evt,'remove');
 		});
 			
@@ -652,14 +657,15 @@ CGIsotope.prototype.events_button = function(component) {
 		['click', 'touchstart'].forEach(type => {
 			agroup[i].addEventListener(type,function(evt) {
 				evt.stopPropagation();
-				evt.preventDefault();		
-				$myiso.filter_button(this,evt);
+				evt.preventDefault();	
+				id = this.parentNode.getAttribute('data');
+				cgisotope[id].filter_button(this,evt);
 			// reset other buttons
 				mygroup= this.parentNode.querySelectorAll('button' );
 				for (var g=0; g< mygroup.length;g++) {
-					$myiso.removeClass(mygroup[g],'is-checked');
+					cgisotope[id].removeClass(mygroup[g],'is-checked');
 				}
-				$myiso.addClass(this,'is-checked');
+				cgisotope[id].addClass(this,'is-checked');
 			});
 		})
 	};
@@ -674,9 +680,10 @@ CGIsotope.prototype.events_multibutton = function(component) {
 		['click', 'touchstart'].forEach(type =>{
 			agroup[i].addEventListener(type,function(evt) {
 			evt.stopPropagation();
-			evt.preventDefault();		
-			$myiso.filter_multi(this,evt);
-			$myiso.set_buttons_multi(this);
+			evt.preventDefault();
+			id = this.parentNode.getAttribute('data');
+			cgisotope[id].filter_multi(this,evt);
+			cgisotope[id].set_buttons_multi(this);
 			})
 		})
 	};
@@ -739,79 +746,80 @@ CGIsotope.prototype.infinite_buttons = function(appended_list) {
 	}
 }
 /*------- grid filter --------------*/
-CGIsotope.prototype.grid_filter = function(elem) {
-	var searchResult = this.qsRegex ? elem.textContent.match( this.qsRegex ) : true;
+CGIsotope.prototype.grid_filter = function($id,elem) {
+	var $myiso = cgisotope[$id];
+	var searchResult = $myiso.qsRegex ? elem.textContent.match( $myiso.qsRegex ) : true;
 	var	lacat = elem.getAttribute('data-category');
 	var laclasse = elem.getAttribute('class');
 	var lescles = laclasse.split(" ");
 	var buttonResult = false;
 	var rangeResult = true;
 	var searchAlpha = true;
-	if (this.filters['alpha'].indexOf('*') == -1) {// alpha filter
+	if ($myiso.filters['alpha'].indexOf('*') == -1) {// alpha filter
 		alpha = elem.getAttribute('data-title').substring(0,1);
-		if (this.filters['alpha'].indexOf(alpha) == -1) return false;
+		if ($myiso.filters['alpha'].indexOf(alpha) == -1) return false;
 	}
-	if (this.filters['lang'].indexOf('*') == -1) { 
+	if ($myiso.filters['lang'].indexOf('*') == -1) { 
 		lalang = elem.getAttribute('data-lang') ;
-		if (this.filters['lang'].indexOf(lalang) == -1)  {
+		if ($myiso.filters['lang'].indexOf(lalang) == -1)  {
 			return false;
 		}
 	}
-	if 	(this.rangeSlider) {
+	if 	($myiso.rangeSlider) {
 		var lerange = elem.getAttribute('data-range');
-		if (this.range_sel != this.range_init) {
-			ranges = this.range_sel.split(",");
+		if ($myiso.range_sel != $myiso.range_init) {
+			ranges = $myiso.range_sel.split(",");
 			rangeResult = (parseInt(lerange) >= parseInt(ranges[0])) && (parseInt(lerange) <= parseInt(ranges[1]));
 		}
 	}
-	if ((this.options.article_cat_tag != "fields") && (this.options.article_cat_tag != "catfields") && (this.options.article_cat_tag != "tagsfields") && (this.options.article_cat_tag != "cattagsfields")) {
-		if ((this.filters['cat'].indexOf('*') != -1) && (this.filters['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
+	if (($myiso.options.article_cat_tag != "fields") && ($myiso.options.article_cat_tag != "catfields") && ($myiso.options.article_cat_tag != "tagsfields") && ($myiso.options.article_cat_tag != "cattagsfields")) {
+		if (($myiso.filters['cat'].indexOf('*') != -1) && ($myiso.filters['tags'].indexOf('*') != -1)) { return searchResult && rangeResult && true};
 		count = 0;
-		if (this.filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-			if (this.filters['cat'].indexOf(lacat) == -1)  {
+		if ($myiso.filters['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if ($myiso.filters['cat'].indexOf(lacat) == -1)  {
 				return false; // n'appartient pas à la bonne classe: on ignore
 			} else { count = 1; } // on a trouvé la catégorie
 		}
-		if (this.filters['tags'].indexOf('*') != -1) { // tous les tags
+		if ($myiso.filters['tags'].indexOf('*') != -1) { // tous les tags
 			return searchResult && rangeResult && true;
 		}
 		for (var i in lescles) {
-			if  (this.filters['tags'].indexOf(lescles[i]) != -1) {
+			if  ($myiso.filters['tags'].indexOf(lescles[i]) != -1) {
 				buttonResult = true;
 				count += 1;
 			}
 		}
-		if (this.options.searchmultiex == "true")	{
-			lgth = this.filters['cat'].length + this.filters['tags'].length;
-			if ((this.filters['tags'].indexOf('*') != -1) || (this.filters['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
+		if ($myiso.options.searchmultiex == "true")	{
+			lgth = $myiso.filters['cat'].length + $myiso.filters['tags'].length;
+			if (($myiso.filters['tags'].indexOf('*') != -1) || ($myiso.filters['cat'].indexOf('*') != -1)) {lgth = lgth - 1;}
 			return searchResult && rangeResult && (count == lgth) ;
 		} else { 
 			return searchResult && rangeResult && buttonResult;
 		}
 	} else { // fields
 		ix = 0;
-		if (typeof this.filters === 'undefined' ) { // aucun filtre: on passe
+		if (typeof $myiso.filters === 'undefined' ) { // aucun filtre: on passe
 			return searchResult && rangeResult && true;
 		}
 		// combien de filtres diff. tout ?
 		filterslength = 0;
-		for (x in this.filters) {
+		for (x in $myiso.filters) {
 			if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags') ) continue; 
 			filterslength++;
-			if (this.filters[x].indexOf('*') != -1) ix++; 
+			if ($myiso.filters[x].indexOf('*') != -1) ix++; 
 		}
 		catok = false;
-		if (this.filters['cat'].indexOf('*') == -1) { // on a demandé une classe
-			if (this.filters['cat'].indexOf(lacat) == -1)  {
+		if ($myiso.filters['cat'].indexOf('*') == -1) { // on a demandé une classe
+			if ($myiso.filters['cat'].indexOf(lacat) == -1)  {
 				return false; // n'appartient pas à la bonne classe: on ignore
 			} else { catok = true; } // on a trouvé la catégorie
 		} else {
 			catok = true;
 		}
 		tagok = false;
-		if (this.filters['tags'].indexOf('*') == -1) { // on a demandé un tag
+		if ($myiso.filters['tags'].indexOf('*') == -1) { // on a demandé un tag
 			for (var i in lescles) {
-				if  (this.filters['tags'].indexOf(lescles[i]) != -1) {
+				if  ($myiso.filters['tags'].indexOf(lescles[i]) != -1) {
 					tagok = true;
 				//	filterslength++;
 				}
@@ -822,29 +830,31 @@ CGIsotope.prototype.grid_filter = function(elem) {
 		if ( (ix == filterslength) && catok && tagok) return searchResult && rangeResult && true;
 		count = 0;
 		for ( var j in lescles) {
-			for (x in this.filters) {
+			for (x in $myiso.filters) {
 				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') || (x == 'tags'))continue; 
-				if  (this.filters[x].indexOf(lescles[j]) != -1) { 
+				if  ($myiso.filters[x].indexOf(lescles[j]) != -1) { 
 					// buttonResult = true;
 					count += 1;
 				}
 			}
 		}
-		if (this.options.searchmultiex == "true")	{ // multi-select on grouped buttons
+		if ($myiso.options.searchmultiex == "true")	{ // multi-select on grouped buttons
 			lgth = 0;
-			for (x in this.filters) {
+			for (x in $myiso.filters) {
 				if ( (x == 'cat') || (x == 'lang') || (x == 'alpha') ||(x == 'tags')) continue;
-				lgth = lgth + this.filters[x].length;
-				if (this.filters[x].indexOf('*') != -1) lgth = lgth - 1;
+				lgth = lgth + $myiso.filters[x].length;
+				if ($myiso.filters[x].indexOf('*') != -1) lgth = lgth - 1;
 			}
 			return searchResult && rangeResult && (count == lgth) && tagok;
 		} else  {
 			return searchResult && rangeResult && (count >= (filterslength -ix)) && catok && tagok;
 		}
 	}
+
 } 
 // ---- Filter List 
-CGIsotope.prototype.filter_list = function(obj,evt,params) {
+CGIsotope.prototype.filter_list = function($this,evt,params) {
+	obj = evt.currentTarget;
 	$parent = obj.getAttribute('data-filter-group');
 	$isclone = false;
 	if (obj.parentNode.id == "clonedbuttons") { // clone 
@@ -864,47 +874,52 @@ CGIsotope.prototype.filter_list = function(obj,evt,params) {
 	if ($grdparent.className == "offcanvas-body") {
 		$needclone = true;
 	}
-	if (params == 'remove' && $needclone) { // remove item from offcanvas => remove button
-		this.removeFilter( this.filters, $parent, evt.detail.value );
-		myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+evt.detail.value+'"]')
-		if (myclone) myclone.remove();
-		if (this.filters[$parent].length == 0) {
-			this.filters[$parent] = ['*'] ;
+	if (params == 'remove' ) { // remove item from offcanvas => remove button
+		$this.removeFilter( $this.filters, $parent, evt.detail.value );
+		if  ($needclone) {
+			myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+evt.detail.value+'"]')
+			if (myclone) myclone.remove();
+		}
+		if ($this.filters[$parent].length == 0) {
+			$this.filters[$parent] = ['*'] ;
 			choicesInstance.setChoiceByValue('')
-			this.update_cookie_filter();
+			$this.update_cookie_filter();
+			$this.iso.arrange(); 
+			$this.updateFilterCounts();
 		}	
 		return;
 	}
 	if (sortValue == '')   {
 		choicesInstance.removeActiveItems();
 		choicesInstance.setChoiceByValue('')		
-		this.filters[$parent] = ['*'];
+		$this.filters[$parent] = ['*'];
 		$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 		for (var i=0; i< $buttons.length;i++) { // remove buttons
 			$buttons[i].remove(); 
 		}
 	} else { 
-		this.filters[$parent] = [sortValue];
+		$this.filters[$parent] = [sortValue];
 		if ($needclone) { // clone
 			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< $buttons.length;i++) { // remove buttons
 				$buttons[i].remove(); 
 			}
-			clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+this.filters[$parent]+'"]');
+			clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+$this.filters[$parent]+'"]');
 			if (!clone_exist) {
 				lib = evt.detail.choice.label;
-				this.create_clone_button($parent,sortValue,lib,'list','');
-				this.create_clone_listener(sortValue);
+				$this.create_clone_button($parent,sortValue,lib,'list','');
+				$this.create_clone_listener(sortValue);
 			}
 		}
 	}
-	this.update_cookie_filter();
-	this.iso.arrange(); 
-	this.updateFilterCounts();
+	$this.update_cookie_filter();
+	$this.iso.arrange(); 
+	$this.updateFilterCounts();
 }
 	// ----- Filter MultiSelect List
-CGIsotope.prototype.filter_list_multi = function(obj,evt,params) {
+CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 		$evnt = evt;
+		obj = evt.currentTarget;
 		$params = params;
 		$isclone = false;
 		if (obj.parentNode.id == "clonedbuttons") { // clone 
@@ -915,35 +930,35 @@ CGIsotope.prototype.filter_list_multi = function(obj,evt,params) {
 			$parent = obj.parentNode.parentNode.parentNode.getAttribute('data-filter-group')
 			$selectid = obj.getAttribute('id');
 		}
-		if (typeof this.filters[$parent] === 'undefined' ) { 
-			this.filters[$parent] = [];
+		if (typeof $this.filters[$parent] === 'undefined' ) { 
+			$this.filters[$parent] = [];
 		}
 		var elChoice = document.querySelector('joomla-field-fancy-select#'+$selectid);
 		var choicesInstance = elChoice.choicesInstance;
 		
 		if ($params == "remove") { // deselect element except all
 			if ($isclone) {
-				this.removeFilter( this.filters, $parent, obj.getAttribute('data-sort-value') );
+				$this.removeFilter( $this.filters, $parent, obj.getAttribute('data-sort-value') );
 				savfilter = JSON.parse(JSON.stringify(this.filters)); // save filter
 				// remove all selected items
 				choicesInstance.removeActiveItems();
-				this.filters = JSON.parse(JSON.stringify(savfilter));
+				$this.filters = JSON.parse(JSON.stringify(savfilter));
 				choicesInstance.removeActiveItemsByValue('');
 				// recreate remaining values and buttons
-				for (var i = 0; i < this.filters[$parent].length; i++) {
-					remval = this.filters[$parent][i];
+				for (var i = 0; i < $this.filters[$parent].length; i++) {
+					remval = $this.filters[$parent][i];
 					choicesInstance.setChoiceByValue(remval);
 					asel = choicesInstance.getValue()[i];
-					this.create_clone_button($parent,remval,asel.label,'list_multi','');
-					this.create_clone_listener(remval);
+					$this.create_clone_button($parent,remval,asel.label,'list_multi','');
+					$this.create_clone_listener(remval);
 				}
 			} else {
-				this.removeFilter( this.filters, $parent, $evnt.detail.value );
+				this.removeFilter( $this.filters, $parent, $evnt.detail.value );
 				myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+$evnt.detail.value+'"]')
 				if (myclone) myclone.remove();
 			}
-			if (this.filters[$parent].length == 0) {
-				this.filters[$parent] = ['*'] ;
+			if ($this.filters[$parent].length == 0) {
+				$this.filters[$parent] = ['*'] ;
 				choicesInstance.setChoiceByValue('')
 			}
 		}
@@ -958,7 +973,7 @@ CGIsotope.prototype.filter_list_multi = function(obj,evt,params) {
 			sel = $evnt.detail.choice.value;
 			lib = $evnt.detail.choice.label;
 			if (sel == '') {// all
-				this.filters[$parent] = ['*'];
+				$this.filters[$parent] = ['*'];
 				choicesInstance.removeActiveItems();
 				choicesInstance.setChoiceByValue('');
 				$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
@@ -966,30 +981,32 @@ CGIsotope.prototype.filter_list_multi = function(obj,evt,params) {
 					$buttons[i].remove(); 
 				}
 			} else {
-				if (this.filters[$parent].indexOf('*') != -1) { // was all
+				if ($this.filters[$parent].indexOf('*') != -1) { // was all
 					choicesInstance.removeActiveItemsByValue('')
-					this.filters[$parent] = []; // remove it
+					$this.filters[$parent] = []; // remove it
 				}
 				if ($needclone) {
 					clone_exist = false;
-					if (this.filters[$parent].indexOf(sel) != -1) clone_exist = true
+					if ($this.filters[$parent].indexOf(sel) != -1) clone_exist = true
 					// clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+this.filters[$parent]+'"]');
 					if (!clone_exist) {
-						this.create_clone_button($parent,sel,lib,'list_multi','');
-						this.create_clone_listener(sel);
+						$this.create_clone_button($parent,sel,lib,'list_multi','');
+						$this.create_clone_listener(sel);
 					}
 				}
-				this.addFilter( this.filters, $parent, sel );
+				$this.addFilter( $this.filters, $parent, sel );
 			}
 			choicesInstance.hideDropdown();
 		}
-		this.update_cookie_filter();
-		this.iso.arrange(); 
-		this.updateFilterCounts();
+		$this.update_cookie_filter();
+		$this.iso.arrange(); 
+		$this.updateFilterCounts();
 	}
      
 CGIsotope.prototype.filter_button = function(obj,evt) {
-		if (this.hasClass(obj,'disabled')) return; //ignore disabled buttons
+		$myid = obj.parentNode.getAttribute('data');
+		$myiso = cgisotope[$myid];
+		if ($myiso.hasClass(obj,'disabled')) return; //ignore disabled buttons
 		$parent = obj.parentNode.getAttribute('data-filter-group');
 		child =  obj.getAttribute('data-child'); // child group number
 		var sortValue = obj.getAttribute('data-sort-value');
@@ -997,55 +1014,57 @@ CGIsotope.prototype.filter_button = function(obj,evt) {
 		if (obj.parentNode.id == "clonedbuttons") { // clone 
 			$parent = obj.getAttribute('data-filter-group');
 			abutton = document.querySelector('.isotope_button-group .iso_button_'+$parent+'_'+sortValue);
-			this.toggleClass(abutton,'is-checked');
+			$myiso.toggleClass(abutton,'is-checked');
 			sortValue = '*';
-			if (this.std_parents.indexOf($parent) != -1) {
+			if ($myiso.std_parents.indexOf($parent) != -1) {
 				abutton = document.querySelector('.iso_button_'+$parent+'_tout');
 			} else {// custom field
 				abutton = document.querySelector('.iso_button_tout.filter-button-group-'+$parent);
 			}
-			this.toggleClass(abutton,'is-checked'); // all button
+			$myiso.toggleClass(abutton,'is-checked'); // all button
 			$isclone = true;
 		} 		
-		if (typeof this.filters[$parent] === 'undefined' ) { 
-			this.filters[$parent] = {};
+		if (typeof $myiso.filters[$parent] === 'undefined' ) { 
+			$myiso.filters[$parent] = {};
 		}
 		$needclone = false;
 		$grdparent = obj.parentNode.parentNode;
-		if (this.hasClass($grdparent,"offcanvas-body")) {
+		if ($myiso.hasClass($grdparent,"offcanvas-body")) {
 			$needclone = true;
 		}
 		if ($needclone) {
-			if (this.hasClass(obj,'is-checked')) {return} // already cloned
+			if ($myiso.hasClass(obj,'is-checked')) {return} // already cloned
 			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< $buttons.length;i++) { // remove buttons
 					$buttons[i].remove(); 
 			}
 			if (sortValue != '*') { // don't clone all button
 				lib = evt.srcElement.innerHTML;
-				this.create_clone_button($parent,sortValue,lib,'button',child);
-				this.create_clone_listener(sortValue);
+				$myiso.create_clone_button($parent,sortValue,lib,'button',child);
+				$myiso.create_clone_listener(sortValue);
 			}
 		}
 		if (sortValue == '*') {
-			this.filters[$parent] = ['*'];
+			$myiso.filters[$parent] = ['*'];
 			if ($isclone) {
 				obj.remove;
 			}
 			if (child) {
-				this.set_family_all(this.me,child,'button');
+				$myiso.set_family_all($myiso.me,child,'button');
 			}
 		} else { 
-			this.filters[$parent]= [sortValue];
+			$myiso.filters[$parent]= [sortValue];
 			if (child) {
-				this.set_family(this.me,'',child,sortValue,'button');
+				$myiso.set_family($myiso.me,'',child,sortValue,'button');
 			}
 		}
-		this.update_cookie_filter();
-		this.iso.arrange(); 
-		this.updateFilterCounts();
+		$myiso.update_cookie_filter();
+		$myiso.iso.arrange(); 
+		$myiso.updateFilterCounts();
 	}
 CGIsotope.prototype.filter_multi = function(obj,evt) {
+		id = obj.parentNode.getAttribute('data');
+		$this = cgisotope[id];
 		var sortValue = obj.getAttribute('data-sort-value');
 		child =  obj.getAttribute('data-child'); // child group number
 		$isclone = false;
@@ -1053,18 +1072,18 @@ CGIsotope.prototype.filter_multi = function(obj,evt) {
 			$parent = obj.getAttribute('data-filter-group');
 			$buttons = document.querySelectorAll('.iso_button_'+$parent+'_'+sortValue);
 			for (var i=0; i< $buttons.length;i++) { 
-					this.toggleClass($buttons[i],'is-checked');
+					$this.toggleClass($buttons[i],'is-checked');
 			}
 			$isclone = true;
 		} else {
 			$parent = obj.parentNode.getAttribute('data-filter-group');
-			this.toggleClass(obj,'is-checked');
+			$this.toggleClass(obj,'is-checked');
 		}
-		var isChecked = this.hasClass(obj,'is-checked');
+		var isChecked = $this.hasClass(obj,'is-checked');
 		// clone offcanvas button
 		$needclone = false;
 		$grdparent = obj.parentNode.parentNode;
-		if (this.hasClass($grdparent,"offcanvas-body")) {
+		if ($this.hasClass($grdparent,"offcanvas-body")) {
 			$needclone = true;
 		}
 		if ($needclone) {
@@ -1072,8 +1091,8 @@ CGIsotope.prototype.filter_multi = function(obj,evt) {
 			    if (evt.srcElement.localName == "img")
 					lib = evt.srcElement.outerHTML+evt.srcElement.nextSibling.textContent;
 				else lib = evt.srcElement.innerHTML;
-				this.create_clone_button($parent,sortValue,lib,'multi',child);
-				this.create_clone_listener(sortValue);
+				$this.create_clone_button($parent,sortValue,lib,'multi',child);
+				$this.create_clone_listener(sortValue);
 			} else { // remove cloned button
 				if (sortValue != "*") {
 					aclone = document.querySelector('#clonedbuttons .iso_button_'+$parent+'_'+sortValue)
@@ -1082,47 +1101,47 @@ CGIsotope.prototype.filter_multi = function(obj,evt) {
 			}
 		}
 		// end of cloning
-		if (typeof this.filters[$parent] === 'undefined' ) { 
-			this.filters[$parent] = [];
+		if (typeof $this.filters[$parent] === 'undefined' ) { 
+			$this.filters[$parent] = [];
 		}
 		if (sortValue == '*') {
-			this.filters[$parent] = ['*'];
+			$this.filters[$parent] = ['*'];
 			clones = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< clones.length;i++) { 
 				clones[i].remove(); // remove other cloned buttons
 			}
 			if (child) {
-				this.set_family_all(this.me,child,'button')
+				$this.set_family_all($this.me,child,'button')
 			}
 		} else { 
-			this.removeFilter(this.filters, $parent,'*');
-			this.removeFilter(this.filters, $parent,'none');
+			$this.removeFilter($this.filters, $parent,'*');
+			$this.removeFilter($this.filters, $parent,'none');
 			if ( isChecked ) {
-				this.addFilter( this.filters, $parent,sortValue );
+				$this.addFilter( $this.filters, $parent,sortValue );
 				if (child) {
-					this.set_family(this.me,$parent,child,sortValue,'button')
+					$this.set_family($this.me,$parent,child,sortValue,'button')
 				}
 			} else {
-				this.removeFilter( this.filters, $parent, sortValue );
-				if (this.filters[$parent].length == 0) {// no more selection
-					this.filters[$parent] = ['*'];
+				$this.removeFilter( $this.filters, $parent, sortValue );
+				if ($this.filters[$parent].length == 0) {// no more selection
+					$this.filters[$parent] = ['*'];
 					if ($isclone) {
 						aclone = document.querySelector('.filter-button-group-'+$parent+' [data-sort-value="*"]');
-						this.addClass(aclone,'is-checked');
+						$this.addClass(aclone,'is-checked');
 					}
 				}
 				if (child) {
-					if (this.filters[$parent] == ['*']) {// no more selection
-						this.set_family_all(this.me,child,'button')
+					if ($this.filters[$parent] == ['*']) {// no more selection
+						$this.set_family_all($this.me,child,'button')
 					} else { // remove current selection
-						this.del_family(this.me,$parent,child,sortValue,'button')
+						$this.del_family($this.me,$parent,child,sortValue,'button')
 					}
 				}
 			}	
 		}
-		this.update_cookie_filter();
-		this.iso.arrange(); 
-		this.updateFilterCounts();
+		$this.update_cookie_filter();
+		$this.iso.arrange(); 
+		$this.updateFilterCounts();
 	}
 CGIsotope.prototype.set_buttons_multi = function(obj) {
 		$parent = obj.parentNode.getAttribute('data-filter-group');
@@ -1736,7 +1755,9 @@ CGIsotope.prototype.resetToggle = function () {
 		$myiso.iso_div.refresh;
 	}
 }
-
+/*------- grid filter --------------*/
+grid_filter = function(elem) {
+} 
 go_click = function($entree,$link) {
 	event.preventDefault();
 	if (($entree == "webLinks") || (window.event.ctrlKey) ) {
