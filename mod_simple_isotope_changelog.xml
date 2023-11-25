@@ -2,6 +2,28 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.4</version>
+        <note>
+            <item>Update : 25/11/2023</item>
+        </note>
+		<fix>
+			<item>Admin : remove admin_css.js hidden test </item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.3.3</version>
+        <note>
+            <item>Update : 25/11/2023</item>
+        </note>
+		<fix>
+			<item>fix version number</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.2</version>
         <note>
             <item>Update : 24/11/2023</item>
