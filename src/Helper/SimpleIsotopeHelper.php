@@ -1,10 +1,10 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.1
+* Version			: 4.3.5
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2022 ConseilGouz. All rights reserved.
-* license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
 namespace ConseilGouz\Module\SimpleIsotope\Site\Helper;
@@ -666,12 +666,14 @@ class SimpleIsotopeHelper
 		}
 		return $perso;
 	}
+	// Check a tag is in the selected tags list
 	public static function checkTagSet($tag,$filter) {
 		foreach($filter as $onefilter) {
 			if ($onefilter[0]->tag == $tag) return true;
 		}
 		return false;
-	}//-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
+	}
+	//-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
 	public static function create_buttons($fields, $group_lib,$onefilter,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_title) {
 	    $params_fields = $params->get('displayfields');
 	    $libfilter=Text::_('SSISO_LIBFILTER');		

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.3
+* Version			: 4.3.5
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -20,10 +20,16 @@ use Joomla\CMS\Language\LanguageHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeHelper;
 use ConseilGouz\Component\CGIsotope\Site\Helper\CGHelper;
 use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper;
+use Joomla\CMS\Session\Session;									  
+										
 
 $uri = Uri::getInstance();
 $user = Factory::getUser();
+								 
+										
+													   
 
+																		
 $displaysortinfo = $params->get('displaysortinfo', 'show');
 
 $tagsfilterorder = $params->get('tagsfilterorder','false');
@@ -76,7 +82,7 @@ $width = 1;
 $line = 1;
 $pos = 0;
 if ($displaysort != "hide") {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "sort";
 	$values->div_line = $line;
 	$values->div_pos = "1";
@@ -88,7 +94,7 @@ if ($displaysort != "hide") {
 	$layouts['sort'] = $values;
 }
 if ($displaysearch == "true") {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "search";
 	$pos += 1;
 	$values->div_pos = $pos;
@@ -100,7 +106,7 @@ if ($displaysearch == "true") {
 	$layouts['search'] = $values;
 }
 if ($article_cat_tag == 'cattags') {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "cat";
 	$pos += 1;
 	if ($width + 6 > 12) {
@@ -115,7 +121,7 @@ if ($article_cat_tag == 'cattags') {
 	$values->div_align="";
 	$values->offcanvas = "false";
 	$layouts['cat'] = $values;
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "tag";
 	$pos += 1;
 	if ($width + 6 > 12) {
@@ -132,7 +138,7 @@ if ($article_cat_tag == 'cattags') {
 	$layouts['tag'] = $values;
 }
 if ($article_cat_tag == 'cat') {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "cat";
 	$values->div_width = "7";
 	$pos += 1;
@@ -149,7 +155,7 @@ if ($article_cat_tag == 'cat') {
 	$layouts['cat'] = $values;
 }
 if ($article_cat_tag == 'tags') {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "tag";
 	$values->div_width = "7";
 	$pos += 1;
@@ -166,7 +172,7 @@ if ($article_cat_tag == 'tags') {
 	$layouts['tag'] = $values;
 }
 if ($displayrange == "true") {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "range";
 	$line +=1;
 	$values->div_line = $line;
@@ -177,7 +183,7 @@ if ($displayrange == "true") {
 	$layouts['range'] = $values;
 }
 if ($displayalpha != "false") {
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "alpha";
 	$line +=1;
 	$values->div_line = $line;
@@ -188,7 +194,7 @@ if ($displayalpha != "false") {
 	$layouts['alpha'] = $values;
 }
 if ($language_filter != "false") { // php 8
-	$values = new stdClass();
+	$values = new \stdClass();
 	$values->div = "lang";
 	$line +=1;
 	$values->div_line = $line;
@@ -198,7 +204,7 @@ if ($language_filter != "false") { // php 8
 	$values->offcanvas = "false";
 	$layouts['lang'] = $values;
 }
-$values = new stdClass();
+$values = new \stdClass();
 $values->div = "iso";
 $line +=1;
 $values->div_line = $line;
@@ -243,7 +249,7 @@ if ($is_component && $params->get('show_page_heading')) {
 }
 if ($is_component && $params->get('intro') && (strlen(trim($params->get('intro',''))) > 0) ){
 	// apply content plugins on weblinks
-	$item_cls = new stdClass;
+	$item_cls = new \stdClass;
 	$item_cls->text = $params->get('intro');
 	$item_cls->params = $params;
     $item_cls->id= $com_id;
@@ -568,7 +574,7 @@ $width = $layouts["iso"]->div_width;
 $isotope_grid_div = "";
 if ($is_component && $params->get('middle') && (strlen(trim($params->get('middle',''))) > 0) ){
 	// apply content plugins 
-	$item_cls = new stdClass;
+	$item_cls = new \stdClass;
 	$item_cls->text = $params->get('middle');
 	$item_cls->params = $params;
     $item_cls->id= $com_id;
@@ -862,7 +868,7 @@ $width = $layouts["iso"]->div_width;
 if ($params->get('readmore','false') =='iframe') {
    echo '<div id="isotope_an_article" class="isotope_an_article fg-c'.$width.' fg-cs12 isotope-hide" ><button type="button" class="close">X</button><iframe src="" id="isotope_article_frame"></iframe></div>'; 
 } elseif ($params->get('readmore','false') =='ajax') {
-	echo '<input id="token" type="hidden" name="' . JSession::getFormToken() . '" value="1" />';
+	echo '<input id="token" type="hidden" name="' . Session::getFormToken() . '" value="1" />';
 	echo '<div id="isotope_an_article" class="isotope_an_article fg-c'.$width.' fg-cs12 isotope-hide" ></div>'; 
 }
 ?>
@@ -893,7 +899,7 @@ if ($params->get('readmore','false') =='iframe') {
 <?php } ?>
 <?php if ($is_component && (strlen(trim($params->get('bottom',''))) > 0)) {
 	// apply content plugins on weblinks
-	$item_cls = new stdClass;
+	$item_cls = new \stdClass;
 	$item_cls->text = $params->get('bottom');
 	$item_cls->params = $params;
     $item_cls->id= $com_id;
