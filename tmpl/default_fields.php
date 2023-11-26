@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.5
+* Version			: 4.3.6
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -868,7 +868,7 @@ foreach ($layouts_order as $layout) {
 		} else {
 			echo '<span class="navbar-toggler-text">'.Text::_('SSISO_LIBFILTER').'</span>';
 		}
-		echo '</a><div id="clonedbuttons"></div></div>';
+		echo '</a><div id="clonedbuttons" data="'.$module->id.'"></div></div>';
 	    echo '<div class="offcanvas offcanvas-'.$offcanvaspos.'" tabindex="-1" id="offcanvas'.$obj->div.'" aria-labelledby="offcanvas'.$obj->div.'Label" data-bs-scroll="true">';
 		$liboff = Text::_('SSISO_LIBFILTER');
 		echo '<div class="offcanvas-header"><h5 class="offcanvas-title" id="offcanvas'.$obj->div.'Label">'.$liboff.'</h5>';
