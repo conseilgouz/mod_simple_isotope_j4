@@ -1,6 +1,6 @@
 /* 
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.4
+* Version			: 4.3.7
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -35,6 +35,6 @@ jQuery(document).ready(function(){
 	jQuery( ".left" ).parent('.form-check').parent('.controls').parent(".control-group").css({"float":"left"});
 	jQuery( ".right" ).parent('.form-check').parent('.controls').parent(".control-group").css({"float":"right"});
 	
-	// jQuery( ".hidden" ).parent('.controls').parent(".control-group").css({"display":"none"});
+	jQuery( "#jform_params_cgisotope" ).parent().parent().css({"display":"none"}); // 4.3.7
 	
 });

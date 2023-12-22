@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.7</version>
+        <note>
+            <item>Update : 22/12/2023</item>
+        </note>
+		<fix>
+			<item>Admin : hide cgisotope parameter (hidden)</item>
+			<item>Admin : error _cgisotope_page doesn t exist</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.6</version>
         <note>
             <item>Update : 26/11/2023</item>

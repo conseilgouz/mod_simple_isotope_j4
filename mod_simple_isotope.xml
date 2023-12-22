@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2023/11/26</creationDate>
+	<creationDate>2023/12/22</creationDate>
 	<copyright>Copyright (C) 2023 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.3.6</version>
+	<version>4.3.7</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -49,7 +49,7 @@
 					key_field="enabled"	key_value="enabled"	class="hidden" 
 				/>
 <field	name="notecgisotope" showon="iso_entree:cgisotope[AND]cgisotope!:1"	type="note" label="SSISO_CGISO_NOT_INSTALLED" class="alert-success  half right"/>
-				<field name="iso_id" type="sql" default=""  showon="iso_entree:cgisotope[AND]cgisotope:1"
+				<field name="iso_id" type="sqlnoerr" default=""  showon="iso_entree:cgisotope[AND]cgisotope:1"
 					label="SSISO_ISO_ID_LABEL" 	description="SSISO_ISO_ID_LABEL_DESC" 
 					query="SELECT id, title FROM #__cgisotope_page WHERE state=1" 
 					key_field="id" value_field="title" 
