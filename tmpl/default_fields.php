@@ -1,9 +1,9 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.6
+* Version			: 4.3.8
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -669,7 +669,8 @@ foreach ($list as $key=>$category) {
 				};
 			}
 			if (!$isdefined) continue; // not in list : ignore it
-		} 		
+			} 	
+		}			
 		$cat_params = json_decode($cats_params[$item->catid]);
 		if (($cat_params) && ($cat_params->image != "")) {
 			$cat_img = "<img src='".URI::root().$cat_params->image."' alt='".$cat_params->image_alt."' class='iso_cat_img_art'/>";
