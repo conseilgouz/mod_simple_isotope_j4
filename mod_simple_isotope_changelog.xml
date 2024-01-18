@@ -2,6 +2,19 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.9</version>
+        <note>
+            <item>Update : 18/01/2024</item>
+        </note>
+		<fix>
+			<item>No pagination : readmore article button not showing if limit items is set</item>
+			<item>Ignore limit items if pagination is set</item>
+			<item>Pagination : show all selected tags even if no matching article is displayed at the moment</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.8</version>
         <note>
             <item>Update : 11/01/2024</item>

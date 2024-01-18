@@ -438,12 +438,12 @@
 					<option value="true">JYES</option> 
 					<option value="false">JNO</option> 
 				</field>
-  				<field name="iso_count" 
-				showon="iso_entree:articles" class="clear"
+   				<field name="iso_count" 
+				showon="iso_entree:articles" class="clear half left"
 				type="number" default="0" min="0" max="200" 
 				label="SSISO_COUNT" description="SSISO_COUNTDESC" />
-   				<field name="limit_items"  class="clear"
-				showon="iso_entree:articles,webLinks"
+   				<field name="limit_items"  class="half right"
+				showon="iso_entree:articles,webLinks[AND]pagination:false"
 				type="number" default="0" min="0" step="10" 
 				label="SSISO_LIMIT_ITEMS" description="SSISO_LIMIT_ITEMS_DESC"/>
    				<field name="pagination" 
@@ -485,7 +485,6 @@
 					<option value="ordering ASC">SSISO_DEFDISPLAYBLOG</option> 
 					<option value="ordering DESC">SSISO_DEFDISPLAYBLOGREV</option> 
 				</field>
- 
 				<field
 					name="iso_layout" showon="iso_entree!:cgisotope"
 					type="radio" default="fitRows" class="btn-group clear half left"

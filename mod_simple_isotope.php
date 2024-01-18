@@ -1,9 +1,9 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.3
+* Version			: 4.3.9
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -85,11 +85,12 @@ $cats_params = array();
 $article_fields = array(); 
 $article_fields_names = array(); 
 $alpha = array(); 
+$article_tags = array();
 
 if ($iso_entree == "webLinks") {
 	$categories = $params->get('wl_categories');
 	$weblinks_params = ComponentHelper::getParams('com_weblinks');
-	$list = IsotopeHelper::getWebLinks($params,$weblinks_params,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias,$article_tags,$cats_lib ,$cats_alias,$cats_note,$cats_params,$fields,$article_fields, $article_fields_names,$rangefields,$alpha);
+	$list = IsotopeHelper::getWebLinks($params,$weblinks_params,$tags_list,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias,$article_tags,$cats_lib ,$cats_alias,$cats_note,$cats_params,$fields,$article_fields, $article_fields_names,$rangefields,$alpha);
 	if (!$list) return false; // on a eu une erreur: on sort
 } else { 
 	$categories = $params->get('categories');
@@ -102,7 +103,6 @@ if ($iso_entree == "webLinks") {
 			}
 		}
 	}
-	$article_tags = array();
 	if ($params->get("pagination","false") != 'false') {
 		$limit = (int) $params->get("page_count",0);
 		$order =  $params->get("page_order","a.ordering");
@@ -111,8 +111,23 @@ if ($iso_entree == "webLinks") {
 		$order = "a.ordering";
 	}
 	$pagination = "";
-	$list[] = IsotopeHelper::getItems($categories,$params,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias, $cats_lib, $cats_alias, $cats_note,$cats_params, $article_tags,$module,$fields,$article_fields, $article_fields_names, $pagination, $limitstart, $limit,$order,$rangefields,$rangetitle,$rangelabel,$rangedesc,$minrange,$maxrange,$alpha);
+	$list[] = IsotopeHelper::getItems($categories,$params,$tags_list,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias, $cats_lib, $cats_alias, $cats_note,$cats_params, $article_tags,$module,$fields,$article_fields, $article_fields_names, $pagination, $limitstart, $limit,$order,$rangefields,$rangetitle,$rangelabel,$rangedesc,$minrange,$maxrange,$alpha);
 
+}
+// pagination : check tags_list to add missing tags in the list
+if (sizeof($tags_list) && ($params->get("pagination","false") != 'false')) {
+	$authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
+	$missings = IsotopeHelper::getMissingTags($tags_list,$authorised);
+	foreach ($missings as $tag) { 
+		if (!in_array($tag->tag, $tags)) {
+			$tags[]=$tag->tag;
+			$tags_alias[$tag->tag] = $tag->alias;
+			$tags_image[$tag->alias] = $tag->images;
+			$tags_note[$tag->alias] = $tag->note; 
+			$tags_parent[$tag->alias] = $tag->parent_title;					
+			$tags_parent_alias[$tag->alias] = $tag->parent_alias;					
+		}
+	}
 }
 // HTMLHelper::_('bootstrap.framework');
 // HTMLHelper::_('jquery.framework');   

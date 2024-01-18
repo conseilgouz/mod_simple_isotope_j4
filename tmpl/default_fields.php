@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.8
+* Version			: 4.3.9
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -650,7 +650,7 @@ foreach ($list as $key=>$category) {
 		if (($article_cat_tag  == "tagsfields") || ($article_cat_tag  == "cattagsfields")) { // filtre 
 			foreach ($article_tags[$item->id] as $tag) {
 		    $isdefined = false; // supposed not found
-		    if ($params->get('tagsmissinghidden','false') == 'false') $isdefined = true; // don't check => ok 
+		    if (($params->get('tagsmissinghidden','false') == 'false') || ($params->get('pagination','false') != 'false') ) $isdefined = true; // don't check => ok 
 			foreach ($article_tags[$item->id] as $tag) {
 			    // ignore tags not defined in the tags list if tagsmissinghidden param is set
 			    if ($tags_list && (count($tags_list) > 0) && ($params->get('tagsmissinghidden','false') == 'true')) {

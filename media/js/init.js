@@ -1,8 +1,8 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.3.6
+* Version			: 4.3.9
 * Package			: CG ISotope/Simple Isotope
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -234,6 +234,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 	imagesLoaded(grid, function() {
 		$myiso = cgisotope[this.elements[0].getAttribute('data')];
 		$myiso.iso.arrange();
+		$myiso.updateFilterCounts();
 		if ($myiso.sort_by == "random") {
 			$myiso.iso.shuffle();
 		}
