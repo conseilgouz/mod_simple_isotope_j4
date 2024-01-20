@@ -10,6 +10,7 @@
 			<item>No pagination : readmore article button not showing if limit items is set</item>
 			<item>Ignore limit items if pagination is set</item>
 			<item>Pagination : show all selected tags even if no matching article is displayed at the moment</item>
+			<item>Infinite : hide show more/less message if not required</item>
 			<item>fix : depend.css not found in administration</item>
 		</fix>
 	</changelog>
