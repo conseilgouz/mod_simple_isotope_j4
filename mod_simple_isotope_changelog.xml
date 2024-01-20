@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.10</version>
+        <note>
+            <item>Update : 20/01/2024</item>
+        </note>
+		<fix>
+			<item>Version number in XML</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.9</version>
         <note>
             <item>Update : 18/01/2024</item>
