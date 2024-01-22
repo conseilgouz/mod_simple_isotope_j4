@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2024/01/20</creationDate>
+	<creationDate>2024/01/21</creationDate>
 	<copyright>Copyright (C) 2024 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.3.10</version>
+	<version>4.3.11</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>

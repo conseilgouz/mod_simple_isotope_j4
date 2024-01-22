@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.9
+* Version			: 4.3.11
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -702,7 +702,7 @@ class SimpleIsotopeHelper
 		return false;
 	}
 	//-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
-	public static function create_buttons($fields, $group_lib,$onefilter,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_title) {
+	public static function create_buttons($fields, $group_lib,$onefilter,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_title, $group_id = null, $module_id = null) {
 	    $params_fields = $params->get('displayfields');
 	    $libfilter=Text::_('SSISO_LIBFILTER');		
 		$liball = Text::_('SSISO_LIBALL');
@@ -721,7 +721,7 @@ class SimpleIsotopeHelper
 		$result = "";
 		if  (($displayfilterfields == "button")  || ($displayfilterfields == "multi") || ($displayfilterfields == "multiex")) {
 			 if ($splitfieldstitle == "true") {
-				$result .= "<p class='iso_fields_title ".$col_width."' data-filter-group='".$group_lib."' data-group-id='".$group_id."' data-group-id='".$group_id."'>". Text::_($group_title)."<br/>";
+				$result .= "<p class='iso_fields_title ".$col_width."' data-filter-group='".$group_lib."' data-group-id='".$group_id."' data-group-id='".$group_id."' data='".$module_id."'>". Text::_($group_title)."<br/>";
 			 }
 			 $first_time = true;
 		     foreach ($onefilter as $key=>$filter) {

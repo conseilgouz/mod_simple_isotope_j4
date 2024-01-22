@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.11</version>
+        <note>
+            <item>Update : 21/01/2024</item>
+        </note>
+		<fix>
+			<item>Fields : error in js if Display Fields Label is set</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.10</version>
         <note>
             <item>Update : 20/01/2024</item>

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.9
+* Version			: 4.3.11
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -614,7 +614,7 @@ $filter_div = "";
 			$group_id = $onegroup[$first]->field_id;
 			$filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'" data="'.$module->id.'">';
 			
-			$filter_div .= IsotopeHelper::create_buttons( $fields,$group_lib,$onegroup,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_label[$group_lib],$group_id);
+			$filter_div .= IsotopeHelper::create_buttons( $fields,$group_lib,$onegroup,$params,$col_width,$button_bootstrap,$splitfieldstitle,$group_label[$group_lib],$group_id, $module->id);
 			$filter_div .= "</div>";
 		}
 		if ($params->get('splitfieldscolumn','false') == "true") {
@@ -625,7 +625,7 @@ $filter_div = "";
 		$width = $layouts['field']->div_width;
 		$col_width = "col-md-".$width." col-12";
 	    $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
-	    $filter_div .=  IsotopeHelper::create_buttons( $fields,'fields',$fields,$params,$col_width,$button_bootstrap,'false','fields');
+	    $filter_div .=  IsotopeHelper::create_buttons( $fields,'fields',$fields,$params,$col_width,$button_bootstrap,'false','fields', 0, $module->id);
 		$filter_div .= "</div>";
 	}
  } 
