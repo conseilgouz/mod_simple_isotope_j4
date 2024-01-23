@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.12</version>
+        <note>
+            <item>Update : 23/01/2024</item>
+        </note>
+		<fix>
+			<item>Logical pagination : use sort order</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.11</version>
         <note>
             <item>Update : 21/01/2024</item>

@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.9
+* Version			: 4.3.12
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -108,7 +108,25 @@ if ($iso_entree == "webLinks") {
 		$order =  $params->get("page_order","a.ordering");
 	} else {
 		$limit = (int) $params->get('iso_count', 0);
+		$choixdate = $params->get('choixdate', 'modified');
+		$defaultdisplay = $params->get('defaultdisplay', 'date_desc');
 		$order = "a.ordering";
+		$dirstr = " DESC";
+		if (strpos((string)$defaultdisplay,'ASC') !== false)  {
+			$dirstr = " ASC";
+		}
+		if (strpos((string)$defaultdisplay,'date') !== false)  {
+			$order = 'a.'.$choixdate.$dirstr;
+		}
+		if (strpos((string)$defaultdisplay,'id') !== false)  {
+			$order = 'a.id'.$dirstr;
+		}
+		if (strpos((string)$defaultdisplay,'blog') !== false)  {
+			$order = 'ordering'.$dirstr;
+		}
+		if ($defaultdisplay == 'random')  { // 
+			$order = 'RAND() ';
+		}
 	}
 	$pagination = "";
 	$list[] = IsotopeHelper::getItems($categories,$params,$tags_list,$tags,$tags_alias,$tags_note,$tags_image,$tags_parent,$tags_parent_alias, $cats_lib, $cats_alias, $cats_note,$cats_params, $article_tags,$module,$fields,$article_fields, $article_fields_names, $pagination, $limitstart, $limit,$order,$rangefields,$rangetitle,$rangelabel,$rangedesc,$minrange,$maxrange,$alpha);
