@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.3.11
+* Version			: 4.3.14
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -20,7 +20,8 @@ use \Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Component\Content\Site\Model\ArticlesModel;
 use Joomla\Component\Content\Site\Model\ArticleModel;
-use Joomla\Component\Content\Site\Helper\RouteHelper; 
+use Joomla\Component\Content\Site\Helper\RouteHelper;
+use Joomla\Component\Weblinks\Site\Helper\RouteHelper as WeblinkRouter; 
 use Joomla\CMS\Filter;
 use  Joomla\CMS\Filter\OutputFilter as FilterOutput;
 use Joomla\Component\Modules\Administrator\Helper\ModulesHelper;
@@ -81,7 +82,10 @@ class SimpleIsotopeHelper
 		{
 			foreach ($items as $item)
 			{ // link to update click counter (visits)
-				$item->link	= Route::_('index.php?option=com_weblinks&task=weblink.go&catid=' . $id . ':'.$alias.'&id=' . $item->id.':'.$item->alias);
+				$item->link = Route::_(WeblinkRouter::getWeblinkRoute($item->id, $id, $item->language));
+				$str = '?';
+				if (strpos($item->link,'?')) $str='&';
+				$item->link .= $str.'task=weblink.go'; // force open weblink 
 				$images  = json_decode($item->images);
 				$item->introimg = ""; 			
 				if (!empty($images->image_first)) { // first img exists
