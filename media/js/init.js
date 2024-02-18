@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.2.15 CG Isotope / 4.3.15 Simple Isotope
+* Version			: 4.2.16 CG Isotope / 4.3.16 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -759,6 +759,7 @@ CGIsotope.prototype.infinite_buttons = function(appended_list) {
 			}
 		}
 		if (this.options.displayalpha == "button") { 
+				this.remove_events_button('alpha');
 				this.events_button('alpha')
 		}
 		if (this.options.displayalpha == "multi") { 
