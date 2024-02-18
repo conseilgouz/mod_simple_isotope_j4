@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.15</version>
+        <note>
+            <item>Update : 18/02/2024</item>
+        </note>
+		<fix>
+			<item>Infinite paging : ignore cookie</item>
+			<item>Infinite paging : alpha buttons : recreate event listeners</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.14</version>
         <note>
             <item>Update : 09/02/2024</item>

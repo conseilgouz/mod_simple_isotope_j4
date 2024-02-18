@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.3.9
+* Version			: 4.2.15 CG Isotope / 4.3.15 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -182,6 +182,7 @@ function CGIsotope(isoid,options) {
 CGIsotope.prototype.goisotope = function(isoid) {
 	$myiso = cgisotope[isoid];
 	$myiso.cookie = $myiso.getCookie($myiso.cookie_name);
+	if ($myiso.options.pagination == 'infinite') $myiso.cookie = ""; // infinite page : ignore cookie
 	if ($myiso.cookie != "") {
 		let $arr = $myiso.cookie.split('&');
 		for (let index = 0; index < $arr.length; ++index) {
@@ -282,6 +283,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 		let more = document.querySelector($myiso.me+'.iso_button_more');		
 		if ($myiso.options.infinite_btn == "true") {
 			infScroll.option({button:'.iso_button_more',loadOnScroll: false});
+																	
 			more.style.display = "block";
 			['click', 'touchstart'].forEach(type => {
 				more.addEventListener( type, function(e) {
@@ -370,6 +372,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 		$myiso.quicksearch.addEventListener('keyup',e => {
 			this.qsRegex = new RegExp( this.quicksearch.value, 'gi' );
 			this.CG_Cookie_Set(this.isoid,'search',this.quicksearch.value);
+					  
 			this.updateFilterCounts();
 		});
 	}
@@ -432,6 +435,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 				$buttons[i].remove(); 
 			}
 			isoobj.update_cookie_filter();
+						
 			isoobj.updateFilterCounts();
 			if (isoobj.quicksearch) {
 				isoobj.quicksearch.focus();
@@ -644,6 +648,30 @@ CGIsotope.prototype.events_list = function(component) {
 		}
 	}	
 }
+// remove buttons eventListeners
+CGIsotope.prototype.remove_events_button = function(component) {
+	if (component == "lang")
+		agroup= document.querySelectorAll(this.me+'.iso_lang button')
+	else 
+		agroup= document.querySelectorAll(this.me+'.filter-button-group-'+component+' button');
+	for (var i=0; i< agroup.length;i++) {
+		['click', 'touchstart'].forEach(type => {
+			agroup[i].removeEventListener(type,this.listenbutton);
+			agroup[i].removeEventListener(type,this.listenmultibutton);
+		})
+	};
+}
+CGIsotope.prototype.listenbutton= function(evt){
+	evt.stopPropagation();
+	evt.preventDefault();	
+	id = evt.currentTarget.parentNode.getAttribute('data');
+	cgisotope[id].filter_button(evt.currentTarget,evt);
+	mygroup= evt.currentTarget.parentNode.querySelectorAll('button' );
+	for (var g=0; g< mygroup.length;g++) {
+		cgisotope[id].removeClass(mygroup[g],'is-checked');
+	}
+	cgisotope[id].addClass(evt.currentTarget,'is-checked');
+};
 // create buttons eventListeners
 CGIsotope.prototype.events_button = function(component) {
 	if (component == "lang")
@@ -652,20 +680,16 @@ CGIsotope.prototype.events_button = function(component) {
 		agroup= document.querySelectorAll(this.me+'.filter-button-group-'+component+' button');
 	for (var i=0; i< agroup.length;i++) {
 		['click', 'touchstart'].forEach(type => {
-			agroup[i].addEventListener(type,(evt) => {
-				evt.stopPropagation();
-				evt.preventDefault();	
-				id = evt.currentTarget.parentNode.getAttribute('data');
-				cgisotope[id].filter_button(evt.currentTarget,evt);
-			// reset other buttons
-				mygroup= evt.currentTarget.parentNode.querySelectorAll('button' );
-				for (var g=0; g< mygroup.length;g++) {
-					cgisotope[id].removeClass(mygroup[g],'is-checked');
-				}
-				cgisotope[id].addClass(evt.currentTarget,'is-checked');
-			});
+			agroup[i].addEventListener(type,this.listenbutton);
 		})
 	};
+}
+CGIsotope.prototype.listenmultibutton = function(evt){
+	evt.stopPropagation();
+	evt.preventDefault();
+	id = evt.currentTarget.parentNode.getAttribute('data');
+	cgisotope[id].filter_multi(evt.currentTarget,evt);
+	cgisotope[id].set_buttons_multi(evt.currentTarget);
 }
 // create multiselect buttons eventListeners
 CGIsotope.prototype.events_multibutton = function(component) {
@@ -675,13 +699,7 @@ CGIsotope.prototype.events_multibutton = function(component) {
 		agroup= document.querySelectorAll(this.me+'.filter-button-group-'+component+' button');
 	for (var i=0; i< agroup.length;i++) {
 		['click', 'touchstart'].forEach(type =>{
-			agroup[i].addEventListener(type,function(evt) {
-			evt.stopPropagation();
-			evt.preventDefault();
-			id = evt.currentTarget.parentNode.getAttribute('data');
-			cgisotope[id].filter_multi(this,evt);
-			cgisotope[id].set_buttons_multi(this);
-			})
+			agroup[i].addEventListener(type,this.listenmultibutton);
 		})
 	};
 }	
@@ -740,6 +758,14 @@ CGIsotope.prototype.infinite_buttons = function(appended_list) {
 				buttons.append(abutton);
 			}
 		}
+		if (this.options.displayalpha == "button") { 
+				this.events_button('alpha')
+		}
+		if (this.options.displayalpha == "multi") { 
+				this.remove_events_button('alpha');
+				this.events_multibutton('alpha');
+		}
+
 	}
 }
 /*------- grid filter --------------*/
@@ -881,6 +907,7 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 			$this.filters[$parent] = ['*'] ;
 			choicesInstance.setChoiceByValue('')
 			$this.update_cookie_filter();
+						
 			$this.updateFilterCounts();
 		}	
 		return;
@@ -909,6 +936,7 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 		}
 	}
 	$this.update_cookie_filter();
+					  
 	$this.updateFilterCounts();
 }
 	// ----- Filter MultiSelect List
@@ -994,6 +1022,7 @@ CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 			choicesInstance.hideDropdown();
 		}
 		$this.update_cookie_filter();
+					   
 		$this.updateFilterCounts();
 	}
      
@@ -1053,6 +1082,7 @@ CGIsotope.prototype.filter_button = function(obj,evt) {
 			}
 		}
 		$myiso.update_cookie_filter();
+						
 		$myiso.updateFilterCounts();
 	}
 CGIsotope.prototype.filter_multi = function(obj,evt) {
@@ -1133,6 +1163,7 @@ CGIsotope.prototype.filter_multi = function(obj,evt) {
 			}	
 		}
 		$myiso.update_cookie_filter();
+						
 		$myiso.updateFilterCounts();
 	}
 CGIsotope.prototype.set_buttons_multi = function(obj) {
@@ -1428,6 +1459,7 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 									}
 								} else {
 									$button =  document.querySelector( this.me+'.iso_button_'+values[0]+'_'+ this.filters[values[0]][v]);
+									if (!$button) continue; // not defined : ignore it
 									this.addClass($button,'is-checked');
 									if (this.hasClass($button.parentNode.parentNode,"offcanvas-body"))  { // need clone
 										$type ='button'; // assume button
