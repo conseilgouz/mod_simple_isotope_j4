@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.2.16 CG Isotope / 4.3.16 Simple Isotope
+* Version			: 4.2.17 CG Isotope / 4.3.17 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -1496,8 +1496,8 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 									lib = choicesInstance.getValue()[c].label;
 									sel = choicesInstance.getValue()[c].value;
 									child=null;
-									create_clone_button(values[0],sel,lib,'list',child);
-									create_clone_listener(sel);
+									this.create_clone_button(values[0],sel,lib,'list',child);
+									this.create_clone_listener(sel);
 								}
 							}
 						}
@@ -1521,8 +1521,8 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 										lib = choicesInstance.getValue().label;
 										sel = choicesInstance.getValue().value;
 										child=null;
-										create_clone_button(values[0],sel,lib,'list',child);
-										create_clone_listener(sel);
+										this.create_clone_button(values[0],sel,lib,'list',child);
+										this.create_clone_listener(sel);
 									}
 								}
 							} else {
