@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2024/02/23</creationDate>
+	<creationDate>2024-04-29</creationDate>
 	<copyright>Copyright (C) 2024 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.3.17</version>
+	<version>4.3.18</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -46,7 +46,7 @@
 				</field>
 				<field name="cgisotope" type="sql" default="0"
 					query="select enabled from #__extensions where element = 'com_cgisotope'"
-					key_field="enabled"	key_value="enabled"	class="hidden" 
+					key_field="enabled"	value_field="enabled"	class="hidden" 
 				/>
 <field	name="notecgisotope" showon="iso_entree:cgisotope[AND]cgisotope!:1"	type="note" label="SSISO_CGISO_NOT_INSTALLED" class="alert-success  half right"/>
 				<field name="iso_id" type="sqlnoerr" default=""  showon="iso_entree:cgisotope[AND]cgisotope:1"
@@ -145,7 +145,7 @@
 					showon="iso_entree:articles"
 					name="choixdate"
 					query="select f.id as id, f.title as value from #__fields f where f.context like 'com_content%' and f.state > 0 and type like 'calendar'"
-					key_field="id"	value_field="value"						
+					key_field="id"	value_field="value"
 					type="sql" default="created"	class="btn-group clear"
 					label="SSISO_DATECHOICE" description="SSISO_DATECHOICEDESC" >
 					<option value="created">SSISO_DATECHOICECREATE</option> 
