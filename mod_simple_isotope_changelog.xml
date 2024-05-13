@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.19</version>
+        <note>
+            <item>Update : 13/05/2024</item>
+        </note>
+		<fix>
+			<item>Pagination : display all selected categories buttons, even if empty</item>
+            <item>Joomla 5 compatibility : fix deprecated code</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.18</version>
         <note>
             <item>Update : 29/04/2024</item>
