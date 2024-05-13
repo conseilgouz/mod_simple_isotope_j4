@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.20
+* Version			: 4.3.21
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -18,11 +18,10 @@ use ConseilGouz\Module\SimpleIsotope\Site\Helper\SimpleIsotopeHelper as IsotopeH
 use ConseilGouz\Component\CGIsotope\Site\Helper\CGHelper;
 use ConseilGouz\Component\CGIsotope\Site\Controller\PageController;
 
-$document 		= Factory::getApplication()->getDocument();
-
-$modulefield	= 'media/mod_simple_isotope/';
-$iso_entree = $params->get('iso_entree', 'webLinks');
-$is_component = false;
+$document       = Factory::getApplication()->getDocument();
+$modulefield    = 'media/mod_simple_isotope/';
+$iso_entree     = $params->get('iso_entree', 'webLinks');
+$is_component   = false;
 if ($iso_entree == 'cgisotope') {
     $id = $params->get('iso_id', 0);
     $controller = new PageController();
@@ -136,6 +135,9 @@ if ($iso_entree == "webLinks") {
         if ($defaultdisplay == 'random') { //
             $order = 'RAND() ';
         }
+    }
+    if ((strpos($article_cat_tag,'tags') === false) && sizeof($tags_list)) {// not in tags mode : list must be empty
+        $tags_list = [];
     }
     $pagination = "";
     $list[] = IsotopeHelper::getItems($categories, $params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_parent, $tags_parent_alias, $cats_lib, $cats_alias, $cats_note, $cats_params, $article_tags, $module, $fields, $article_fields, $article_fields_names, $pagination, $limitstart, $limit, $order, $rangefields, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange, $alpha);
