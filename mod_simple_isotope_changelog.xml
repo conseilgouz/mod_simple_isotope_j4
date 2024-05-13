@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.20</version>
+        <note>
+            <item>Update : 13/05/2024</item>
+        </note>
+		<fix>
+            <item>Joomla 5 compatibility : fix getUser deprecation</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.19</version>
         <note>
             <item>Update : 13/05/2024</item>

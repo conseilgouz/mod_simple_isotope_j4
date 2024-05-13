@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.19
+* Version			: 4.3.20
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -43,7 +43,7 @@ $iso_layout = $params->get('iso_layout', 'fitRows');
 $iso_nbcol = $params->get('iso_nbcol', 2);
 $tags_list = $params->get('tags', array());
 // check authorised tags
-$authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity());
+$authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
 foreach ($tags_list as $key => $atag) {
     if (!IsotopeHelper::getTagAccess($atag, $authorised)) {
         unset($tags_list[$key]); // not authorized : remove it
@@ -142,7 +142,7 @@ if ($iso_entree == "webLinks") {
 }
 // pagination : check tags_list to add missing tags in the list
 if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
-    $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity());
+    $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
     $missings = IsotopeHelper::getMissingTags($tags_list, $authorised);
     foreach ($missings as $tag) {
         if (!in_array($tag->tag, $tags)) {

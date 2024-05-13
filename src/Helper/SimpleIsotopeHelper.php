@@ -1,7 +1,7 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.19
+* Version			: 4.3.20
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -185,7 +185,7 @@ class SimpleIsotopeHelper
                         }
                     }
                 }
-                $authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
+                $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
                 $article_tags[$item->id] = self::getWebLinkTags($item->id, $authorised); // article's tags
                 foreach ($article_tags[$item->id] as $tag) {
                     if (!in_array($tag->tag, $tags)) {
@@ -263,7 +263,7 @@ class SimpleIsotopeHelper
             $articles->setState('list.limit', $limit);
             $articles->setState('filter.published', 1);
             $access     = true; // check user access level
-            $authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
+            $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
             $articles->setState('filter.access', $access);
             $articles->setState('filter.viewlevels', $authorised);
             $catids = $categories;
@@ -1043,7 +1043,7 @@ class SimpleIsotopeHelper
 
             // Access filter
             $access = ComponentHelper::getParams('com_content')->get('show_noauth');
-            $authorised = Access::getAuthorisedViewLevels(Factory::getUser()->get('id'));
+            $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
             $model->setState('filter.access', $access);
 
             // Filter by language
