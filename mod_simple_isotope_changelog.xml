@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.3.22</version>
+        <note>
+            <item>Update : 05/07/2024</item>
+        </note>
+		<fix>
+            <item>Truncate : use truncateComplex to handle self closing tags</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.21</version>
         <note>
             <item>Update : 13/05/2024</item>

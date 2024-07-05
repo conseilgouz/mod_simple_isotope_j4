@@ -1,7 +1,6 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.20
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -631,7 +630,8 @@ class SimpleIsotopeHelper
         $baseLength = strlen($html);
         $ptString = HTMLHelper::_('string.truncate', $html, $maxLength, $noSplit = true, $allowHtml = false);
         for ($maxLength; $maxLength < $baseLength;) {
-            $htmlString = HTMLHelper::_('string.truncate', $html, $maxLength, $noSplit = true, $allowHtml = true);
+            // use truncateComplex to handle self closing tags like <br />
+            $htmlString = HTMLHelper::_('string.truncateComplex', $html, $maxLength, $noSplit = true);
             $htmlStringToPtString = HTMLHelper::_('string.truncate', $htmlString, $maxLength, $noSplit = true, $allowHtml = false);
             if ($ptString == $htmlStringToPtString) {
                 return $htmlString;
