@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.4.1</version>
+	<version>4.4.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -315,13 +315,6 @@
 				>
 				<option value="true">JYES</option>
 				<option value="false">JNO</option>
-				</field>
-			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfiltercount"
-				type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
-				label="SSISO_TAGSFILTERCOUNT" 
-				description="SSISO_TAGSFILTERCOUNTDESC">
-				<option value="true">JYES</option>
-				<option value="false">JNO</option>
 			</field>
 			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfilterlink"
 				type="radio" class="btn-group btn-group-yesno half right" default="false" 
@@ -330,6 +323,18 @@
 				<option value="false">JNO</option>
 				<option value="joomla">Joomla</option>
                 <option value="iso">Isotope</option>
+			</field>
+			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields[AND]tagsfilterlink:iso,joomla" name="tagsfilterlinkcls"
+				type="text" class="half right" default="badge bg-info text-white" 
+				label="SSISO_TAGSFILTERLINKCLS" 
+				description="SSISO_TAGSFILTERLINKCLSDESC">
+			</field>
+			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfiltercount"
+				type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
+				label="SSISO_TAGSFILTERCOUNT" 
+				description="SSISO_TAGSFILTERCOUNTDESC">
+				<option value="true">JYES</option>
+				<option value="false">JNO</option>
 			</field>
                 
 <field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>

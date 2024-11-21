@@ -37,6 +37,7 @@ $filtersoffcanvas = $params->get('offcanvas', 'false');
 
 $tagsfiltercount =  $params->get('tagsfiltercount', 'false');
 $tagsfilterlink =  $params->get('tagsfilterlink', 'false');
+$tagsfilterlinkcls =  $params->get('tagsfilterlinkcls', 'badge bg-info text-white');
 
 $tagsfilterimg =  $params->get('tagsfilterimg', 'false');
 $splitfields = $params->get('displayfiltersplitfields', 'false');
@@ -788,10 +789,10 @@ foreach ($list as $key => $category) {
                 $item->subtitle = '<small>'.trim($item->subtitle).'</small>';
             }
         }
-        $itemtags = "<span class='iso-tags'>";
+        $itemtags = "<span class='iso-tags' data='".$module->id."'>";
         foreach ($article_tags[$item->id] as $tag) {
-           $iso_link_cls == "";
-            $iso_link_sort == "";
+            $iso_link_cls = "";
+            $iso_link_sort = "";
             if ($tagsfilterlink == 'joomla') { // joomla link to tag component
                 $iso_link_cls = $tags_link[$tag->alias] ? " iso_tag_link" : "";
             }
@@ -803,8 +804,11 @@ foreach ($list as $key => $category) {
             if ($tagsfilterlink == 'joomla') { // joomla link to tag component
                 $itemtags .= '<a href="'.$tags_link[$tag->alias].'"  target="_blank">';
             }
+            if ($tagsfilterlink == 'iso') { // isotope link 
+                $itemtags .= '<a href="" class="'.$tagsfilterlinkcls.'">';
+            }
             $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
-            if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+            if ($tagsfilterlink == 'joomla' || $tagsfilterlink == 'iso') { // joomla link to tag component
                 $itemtags .= '</a>';
             }
             $itemtags .= '</span>';

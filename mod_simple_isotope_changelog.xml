@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.2</version>
+        <note>
+            <item>Update : 21/11/2024</item>
+        </note>
+		<addition>
+            <item>Add class list to tag links in article detail</item>
+		</addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.1</version>
         <note>
             <item>Update : 21/11/2024</item>
