@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.3.0 CG Isotope / 4.4.0 Simple Isotope
+* Version			: 4.3.3 CG Isotope / 4.4.1 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -694,7 +694,7 @@ CGIsotope.prototype.listentags= function(evt){
 	evt.stopPropagation();
 	evt.preventDefault();
     id = evt.currentTarget.parentNode.parentNode.parentNode.getAttribute('data');
-    iso = cgisotope[isoid];
+    iso = cgisotope[id];
     if (iso.options.displayfiltertags == "button" ||
         iso.options.displayfiltertags == "multi"  || 
         iso.options.displayfiltertags == "multiex")     { // button
