@@ -760,7 +760,7 @@ foreach ($list as $key => $category) {
                 }
 
                 $perso = $params->get('perso');
-                $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $cats_lib[$item->catid],"{date}" => $libcreated.date($libdateformat, strtotime($item->created)), "{visit}" => $item->hits, "{intro}" => $item->description,"{tagsimg}" => $tag_img,"{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured);
+                $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $cats_lib[$item->catid],"{date}" => $libcreated.date($libdateformat, strtotime($item->created)), "{visit}" => $item->hits, "{intro}" => $item->description,"{tagsimg}" => $tag_img,"{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured,"{url}" => $item->url);
                 foreach ($arr_css as $key_c => $val_c) {
                     $perso = str_replace($key_c, Text::_($val_c), $perso);
                 }
