@@ -1,7 +1,6 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.21
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -74,6 +73,8 @@ $tags_alias = array();
 $tags_image = array();
 $tags_parent = array();
 $tags_note = array();
+$tags_link = array();
+$tags_count = array();
 $tags_parent_alias = array();
 $fields = array();
 $cats_lib = array();
@@ -88,7 +89,7 @@ $article_tags = array();
 if ($iso_entree == "webLinks") {
     $categories = $params->get('wl_categories');
     $weblinks_params = ComponentHelper::getParams('com_weblinks');
-    $list = IsotopeHelper::getWebLinks($params, $weblinks_params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha);
+    $list = IsotopeHelper::getWebLinks($params, $weblinks_params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha);
     if (!$list) {
         return false;
     } // on a eu une erreur: on sort
@@ -105,7 +106,7 @@ if ($iso_entree == "webLinks") {
     }
     if ($params->get("pagination", "false") != 'false') {
         // -> get all categories infos
-        foreach($categories as $catid) {
+        foreach ($categories as $catid) {
             $infos = IsotopeHelper::getCategoryName($catid);
             $cats_lib[$catid] = $infos[0]->title;
             $cats_alias[$catid] = $infos[0]->alias;
@@ -136,11 +137,11 @@ if ($iso_entree == "webLinks") {
             $order = 'RAND() ';
         }
     }
-    if ((strpos($article_cat_tag,'tags') === false) && sizeof($tags_list)) {// not in tags mode : list must be empty
+    if ((strpos($article_cat_tag, 'tags') === false) && sizeof($tags_list)) {// not in tags mode : list must be empty
         $tags_list = [];
     }
     $pagination = "";
-    $list[] = IsotopeHelper::getItems($categories, $params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_parent, $tags_parent_alias, $cats_lib, $cats_alias, $cats_note, $cats_params, $article_tags, $module, $fields, $article_fields, $article_fields_names, $pagination, $limitstart, $limit, $order, $rangefields, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange, $alpha);
+    $list[] = IsotopeHelper::getItems($categories, $params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $cats_lib, $cats_alias, $cats_note, $cats_params, $article_tags, $module, $fields, $article_fields, $article_fields_names, $pagination, $limitstart, $limit, $order, $rangefields, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange, $alpha);
 }
 // pagination : check tags_list to add missing tags in the list
 if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
@@ -196,10 +197,10 @@ if (($iso_layout == "masonry") || ($iso_layout == "fitRows") || ($iso_layout == 
 if ($iso_layout == "vertical") {
     $wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item{ width:100%}');
 }
-if  ($imgmaxwidth) {
+if ($imgmaxwidth) {
     $wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item img{ max-width:'.$imgmaxwidth.'px}');
 }
-if  ($imgmaxheight) {
+if ($imgmaxheight) {
     $wa->addInlineStyle('#isotope-main-'.$module->id.' .isotope_item img{ max-height:'.$imgmaxheight.'px}');
 }
 $language_filter = $params->get('language_filter', 'false');
@@ -301,7 +302,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
     $displayfiltertags = $params->get('displayfiltertags', 'button');
     $displayfilter =  $params->get('displayfilter', 'button');
     $searchmultiex = "false";
-    if  (($displayfilterfields == "multiex") || ($displayfilterfields == "listex")) {
+    if (($displayfilterfields == "multiex") || ($displayfilterfields == "listex")) {
         $searchmultiex = "true";
     }
     if ($article_cat_tag == "catfields") {

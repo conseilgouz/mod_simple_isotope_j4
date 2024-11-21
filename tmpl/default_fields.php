@@ -1,7 +1,6 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.19
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -35,6 +34,9 @@ if  ($displayoffcanvas == "hamburger") {
     $offcanvasbtnpos =  $params->get('offcanvasbtnpos', 'leave');
 }
 $filtersoffcanvas = $params->get('offcanvas', 'false');
+
+$tagsfiltercount =  $params->get('tagsfiltercount', 'false');
+$tagsfilterlink =  $params->get('tagsfilterlink', 'false');
 
 $tagsfilterimg =  $params->get('tagsfilterimg', 'false');
 $splitfields = $params->get('displayfiltersplitfields', 'false');
@@ -426,7 +428,11 @@ if ($displayfilterfields != "hide") {
                     if ($default_tag == $aff_alias) {
                         $checked = "is-checked";
                     }
-                    $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$tags_note[$aff_alias].'"/>'.$img.Text::_($aff).'</button>';
+                    $tagcount = '';
+                    if ($tagsfiltercount == 'true') {
+                        $tagcount = '<span class="tag-count badge bg-info">'.$tags_count[$aff_alias].'</span>';
+                    }
+                    $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$tags_note[$aff_alias].'"/>'.$img.Text::_($aff).$tagcount.'</button>';
                 }
             }
             if ($tagsfilterparent == "true") {
@@ -462,12 +468,16 @@ if ($displayfilterfields != "hide") {
                 $parent = $res[0];
                 $aff = $filter;
                 $aff_alias = $alias[$filter];
+                $tagcount = '';
+                if ($tagsfiltercount == 'true') {
+                     $tagcount = ' ('.$tags_count[$aff_alias].') ';
+                }
                 if (!is_null($aff)) {
                     $selected = "";
                     if ($default_tag == $aff_alias) {
                         $selected = "selected";
                     }
-                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff));
+                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff).$tagcount);
                 }
             }
             $filter_tag_div .= '<joomla-field-fancy-select '.implode(' ', $attributes).'>';
@@ -778,10 +788,28 @@ foreach ($list as $key => $category) {
                 $item->subtitle = '<small>'.trim($item->subtitle).'</small>';
             }
         }
-        $itemtags = "";
+        $itemtags = "<span class='iso-tags'>";
         foreach ($article_tags[$item->id] as $tag) {
-            $itemtags .= '<span class="iso_tag_'.$tags_alias[$tag->tag].'">'.(($itemtags == "") ? $tag->tag : "<span class='iso_tagsep'><span>-</span></span>".$tag->tag).'</span>';
+           $iso_link_cls == "";
+            $iso_link_sort == "";
+            if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                $iso_link_cls = $tags_link[$tag->alias] ? " iso_tag_link" : "";
+            }
+            if ($tagsfilterlink == 'iso') { // isotope filtering
+                $iso_link_sort = ' data-sort-value="'.$tag->alias.'"';
+                $iso_link_cls = ' iso_tag_link';
+            }
+            $itemtags .= '<span class="iso_tag_'.$tags_alias[$tag->tag].$iso_link_cls.'"'.$iso_link_sort.'>';
+            if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                $itemtags .= '<a href="'.$tags_link[$tag->alias].'"  target="_blank">';
+            }
+            $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
+            if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                $itemtags .= '</a>';
+            }
+            $itemtags .= '</span>';
         }
+        $itemtags .= "</span>";
         $ladate = $item->displayDate;
         $data_cat =  $item->category_alias;
         $click = $item->hits;

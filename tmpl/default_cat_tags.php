@@ -1,7 +1,6 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Version			: 4.3.19
 * Package			: Joomla 4.x/5.x
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -32,6 +31,8 @@ $tagsfilterimg =  $params->get('tagsfilterimg', 'false');
 $tagsfilterparent =  $params->get('tagsfilterparent', 'false');
 $tagsfilterparentlabel =  $params->get('tagsfilterparentlabel', 'false');
 $catsfilterimg =  $params->get('catsfilterimg', 'false');
+$tagsfiltercount =  $params->get('tagsfiltercount', 'false');
+$tagsfilterlink =  $params->get('tagsfilterlink', 'false');
 $blocklink =  $params->get('blocklink', 'false');
 $titlelink =  $params->get('titlelink', 'true');
 if ($article_cat_tag == "cat") {
@@ -48,7 +49,7 @@ $displaysearch = $params->get('displaysearch', 'false');
 $displayoffcanvas =  $params->get('displayoffcanvas', 'text');
 $offcanvaspos = $params->get('offcanvaspos', 'start');
 $offcanvasbtnpos = "leave";
-if  ($displayoffcanvas == "hamburger") {
+if ($displayoffcanvas == "hamburger") {
     $offcanvasbtnpos =  $params->get('offcanvasbtnpos', 'leave');
 }
 $filtersoffcanvas = $params->get('offcanvas', 'false');
@@ -377,7 +378,7 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
             if ($params->get('catfilteralias', 'false') != 'order') { // don't sort categories
                 asort($sortFilter, SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL); // alphabatic order
             }
-            if  (($displayfiltercat == "button")  || ($displayfiltercat == "multi") || ($displayfiltercat == "multiex")) {
+            if (($displayfiltercat == "button")  || ($displayfiltercat == "multi") || ($displayfiltercat == "multiex")) {
                 $awidth = $layouts["cat"]->div_width;
                 if (!property_exists($layouts["cat"], 'offcanvas')) {
                     $layouts["cat"]->offcanvas = "false";
@@ -404,7 +405,7 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                             $catparam  = json_decode($cats_params[$key]);
                             if ($catparam->image != "") {
                                 $img = '<img src="'.URI::root().$catparam->image.'"  
-							class="iso_cat_img" alt="'.$catparam->image_alt.'" /> '; // pascal
+                                        class="iso_cat_img" alt="'.$catparam->image_alt.'" /> '; // pascal
                             }
                         }
                         $filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$cats_note[$key].'"/>'.$img.Text::_($aff).'</button>';
@@ -547,7 +548,11 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                             $checked = "is-checked";
                         }
                         $one_title = array_key_exists($aff_alias, $tags_note) ? $tags_note[$aff_alias] : '';
-                        $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$one_title.'"/>'.$img.Text::_($aff).'</button>';
+                        $tagcount = '';
+                        if ($tagsfiltercount == 'true') {
+                            $tagcount = '<span class="tag-count badge bg-info">'.$tags_count[$aff_alias].'</span>';
+                        }
+                        $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$one_title.'"/>'.$img.Text::_($aff).$tagcount.'</button>';
                     }
                 }
                 if (($tagsfilterparent == "true") && ($cur_parent != "")) {
@@ -583,12 +588,16 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                     $parent = $res[0];
                     $aff = $filter;
                     $aff_alias = $alias[$filter];
+                    $tagcount = '';
+                    if ($tagsfiltercount == 'true') {
+                        $tagcount = ' ('.$tags_count[$aff_alias].') ';
+                    }
                     if (!is_null($aff)) {
                         $selected = "";
                         if ($default_tag == $aff_alias) {
                             $selected = "selected";
                         }
-                        $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff));
+                        $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff).$tagcount);
                     }
                 }
                 $filter_tag_div .= '<joomla-field-fancy-select '.implode(' ', $attributes).'>';
@@ -682,10 +691,28 @@ foreach ($list as $key => $category) {
                     }
                 };
             }
-            $itemtags = "";
+            $itemtags = "<span class='iso-tags'>";
             foreach ($article_tags[$item->id] as $tag) {
-                $itemtags .= '<span class="iso_tag_'.$tags_alias[$tag->tag].'">'.(($itemtags == "") ? $tag->tag : "<span class='iso_tagsep'><span>-</span></span>".$tag->tag).'</span>';
+                $iso_link_cls == "";
+                $iso_link_sort == "";
+                if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                    $iso_link_cls = $tags_link[$tag->alias] ? " iso_tag_link" : "";
+                }
+                if ($tagsfilterlink == 'iso') { // isotope filtering
+                    $iso_link_sort = ' data-sort-value="'.$tag->alias.'"';
+                    $iso_link_cls = ' iso_tag_link';
+                }
+                $itemtags .= '<span class="iso_tag_'.$tags_alias[$tag->tag].$iso_link_cls.'"'.$iso_link_sort.'>';
+                if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                    $itemtags .= '<a href="'.$tags_link[$tag->alias].'"  target="_blank">';
+                }
+                $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
+                if ($tagsfilterlink == 'joomla') { // joomla link to tag component
+                    $itemtags .= '</a>';
+                }
+                $itemtags .= '</span>';
             }
+            $itemtags .= "</span>";
             //=== LM - fin prise en charge sous-titre par tilde et badge nouveau
             $ladate = $iso_entree == "webLinks" ? $item->created : $item->displayDate;
             $data_cat = $iso_entree == "webLinks" ? $cats_alias[$item->catid] : $item->category_alias;

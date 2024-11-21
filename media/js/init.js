@@ -1,6 +1,6 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.2.17 CG Isotope / 4.3.17 Simple Isotope
+* Version			: 4.3.0 CG Isotope / 4.4.0 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -280,10 +280,9 @@ CGIsotope.prototype.goisotope = function(isoid) {
 			currentpage = this.loadCount;
 			return '?start='+(currentpage+1)*$myiso.options.page_count; 
 		}
-		let more = document.querySelector($myiso.me+'.iso_button_more');		
+		let more = document.querySelector($myiso.me+'.iso_button_more');
 		if ($myiso.options.infinite_btn == "true") {
 			infScroll.option({button:'.iso_button_more',loadOnScroll: false});
-																	
 			more.style.display = "block";
 			['click', 'touchstart'].forEach(type => {
 				more.addEventListener( type, function(e) {
@@ -328,7 +327,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 				};
 				waitForEl(function () {
 					document.querySelector(selector); // do something with selector
-				}, 3);		
+				}, 3);
 			})
 		})
 	// set default buttons in cloned area
@@ -342,7 +341,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 					agroup = document.querySelectorAll($myiso.me+'.filter-button-group-'+grouptype[g]+' button'); 
 					for (var i=0; i< agroup.length;i++) {
 						if (agroup[i].getAttribute('data-sort-value') == $myiso.filters[grouptype[g]]) {
-							$myiso.create_clone_button(grouptype[g],$myiso.filters[grouptype[g]],agroup[i].textContent,optionstype[g],'');
+							$myiso.create_clone_button(grouptype[g],$myiso.filters[grouptype[g]],agroup[i].textContent,agroup[i].title,optionstype[g],'');
 							$myiso.create_clone_listener($myiso.filters[grouptype[g]]);
 						}
 					}
@@ -445,6 +444,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 	}
 	if  ($myiso.options.displayfiltertags == "listmulti") 	{ 
 		$myiso.events_listmulti('tags');
+        $myiso.events_tags();
 	}
 	if ($myiso.options.displayfiltercat == "listmulti") {
 		$myiso.events_listmulti('cat');
@@ -457,6 +457,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 	} 
 	if  (($myiso.options.displayfiltertags == "list") || ($myiso.options.displayfiltertags == "listex")) { 
 		$myiso.events_list('tags');
+   		$myiso.events_tags();
 	} 
 	if  (($myiso.options.displayfilterfields == "list") || ($myiso.options.displayfilterfields == "listex")) { 
 		$myiso.events_list('fields');
@@ -466,6 +467,7 @@ CGIsotope.prototype.goisotope = function(isoid) {
 	}
 	if (($myiso.options.displayfiltertags == "multi") || ($myiso.options.displayfiltertags == "multiex")  ) {
 		$myiso.events_multibutton('tags')
+   		$myiso.events_tags();
 	}
 	if (($myiso.options.displayfilterfields == "multi") || ($myiso.options.displayfilterfields == "multiex")) { 
 		$myiso.events_multibutton('fields');
@@ -481,7 +483,8 @@ CGIsotope.prototype.goisotope = function(isoid) {
 	}
 	if ($myiso.options.displayfiltertags == "button") { 
 		$myiso.events_button('tags');
-	}
+   		$myiso.events_tags();
+    }
 	if ($myiso.options.displayfilterfields == "button") { 
 		$myiso.events_button('fields');
 	}
@@ -615,7 +618,7 @@ CGIsotope.prototype.events_listmulti = function(component) {
 				sel = savefilter;
 				lib = choicesInstance.getValue()[0].label;
 				child = null;
-				this.create_clone_button(component,sel,lib,'list',child);
+				this.create_clone_button(component,sel,lib,'','list',child);
 				this.create_clone_listener(sel);
 			}
 		}
@@ -638,12 +641,12 @@ CGIsotope.prototype.events_list = function(component) {
 	var choicesInstance = elChoice.choicesInstance;
 	choicesInstance.setChoiceByValue(this.filters[component]);
 	if ((elChoice.parentElement.parentElement.className == "offcanvas-body") && (this.filters[component] != '*')) { // need clone
-		clone_exist = document.querySelector(me+'#clonedbuttons button[data-sort-value="'+this.filters[component]+'"]');
+		clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+this.filters[component]+'"]');
 		if (!clone_exist) { // create default button
 			sel = this.filters[component];
 			lib = choicesInstance.getValue().label;
 			child = null;
-			this.create_clone_button(component,sel,lib,'list',child);
+			this.create_clone_button(component,sel,lib,'','list',child);
 			this.create_clone_listener(sel);
 		}
 	}	
@@ -663,7 +666,7 @@ CGIsotope.prototype.remove_events_button = function(component) {
 }
 CGIsotope.prototype.listenbutton= function(evt){
 	evt.stopPropagation();
-	evt.preventDefault();	
+	evt.preventDefault();
 	id = evt.currentTarget.parentNode.getAttribute('data');
 	cgisotope[id].filter_button(evt.currentTarget,evt);
 	mygroup= evt.currentTarget.parentNode.querySelectorAll('button' );
@@ -684,6 +687,49 @@ CGIsotope.prototype.events_button = function(component) {
 		})
 	};
 }
+/*-----------tags from article detail-------------*/
+CGIsotope.prototype.listentags= function(evt){
+    val = evt.currentTarget.getAttribute('data-sort-value');
+    if (!val) return;
+	evt.stopPropagation();
+	evt.preventDefault();
+    id = evt.currentTarget.parentNode.parentNode.parentNode.getAttribute('data');
+    iso = cgisotope[isoid];
+    if (iso.options.displayfiltertags == "button" ||
+        iso.options.displayfiltertags == "multi"  || 
+        iso.options.displayfiltertags == "multiex")     { // button
+        agroup= document.querySelectorAll(iso.me+'.filter-button-group-tags button');
+        agroup.forEach(abutton => {
+            if (abutton.getAttribute('data-sort-value') == val) {
+                abutton.click();
+            }
+        })
+    } else {        /* list */
+        agroup= document.querySelectorAll(iso.me+'.filter-button-group-tags');
+        evt.currentTarget.setAttribute('data-filter-group','tags');
+        node = document.createElement('div');
+        node.classList.add('is-highlighted');
+        node.dataset.value = val;
+        evt.currentTarget.appendChild(node);
+        if (iso.options.displayfiltertags == "list") {
+            iso.filter_list(iso,evt,'choice');
+        } else {
+            evt.currentTarget.id = 'isotope-select-tags';
+            iso.filter_list_multi(iso,evt,'choice');
+            evt.currentTarget.id = '';
+        }
+        evt.currentTarget.removeChild(node);
+    }
+}
+CGIsotope.prototype.events_tags = function() {
+	agroup= document.querySelectorAll(this.me+'.iso-tags span ');
+	for (var i=0; i< agroup.length;i++) {
+		['click', 'touchstart'].forEach(type => {
+			agroup[i].addEventListener(type,this.listentags);
+		})
+	};
+}
+/* ------end of tags from article detail --------------*/
 CGIsotope.prototype.listenmultibutton = function(evt){
 	evt.stopPropagation();
 	evt.preventDefault();
@@ -885,6 +931,8 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 		$selectid = $parent;
 		$isclone = true;
 		sortValue =  '';
+        $isoid = obj.parentNode.getAttribute('data');
+        $this = cgisotope[$isoid];
 	} else {
 		$selectid = obj.getAttribute('data-filter-group');
 		sortValue = obj.querySelector(".is-highlighted");
@@ -901,9 +949,11 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 	if (params == 'remove' ) { // remove item from offcanvas => remove button
 		$this.removeFilter( $this.filters, $parent, evt.detail.value );
 		if  ($needclone) {
-			myclone = document.querySelector('#clonedbuttons button[data-sort-value="'+evt.detail.value+'"]')
-			if (myclone) myclone.remove();
-		}
+			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+			for (var i=0; i< $buttons.length;i++) { // remove buttons
+				$buttons[i].remove(); 
+			}
+        }
 		if ($this.filters[$parent].length == 0) {
 			$this.filters[$parent] = ['*'] ;
 			choicesInstance.setChoiceByValue('')
@@ -915,7 +965,7 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 	}
 	if (sortValue == '')   {
 		choicesInstance.removeActiveItems();
-		choicesInstance.setChoiceByValue('')		
+		choicesInstance.setChoiceByValue('');
 		$this.filters[$parent] = ['*'];
 		$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 		for (var i=0; i< $buttons.length;i++) { // remove buttons
@@ -923,6 +973,14 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 		}
 	} else { 
 		$this.filters[$parent] = [sortValue];
+        if (choicesInstance.getValue().value != sortValue) {
+            choicesInstance.setChoiceByValue(sortValue);
+        }
+        lib = choicesInstance.getValue().label;
+        if ($parent == 'tags') { // coming from tags list in article detail
+            tmpoff = document.querySelector('.offcanvas .filter-button-group-tags');
+            if (tmpoff) $needclone = true;
+        }
 		if ($needclone) { // clone
 			$buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
 			for (var i=0; i< $buttons.length;i++) { // remove buttons
@@ -930,8 +988,7 @@ CGIsotope.prototype.filter_list = function($this,evt,params) {
 			}
 			clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+$this.filters[$parent]+'"]');
 			if (!clone_exist) {
-				lib = evt.detail.choice.label;
-				$this.create_clone_button($parent,sortValue,lib,'list','');
+				$this.create_clone_button($parent,sortValue,lib,'','list','');
 				$this.create_clone_listener(sortValue);
 			}
 		}
@@ -950,6 +1007,8 @@ CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 			$parent = obj.getAttribute('data-filter-group');
 			$selectid = "isotope-select-"+$parent;
 			$isclone = true;
+            $isoid = obj.parentNode.getAttribute('data');
+            $this = cgisotope[$isoid];
 		} else {
 			$parent = obj.parentNode.parentNode.parentNode.getAttribute('data-filter-group')
 			$selectid = obj.getAttribute('id');
@@ -973,7 +1032,7 @@ CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 					remval = $this.filters[$parent][i];
 					choicesInstance.setChoiceByValue(remval);
 					asel = choicesInstance.getValue()[i];
-					$this.create_clone_button($parent,remval,asel.label,'list_multi','');
+					$this.create_clone_button($parent,remval,asel.label,'','list_multi','');
 					$this.create_clone_listener(remval);
 				}
 			} else {
@@ -994,8 +1053,25 @@ CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 			}
 		}
 		if ($params == "choice") {
-			sel = $evnt.detail.choice.value;
-			lib = $evnt.detail.choice.label;
+            if (Number.isInteger($evnt.detail)) { // coming from tags list in article detail
+                sortValue = obj.querySelector(".is-highlighted");
+                sortValue = sortValue.dataset.value;
+                $parent = "tags";
+                values = choicesInstance.choiceList.element.children; 
+                sel = ""; // assume not found
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i].getAttribute('data-value') == sortValue) {
+                        sel = sortValue;
+                        lib = values[i].innerHTML;
+                        choicesInstance.setChoiceByValue(sel);
+                    }
+                }
+                tmpoff = document.querySelector('.offcanvas .filter-button-group-tags');
+                if (tmpoff) $needclone = true;
+            } else {
+                sel = $evnt.detail.choice.value;
+                lib = $evnt.detail.choice.label;
+            }
 			if (sel == '') {// all
 				$this.filters[$parent] = ['*'];
 				choicesInstance.removeActiveItems();
@@ -1008,13 +1084,17 @@ CGIsotope.prototype.filter_list_multi = function($this,evt,params) {
 				if ($this.filters[$parent].indexOf('*') != -1) { // was all
 					choicesInstance.removeActiveItemsByValue('')
 					$this.filters[$parent] = []; // remove it
+                    $buttons = document.querySelectorAll('#clonedbuttons [data-filter-group="'+$parent+'"]');
+                    for (var i=0; i< $buttons.length;i++) { // remove buttons
+                        $buttons[i].remove(); 
+                    }
 				}
 				if ($needclone) {
 					clone_exist = false;
 					if ($this.filters[$parent].indexOf(sel) != -1) clone_exist = true
 					// clone_exist = document.querySelector(this.me+'#clonedbuttons button[data-sort-value="'+this.filters[$parent]+'"]');
 					if (!clone_exist) {
-						$this.create_clone_button($parent,sel,lib,'list_multi','');
+						$this.create_clone_button($parent,sel,lib,'','list_multi','');
 						$this.create_clone_listener(sel);
 					}
 				}
@@ -1064,7 +1144,8 @@ CGIsotope.prototype.filter_button = function(obj,evt) {
 			}
 			if (sortValue != '*') { // don't clone all button
 				lib = evt.srcElement.innerHTML;
-				$myiso.create_clone_button($parent,sortValue,lib,'button',child);
+                title = evt.srcElement.title;
+				$myiso.create_clone_button($parent,sortValue,lib,title,'button',child);
 				$myiso.create_clone_listener(sortValue);
 			}
 		}
@@ -1115,7 +1196,8 @@ CGIsotope.prototype.filter_multi = function(obj,evt) {
 			    if (evt.srcElement.localName == "img")
 					lib = evt.srcElement.outerHTML+evt.srcElement.nextSibling.textContent;
 				else lib = evt.srcElement.innerHTML;
-				$myiso.create_clone_button($parent,sortValue,lib,'multi',child);
+                title = evt.srcElement.title;
+				$myiso.create_clone_button($parent,sortValue,lib,title,'multi',child);
 				$myiso.create_clone_listener(sortValue);
 			} else { // remove cloned button
 				if (sortValue != "*") {
@@ -1239,7 +1321,7 @@ CGIsotope.prototype.updateFilterCounts = function() {
 		this.iso.arrange();
 	}
 // -- Create a clone button
-CGIsotope.prototype.create_clone_button = function($parent,$sel,$lib,$type,child) {
+CGIsotope.prototype.create_clone_button = function($parent,$sel,$lib,$title,$type,child) {
 	buttons = document.querySelector('#clonedbuttons');
 	var abutton = document.createElement('button');
 	abutton.classList.add('btn');
@@ -1254,7 +1336,7 @@ CGIsotope.prototype.create_clone_button = function($parent,$sel,$lib,$type,child
 		abutton.title = $lib.substr($lib.indexOf(">") + 1)
 	}
 	else {
-		abutton.title = $lib;
+		abutton.title = $title;
 	}
 	abutton.innerHTML = $lib;
 	buttons.prepend(abutton);
@@ -1428,7 +1510,7 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 									lib = choicesInstance.getValue()[c].label;
 									sel = choicesInstance.getValue()[c].value;
 									child = null;
-									this.create_clone_button(values[0],sel,lib,'list_multi',child);
+									this.create_clone_button(values[0],sel,lib,'','list_multi',child);
 									this.create_clone_listener(sel);
 								}
 							}
@@ -1455,7 +1537,7 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 										sel = this.filters[values[0]][v];
 										lib = choicesInstance.getValue().label;
 										child = null;
-										this.create_clone_button(values[0],sel,lib,'list',child);
+										this.create_clone_button(values[0],sel,lib,'','list',child);
 										this.create_clone_listener(sel);
 									}
 								} else {
@@ -1471,7 +1553,8 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 										}
 										child = null;
 										lib = $button.innerHTML;
-										this.create_clone_button(values[0],this.filters[values[0]][v],lib,$type,child);
+                                        title = $button.title;
+										this.create_clone_button(values[0],this.filters[values[0]][v],lib,title,$type,child);
 										this.create_clone_listener(this.filters[values[0]][v]);
 									}
 								}
@@ -1496,7 +1579,7 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 									lib = choicesInstance.getValue()[c].label;
 									sel = choicesInstance.getValue()[c].value;
 									child=null;
-									this.create_clone_button(values[0],sel,lib,'list',child);
+									this.create_clone_button(values[0],sel,lib,'','list',child);
 									this.create_clone_listener(sel);
 								}
 							}
@@ -1521,7 +1604,7 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 										lib = choicesInstance.getValue().label;
 										sel = choicesInstance.getValue().value;
 										child=null;
-										this.create_clone_button(values[0],sel,lib,'list',child);
+										this.create_clone_button(values[0],sel,lib,'','list',child);
 										this.create_clone_listener(sel);
 									}
 								}
@@ -1536,7 +1619,8 @@ CGIsotope.prototype.splitCookie = function(isoid,item) {
 								if (this.hasClass(obj.parentNode.parentNode.parentNode,"offcanvas-body"))  { // need clone
 									$type ='button'; 
 									lib = obj.innerHTML;
-									this.create_clone_button(values[0],this.filters[values[0]][v],lib,$type,child);
+                                    title = obj.title;
+									this.create_clone_button(values[0],this.filters[values[0]][v],lib,title,$type,child);
 									this.create_clone_listener(this.filters[values[0]][v]);
 								}
 							}

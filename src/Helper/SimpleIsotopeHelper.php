@@ -24,6 +24,7 @@ use Joomla\Component\Content\Site\Model\ArticleModel;
 use Joomla\Component\Content\Site\Helper\RouteHelper;
 use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\Component\Modules\Administrator\Helper\ModulesHelper;
+use Joomla\Component\Tags\Site\Helper\RouteHelper as TagRouteHelper;
 use Joomla\Component\Weblinks\Site\Helper\RouteHelper as WeblinkRouter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Registry\Registry;
@@ -46,7 +47,7 @@ class SimpleIsotopeHelper
         return $manifest['version'];
     }
 
-    public static function getWebLinks(&$params, $weblinks_params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha)
+    public static function getWebLinks(&$params, $weblinks_params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha)
     {
         $options = array();
         $options['countItems'] = $params->get('show_cat_num_links', 1) || !$params->get('show_empty_categories_cat', 0);
@@ -61,16 +62,16 @@ class SimpleIsotopeHelper
         foreach ($categories as  $categorie) {
             if (count($sel_cat) > 0) {
                 if (in_array($categorie->id, $sel_cat)) { // found in categories selection list
-                    $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
+                    $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
                 }
             } else { // take all categories
-                $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
+                $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
             }
         }
         return $result;
     }
 
-    public static function getWebLinksCategorie($id, $alias, $introtext_img, $wl_params, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha, $params)
+    public static function getWebLinksCategorie($id, $alias, $introtext_img, $wl_params, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha, $params)
     {
         $introtext_img_link  = $params->get('introtext_img_link', 'false');
 
@@ -192,9 +193,11 @@ class SimpleIsotopeHelper
                         $tags_alias[$tag->tag] = $tag->alias;
                         $tags_image[$tag->alias] = $tag->images;
                         $tags_note[$tag->alias] = $tag->note;
+                        $tags_link[$tag->alias] = self::getTagLink($tag);
                         $tags_parent[$tag->alias] = $tag->parent_title;
                         $tags_parent_alias[$tag->alias] = $tag->parent_alias;
                     }
+                    $tags_count[$tag->alias]++;
                 }
                 $info_cat = self::getCategoryName($item->catid);
                 if (!in_array($info_cat[0]->alias, $cats_alias)) {
@@ -250,7 +253,7 @@ class SimpleIsotopeHelper
         $db->setQuery($query);
         return $db->loadObjectList();
     }
-    public static function getItems($categories, $params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_parent, &$tags_parent_alias, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$article_tags, $module, &$fields, &$article_fields, &$article_fields_names, &$pagination, $start, $limit, $order, $rangefields, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange, &$alpha)
+    public static function getItems($categories, $params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$article_tags, $module, &$fields, &$article_fields, &$article_fields_names, &$pagination, $start, $limit, $order, $rangefields, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange, &$alpha)
     {
 
         $articles     = new ArticlesModel(array('ignore_request' => true));
@@ -391,9 +394,11 @@ class SimpleIsotopeHelper
                         $tags_alias[$tag->tag] = $tag->alias;
                         $tags_image[$tag->alias] = $tag->images;
                         $tags_note[$tag->alias] = $tag->note;
+                        $tags_link[$tag->alias] = self::getTagLink($tag);
                         $tags_parent[$tag->alias] = $tag->parent_title;
                         $tags_parent_alias[$tag->alias] = $tag->parent_alias;
                     }
+                    $tags_count[$tag->alias]++;
                 }
                 $params_fields = $params->get('displayfields');  // fields
                 $test = FieldsHelper::getFields('com_content.article', $item);
@@ -536,12 +541,18 @@ class SimpleIsotopeHelper
         }
         return $obj;
     }
+    public static function getTagLink($tag)
+    {
+        $link = Route::_(TagRouteHelper::getComponentTagRoute($tag->id . ':' . $tag->alias, $tag->language));
+        return $link;
+    }
+    
     public static function getTagTitle($id)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
         // Construct the query
-        $query->select('tags.title as tag, tags.alias as alias,tags.note as note, parent.title as parent_title, parent.alias as parent_alias')
+        $query->select('tags.title as tag, tags.alias as alias,tags.note as note, parent.title as parent_title,tags.language as language, parent.alias as parent_alias')
             ->from('#__tags as tags')
             ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
             ->where('tags.id = '.$id)
@@ -565,7 +576,7 @@ class SimpleIsotopeHelper
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
-        $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, parent.title as parent_title, parent.alias as parent_alias, tags.id')
+        $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images,tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
             ->from('#__contentitem_tag_map as map ')
             ->innerJoin('#__content as c on c.id = map.content_item_id')
             ->innerJoin('#__tags as tags on tags.id = map.tag_id')
@@ -580,7 +591,7 @@ class SimpleIsotopeHelper
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
-        $query->select('DISTINCT tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, parent.title as parent_title, parent.alias as parent_alias, tags.id')
+        $query->select('DISTINCT tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
         ->from('#__contentitem_tag_map as map ')
         ->innerJoin('#__tags as tags on tags.id = map.tag_id')
         ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
@@ -593,7 +604,7 @@ class SimpleIsotopeHelper
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
-        $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, parent.title as parent_title, parent.alias as parent_alias ')
+        $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images,tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
             ->from('#__contentitem_tag_map as map ')
             ->innerJoin('#__weblinks as w on w.id = map.content_item_id')
             ->innerJoin('#__tags as tags on tags.id = map.tag_id')

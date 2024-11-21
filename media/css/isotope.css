@@ -397,3 +397,12 @@ div.itemExtraFields ul li span.itemExtraFieldsLabel {
     content: "X";
 }
 .isotope-main .choices__inner input{min-width:10ch!important}
+
+.isotope_button-group .tag-count.badge.bg-info {margin-left:10px}
+/* tags with links */
+.iso_tag_link .iso_tagsep span{display:none}
+.iso-tags .iso_tag_link::after {
+    margin-left:10px;
+    margin-right:10px;
+    content: '\2022';
+}

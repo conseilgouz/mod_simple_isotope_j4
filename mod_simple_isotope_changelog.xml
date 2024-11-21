@@ -2,6 +2,19 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.0</version>
+        <note>
+            <item>Update : 21/11/2024</item>
+        </note>
+		<addition>
+            <item>WebLinks : add url shortcut</item>
+            <item>Tags : add clickable tag links</item>
+            <item>Tags : new parameter : show-hide tag counters</item>
+		</addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.3.22</version>
         <note>
             <item>Update : 05/07/2024</item>
