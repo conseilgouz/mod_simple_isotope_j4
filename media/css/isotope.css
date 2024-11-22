@@ -415,6 +415,7 @@ div.itemExtraFields ul li span.itemExtraFieldsLabel {
 	
 }
 .isotope_button-group .tag-count.badge.bg-info {margin-left:10px}
+.isotope_button-group .cat-count.badge.bg-info {margin-left:10px}
 
 /* tags with links */
 .iso_tag_link .iso_tagsep span{display:none}

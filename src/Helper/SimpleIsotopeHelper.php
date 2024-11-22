@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Access\Access;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use  Joomla\CMS\Filter\OutputFilter as FilterOutput;
+use Joomla\CMS\Filter\OutputFilter as FilterOutput;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -47,7 +47,7 @@ class SimpleIsotopeHelper
         return $manifest['version'];
     }
 
-    public static function getWebLinks(&$params, $weblinks_params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha)
+    public static function getWebLinks(&$params, $weblinks_params, $tags_list, &$iso)
     {
         $options = array();
         $options['countItems'] = $params->get('show_cat_num_links', 1) || !$params->get('show_empty_categories_cat', 0);
@@ -59,19 +59,19 @@ class SimpleIsotopeHelper
             return false; // pas de cat�gorie: on sort
         }
         $sel_cat = $params->get('wl_categories', array());
-        foreach ($categories as  $categorie) {
+        foreach ($categories as $categorie) {
             if (count($sel_cat) > 0) {
                 if (in_array($categorie->id, $sel_cat)) { // found in categories selection list
-                    $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
+                    $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $iso, $params);
                 }
             } else { // take all categories
-                $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha, $params);
+                $result[$categorie->id] = self::getWebLinksCategorie($categorie->id, $categorie->alias, $introtext_img, $weblinks_params, $iso, $params);
             }
         }
         return $result;
     }
 
-    public static function getWebLinksCategorie($id, $alias, $introtext_img, $wl_params, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$article_tags, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$fields, &$article_fields, &$article_fields_names, $rangefields, &$alpha, $params)
+    public static function getWebLinksCategorie($id, $alias, $introtext_img, $wl_params, &$iso, $params)
     {
         $introtext_img_link  = $params->get('introtext_img_link', 'false');
 
@@ -123,7 +123,7 @@ class SimpleIsotopeHelper
                             $alias_sort = FilterOutput::stringURLSafe((string)$val);
                         }
                     }
-                    if (($field->id == $rangefields) && ($field->value != "")) { // min/max range values
+                    if (($field->id == $iso->rangefields) && ($field->value != "")) { // min/max range values
                         $rangetitle = $field->title;
                         $rangelabel = $field->label;
                         $rangedesc = $field->description;
@@ -147,10 +147,10 @@ class SimpleIsotopeHelper
                                         if ($alias == "") {
                                             continue;
                                         }
-                                        $article_fields[$item->id][$field->title][] = $alias;
-                                        $article_fields_names[$item->id][$field->name][] = $alias;
-                                        if (!in_array($alias, $fields)) {
-                                            $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
+                                        $iso->article_fields[$item->id][$field->title][] = $alias;
+                                        $iso->article_fields_names[$item->id][$field->name][] = $alias;
+                                        if (!in_array($alias, $iso->fields)) {
+                                            $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
                                         }
                                     }
                                 }
@@ -162,10 +162,10 @@ class SimpleIsotopeHelper
                                     if ($alias == "") {
                                         continue;
                                     }
-                                    $article_fields[$item->id][$field->title] = $alias;
-                                    $article_fields_names[$item->id][$field->name] = $alias;
-                                    if (!in_array($alias, $fields)) {
-                                        $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
+                                    $iso->article_fields[$item->id][$field->title] = $alias;
+                                    $iso->article_fields_names[$item->id][$field->name] = $alias;
+                                    if (!in_array($alias, $iso->fields)) {
+                                        $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
                                     }
                                     $ix_field += 1;
                                 }
@@ -174,41 +174,42 @@ class SimpleIsotopeHelper
                     } else { // not an option field
                         if (is_string($val)) {  // 30/09/2021 : ignore if not string
                             $alias =  FilterOutput::stringURLSafe((string)$val);
-                            if (!in_array($alias, $fields)) {
+                            if (!in_array($alias, $iso->fields)) {
                                 if ($alias == "") {
                                     continue;
                                 }
-                                $article_fields[$item->id][$field->title] = $alias;
-                                $article_fields_names[$item->id][$field->name] = $alias;
-                                $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
+                                $iso->article_fields[$item->id][$field->title] = $alias;
+                                $iso->article_fields_names[$item->id][$field->name] = $alias;
+                                $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
                             }
                         }
                     }
                 }
                 $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
-                $article_tags[$item->id] = self::getWebLinkTags($item->id, $authorised); // article's tags
-                foreach ($article_tags[$item->id] as $tag) {
-                    if (!in_array($tag->tag, $tags)) {
-                        $tags[] = $tag->tag;
-                        $tags_alias[$tag->tag] = $tag->alias;
-                        $tags_image[$tag->alias] = $tag->images;
-                        $tags_note[$tag->alias] = $tag->note;
-                        $tags_link[$tag->alias] = self::getTagLink($tag);
-                        $tags_parent[$tag->alias] = $tag->parent_title;
-                        $tags_parent_alias[$tag->alias] = $tag->parent_alias;
+                $iso->article_tags[$item->id] = self::getWebLinkTags($item->id, $authorised); // article's tags
+                foreach ($iso->article_tags[$item->id] as $tag) {
+                    if (!in_array($tag->tag, $iso->tags)) {
+                        $iso->tags[] = $tag->tag;
+                        $iso->tags_alias[$tag->tag] = $tag->alias;
+                        $iso->tags_image[$tag->alias] = $tag->images;
+                        $iso->tags_note[$tag->alias] = $tag->note;
+                        $iso->tags_link[$tag->alias] = self::getTagLink($tag);
+                        $iso->tags_parent[$tag->alias] = $tag->parent_title;
+                        $iso->tags_parent_alias[$tag->alias] = $tag->parent_alias;
                     }
-                    $tags_count[$tag->alias]++;
+                    $iso->tags_count[$tag->alias]++;
                 }
                 $info_cat = self::getCategoryName($item->catid);
-                if (!in_array($info_cat[0]->alias, $cats_alias)) {
-                    $cats_lib[$item->catid] = $info_cat[0]->title;
-                    $cats_alias[$item->catid] = $info_cat[0]->alias;
-                    $cats_note[$item->catid] = $info_cat[0]->note;
-                    $cats_params[$item->catid] = $info_cat[0]->params;
+                if (!in_array($info_cat[0]->alias, $iso->cats_alias)) {
+                    $iso->cats_lib[$item->catid] = $info_cat[0]->title;
+                    $iso->cats_alias[$item->catid] = $info_cat[0]->alias;
+                    $iso->cats_note[$item->catid] = $info_cat[0]->note;
+                    $iso->cats_params[$item->catid] = $info_cat[0]->params;
                 }
-                if (!in_array(substr($item->title, 0, 1), $alpha)) {
-                    $alpha[] = substr($item->title, 0, 1);
+                if (!in_array(substr($item->title, 0, 1), $iso->alpha)) {
+                    $iso->alpha[] = substr($item->title, 0, 1);
                 }
+                $iso->cats_count[$item->catid]++;
             }
             return $items;
         }
@@ -253,7 +254,7 @@ class SimpleIsotopeHelper
         $db->setQuery($query);
         return $db->loadObjectList();
     }
-    public static function getItems($categories, $params, $tags_list, &$tags, &$tags_alias, &$tags_note, &$tags_image, &$tags_link, &$tags_count, &$tags_parent, &$tags_parent_alias, &$cats_lib, &$cats_alias, &$cats_note, &$cats_params, &$article_tags, $module, &$fields, &$article_fields, &$article_fields_names, &$pagination, $start, $limit, $order, $rangefields, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange, &$alpha)
+    public static function getItems($params, $tags_list, &$iso, &$pagination, $start, $limit, $order, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange)
     {
 
         $articles     = new ArticlesModel(array('ignore_request' => true));
@@ -268,7 +269,7 @@ class SimpleIsotopeHelper
             $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
             $articles->setState('filter.access', $access);
             $articles->setState('filter.viewlevels', $authorised);
-            $catids = $categories;
+            $catids = $iso->categories;
             $articles->setState('filter.category_id', $catids);
             $articles->setState('filter.category_id.include', (bool) $params->get('category_filtering_type', 1));
             if (strpos((string)$order, 'ASC') !== false) {
@@ -387,18 +388,18 @@ class SimpleIsotopeHelper
                         continue;
                     }
                 }
-                $article_tags[$item->id] = $t_tags;
-                foreach ($article_tags[$item->id] as $tag) {
-                    if (!in_array($tag->tag, $tags)) {
-                        $tags[] = $tag->tag;
-                        $tags_alias[$tag->tag] = $tag->alias;
-                        $tags_image[$tag->alias] = $tag->images;
-                        $tags_note[$tag->alias] = $tag->note;
-                        $tags_link[$tag->alias] = self::getTagLink($tag);
-                        $tags_parent[$tag->alias] = $tag->parent_title;
-                        $tags_parent_alias[$tag->alias] = $tag->parent_alias;
+                $iso->article_tags[$item->id] = $t_tags;
+                foreach ($iso->article_tags[$item->id] as $tag) {
+                    if (!in_array($tag->tag, $iso->tags)) {
+                        $iso->tags[] = $tag->tag;
+                        $iso->tags_alias[$tag->tag] = $tag->alias;
+                        $iso->tags_image[$tag->alias] = $tag->images;
+                        $iso->tags_note[$tag->alias] = $tag->note;
+                        $iso->tags_link[$tag->alias] = self::getTagLink($tag);
+                        $iso->tags_parent[$tag->alias] = $tag->parent_title;
+                        $iso->tags_parent_alias[$tag->alias] = $tag->parent_alias;
                     }
-                    $tags_count[$tag->alias]++;
+                    $iso->tags_count[$tag->alias]++;
                 }
                 $params_fields = $params->get('displayfields');  // fields
                 $test = FieldsHelper::getFields('com_content.article', $item);
@@ -409,7 +410,7 @@ class SimpleIsotopeHelper
                             $alias_sort = FilterOutput::stringURLSafe((string)$val);
                         }
                     }
-                    if (($field->id == $rangefields) && ($field->value != "")) { // min/max range values
+                    if (($field->id == $iso->rangefields) && ($field->value != "")) { // min/max range values
                         $rangetitle = $field->title;
                         $rangelabel = $field->label;
                         $rangedesc = $field->description;
@@ -434,10 +435,10 @@ class SimpleIsotopeHelper
                                         if ($alias == "") {
                                             continue;
                                         }
-                                        $article_fields[$item->id][$field->title][] = $alias;
-                                        $article_fields_names[$item->id][$field->name][] = $alias;
-                                        if (!in_array($alias, $fields)) {
-                                            $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                        $iso->article_fields[$item->id][$field->title][] = $alias;
+                                        $iso->article_fields_names[$item->id][$field->name][] = $alias;
+                                        if (!in_array($alias, $iso->fields)) {
+                                            $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
                                         }
                                     }
                                 }
@@ -449,10 +450,10 @@ class SimpleIsotopeHelper
                                     if ($alias == "") {
                                         continue;
                                     }
-                                    $article_fields[$item->id][$field->title] = $alias;
-                                    $article_fields_names[$item->id][$field->name] = $alias;
-                                    if (!in_array($alias, $fields)) {
-                                        $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                    $iso->article_fields[$item->id][$field->title] = $alias;
+                                    $iso->article_fields_names[$item->id][$field->name] = $alias;
+                                    if (!in_array($alias, $iso->fields)) {
+                                        $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
                                     }
                                     $ix_field += 1;
                                 }
@@ -461,13 +462,13 @@ class SimpleIsotopeHelper
                     } else { // not an option field
                         if (is_string($val)) {
                             $alias =  FilterOutput::stringURLSafe((string)$val);
-                            if (!in_array($alias, $fields)) {
+                            if (!in_array($alias, $iso->fields)) {
                                 if ($alias == "") {
                                     continue;
                                 }
-                                $article_fields[$item->id][$field->title] = $alias;
-                                $article_fields_names[$item->id][$field->name] = $alias;
-                                $fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                $iso->article_fields[$item->id][$field->title] = $alias;
+                                $iso->article_fields_names[$item->id][$field->name] = $alias;
+                                $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
                             }
                         }
                     }
@@ -475,15 +476,16 @@ class SimpleIsotopeHelper
                         $item->displayDate = HTMLHelper::_('date', $field->value, $show_date_format);
                     }
                 }
-                if (!in_array($item->category_alias, $cats_alias)) {
-                    $cats_lib[$item->catid] = $item->category_title;
-                    $cats_alias[$item->catid] = $item->category_alias;
+                if (!in_array($item->category_alias, $iso->cats_alias)) {
+                    $iso->cats_lib[$item->catid] = $item->category_title;
+                    $iso->cats_alias[$item->catid] = $item->category_alias;
                     $infos = self::getCategoryName($item->catid);
-                    $cats_note[$item->catid] = $infos[0]->note;
-                    $cats_params[$item->catid] = $infos[0]->params;
+                    $iso->cats_note[$item->catid] = $infos[0]->note;
+                    $iso->cats_params[$item->catid] = $infos[0]->params;
                 }
-                if (!in_array(substr($item->title, 0, 1), $alpha)) {
-                    $alpha[] = substr($item->title, 0, 1);
+                $iso->cats_count[$item->catid]++;
+                if (!in_array(substr($item->title, 0, 1), $iso->alpha)) {
+                    $iso->alpha[] = substr($item->title, 0, 1);
                 }
                 $currentid++;
             }
@@ -546,7 +548,7 @@ class SimpleIsotopeHelper
         $link = Route::_(TagRouteHelper::getComponentTagRoute($tag->id . ':' . $tag->alias, $tag->language));
         return $link;
     }
-    
+
     public static function getTagTitle($id)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
@@ -666,12 +668,12 @@ class SimpleIsotopeHelper
         if ($count_matches == 0) {
             return '?';
         }
-        for($i = 0; $i < $count_matches; $i++) {
+        for ($i = 0; $i < $count_matches; $i++) {
             $phocacount	= $matches[0][$i][0];
             preg_match($regex_one, $phocacount, $phocacount_parts);
             $values = explode("=", $phocacount_parts[2], 2);
-            $id				= $values[1];
-            $db 			= Factory::getDBO();
+            $id		= $values[1];
+            $db     =  Factory::getContainer()->get(DatabaseInterface::class);
             $query = 'SELECT a.hits'
                     . ' FROM #__phocadownload AS a';
             $query .= ' WHERE a.id = '.(int)$id;
@@ -744,7 +746,7 @@ class SimpleIsotopeHelper
     // Check a tag is in the selected tags list
     public static function checkTagSet($tag, $filter)
     {
-        foreach($filter as $onefilter) {
+        foreach ($filter as $onefilter) {
             if ($onefilter[0]->tag == $tag) {
                 return true;
             }
@@ -770,7 +772,7 @@ class SimpleIsotopeHelper
         asort($aliasorder, SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL); // alpha order
         $onefilter = $aliasorder;
         $result = "";
-        if  (($displayfilterfields == "button")  || ($displayfilterfields == "multi") || ($displayfilterfields == "multiex")) {
+        if (($displayfilterfields == "button")  || ($displayfilterfields == "multi") || ($displayfilterfields == "multiex")) {
             if ($splitfieldstitle == "true") {
                 $result .= "<p class='iso_fields_title ".$col_width."' data-filter-group='".$group_lib."' data-group-id='".$group_id."' data-group-id='".$group_id."' data='".$module_id."'>". Text::_($group_title)."<br/>";
             }
@@ -987,7 +989,7 @@ class SimpleIsotopeHelper
             $splitfields = $params->get('displayfiltersplitfields', 'false'); // 1.3.4 : new parameter
             $displayfilterfields =  $params->get('displayfilterfields', 'button');
             $searchmultiex = "false";
-            if  (($article_cat_tag == "fields") && ($displayfilterfields == "multiex")) {
+            if (($article_cat_tag == "fields") && ($displayfilterfields == "multiex")) {
                 $searchmultiex = "true";
             }
             $ret = '{"entree":"'.$iso_entree.'","article_cat_tag":"'.$article_cat_tag.'","default_tag":"'.$default_tag.'",';
@@ -1083,7 +1085,7 @@ class SimpleIsotopeHelper
 
             $scripts = [];
             if (count($app->getDocument()->_scripts) > 0) { // scripts
-                foreach($app->getDocument()->_scripts as $key => $val) {
+                foreach ($app->getDocument()->_scripts as $key => $val) {
                     $scripts[] = $key;
                 }
             }
@@ -1091,7 +1093,7 @@ class SimpleIsotopeHelper
             $item->scripts = $scripts;
             $css = [];
             if (count($app->getDocument()->_styleSheets) > 0) { // scripts
-                foreach($app->getDocument()->_styleSheets as $key => $val) {
+                foreach ($app->getDocument()->_styleSheets as $key => $val) {
                     $css[] = $key;
                 }
             }

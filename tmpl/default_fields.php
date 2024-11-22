@@ -24,6 +24,7 @@ $defaultdisplay = $params->get('defaultdisplay', 'date_desc');
 $displaysortinfo = $params->get('displaysortinfo', 'show');
 $article_cat_tag = $params->get('cat_or_tag');
 $catsfilterimg =  $params->get('catsfilterimg', 'false');
+$catsfiltercount =  $params->get('catsfiltercount', 'false');
 $displayfilter =  $params->get('displayfilter_f', 'button');
 $tagsfilterorder = $params->get('tagsfilterorder', 'false');
 $tagsfilterparent =  $params->get('tagsfilterparent', 'false');
@@ -364,13 +365,13 @@ if ($displayfilterfields != "hide") {
                 $alias[$filter[0]->tag] = $filter[0]->alias;
             }
         } else { // empty tags list: take all tags found in articles
-            foreach ($tags as $key => $value) {
+            foreach ($iso->tags as $key => $value) {
                 if ($tagsfilterparent == "true") {
-                    $sortFilter[] = $tags_parent_alias[$value]."&".$value;
+                    $sortFilter[] = $iso->tags_parent_alias[$value]."&".$value;
                 } else {
                     $sortFilter[] = "&".$value;
                 }
-                $alias[$value] = $tags_alias[$value];
+                $alias[$value] = $iso->tags_alias[$value];
             }
         }
         if ($tagsfilterorder == "false") {
@@ -406,7 +407,7 @@ if ($displayfilterfields != "hide") {
                     $cur_parent = $parent;
                     $filter_tag_div .= '<div class="isotope_button-group filter-button-group-tags" data-filter-group="tags" data="'.$module->id.'">';
                     if ($tagsfilterparentlabel == "true") {
-                        $filter_tag_div .= '<p class="iso_tags_parent_title">'.$tags_parent[$alias[$filter]].'</p>';
+                        $filter_tag_div .= '<p class="iso_tags_parent_title">'.$iso->tags_parent[$alias[$filter]].'</p>';
                     }
                 }
                 $aff = $filter;
@@ -414,7 +415,7 @@ if ($displayfilterfields != "hide") {
                 if (!is_null($aff)) {
                     $img = "";
                     if ($tagsfilterimg == "true") {
-                        $tagimage  = json_decode($tags_image[$aff_alias]);
+                        $tagimage  = json_decode($iso->tags_image[$aff_alias]);
                         if ((is_object($tagimage) && property_exists($tagimage, 'image_fulltext') || property_exists($tagimage, 'image_intro'))) {
                             if ($tagimage->image_intro != "") {
                                 $img = '<img src="'.URI::root().$tagimage->image_intro.'" style="float:'.$tagimage->float_intro.'" 
@@ -431,9 +432,9 @@ if ($displayfilterfields != "hide") {
                     }
                     $tagcount = '';
                     if ($tagsfiltercount == 'true') {
-                        $tagcount = '<span class="tag-count badge bg-info">'.$tags_count[$aff_alias].'</span>';
+                        $tagcount = '<span class="tag-count badge bg-info">'.$iso->tags_count[$aff_alias].'</span>';
                     }
-                    $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$tags_note[$aff_alias].'"/>'.$img.Text::_($aff).$tagcount.'</button>';
+                    $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$iso->tags_note[$aff_alias].'"/>'.$img.Text::_($aff).$tagcount.'</button>';
                 }
             }
             if ($tagsfilterparent == "true") {
@@ -471,7 +472,7 @@ if ($displayfilterfields != "hide") {
                 $aff_alias = $alias[$filter];
                 $tagcount = '';
                 if ($tagsfiltercount == 'true') {
-                     $tagcount = ' ('.$tags_count[$aff_alias].') ';
+                     $tagcount = ' ('.$iso->tags_count[$aff_alias].') ';
                 }
                 if (!is_null($aff)) {
                     $selected = "";
@@ -492,22 +493,22 @@ if ($displayfilterfields != "hide") {
 
     if (($article_cat_tag  == "catfields") || ($article_cat_tag  == "cattagsfields")) {
         $filter_cat_div = "";
-        if (is_null($categories)) {
-            $keys = array_keys($cats_lib);
+        if (is_null($iso->categories)) {
+            $keys = array_keys($iso->cats_lib);
             $filters['cat'] = $keys;
         } else {
-            $filters['cat'] = $categories;
+            $filters['cat'] = $iso->categories;
         }
         $sortFilter = array();
         // category alias parameter
         if ($params->get('catfilteralias', 'false') == 'true') { // sort category aliases
-            foreach ($cats_alias as $key => $filter) {
-                $sortFilter[$key] = $cats_alias[$key];
+            foreach ($iso->cats_alias as $key => $filter) {
+                $sortFilter[$key] = $iso->cats_alias[$key];
             }
         } else { // sort category names
             foreach ($filters['cat'] as $filter) {
-                if (array_key_exists($filter, $cats_lib)) { // 30/09/2021
-                    $sortFilter[$filter] = $cats_lib[$filter];
+                if (array_key_exists($filter, $iso->cats_lib)) { 
+                    $sortFilter[$filter] = $iso->cats_lib[$filter];
                 }
             }
         }
@@ -529,8 +530,8 @@ if ($displayfilterfields != "hide") {
             }
             $filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_tout '.$checked.'" data-sort-value="*" />'.$liball.'</button>';
             foreach ($sortFilter as $key => $filter) {
-                $aff = $cats_lib[$key];
-                $aff_alias = $cats_alias[$key];
+                $aff = $iso->cats_lib[$key];
+                $aff_alias = $iso->cats_alias[$key];
                 if (!is_null($aff)) {
                     $checked = "";
                     if ($default_cat == $aff_alias) {
@@ -538,13 +539,17 @@ if ($displayfilterfields != "hide") {
                     }
                     $img = "";
                     if ($catsfilterimg == "true") {
-                        $catparam  = json_decode($cats_params[$key]);
+                        $catparam  = json_decode($iso->cats_params[$key]);
                         if ($catparam->image != "") {
                             $img = '<img src="'.URI::root().$catparam->image.'"  
 							class="iso_cat_img" alt="'.$catparam->image_alt.'" /> '; // pascal
                         }
                     }
-                    $filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$cats_note[$key].'"/>'.$img.Text::_($aff).'</button>';
+                    $catcount = '';
+                    if ($catsfiltercount == 'true') {
+                        $catcount = '<span class="cat-count badge bg-info">'.$iso->cats_count[$key].'</span>';
+                    }
+                    $filter_cat_div .= '<button class="'.$button_bootstrap.'  iso_button_cat_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$iso->cats_note[$key].'"/>'.$img.Text::_($aff).$catcount.'</button>';
                 }
             }
             $filter_cat_div .= '</div>';
@@ -579,14 +584,18 @@ if ($displayfilterfields != "hide") {
             $options = array();
             $options['']['items'][] = ModulesHelper::createOption('', $liball);
             foreach ($sortFilter as $key => $filter) {
-                $aff = $cats_lib[$key];
-                $aff_alias = $cats_alias[$key];
+                $aff = $iso->cats_lib[$key];
+                $aff_alias = $iso->cats_alias[$key];
                 if (!is_null($aff)) {
                     $selected = "";
                     if ($default_cat == $aff_alias) {
                         $selected = "selected";
                     }
-                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff));
+                    $catcount = '';
+                    if ($catsfiltercount == 'true') {
+                        $catcount = ' ('.$iso->cats_count[$key].') ';
+                    }
+                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff).$catcount);
                 }
             }
             $filter_cat_div .= '<joomla-field-fancy-select '.implode(' ', $attributes).'>';
@@ -598,11 +607,11 @@ if ($displayfilterfields != "hide") {
     if ($splitfields == "true") { // split fields buttons per field
         $group = array();
         $group_label = array();
-        foreach ($article_fields_names as $key_article => $one) {
+        foreach ($iso->article_fields_names as $key_article => $one) {
             foreach ($one as $key => $onefield) {
                 if (is_array($onefield)) { // multiple values field
                     foreach ($onefield as $oneobj) {
-                        $obj = $fields[$oneobj];
+                        $obj = $iso->fields[$oneobj];
                         if ((count($params_fields) > 0)  &&  (!in_array($obj->field_id, $params_fields))) {
                             continue;
                         }
@@ -620,7 +629,7 @@ if ($displayfilterfields != "hide") {
                         $group[$key] = $val;
                     }
                 } else { // single value field
-                    $obj = $fields[$onefield];
+                    $obj = $iso->fields[$onefield];
                     if ((count($params_fields) > 0)  &&  (!in_array($obj->field_id, $params_fields))) {
                         continue;
                     }
@@ -679,7 +688,7 @@ if ($displayfilterfields != "hide") {
             $group_id = $onegroup[$first]->field_id;
             $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'" data="'.$module->id.'">';
 
-            $filter_div .= IsotopeHelper::create_buttons($fields, $group_lib, $onegroup, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_label[$group_lib], $group_id, $module->id);
+            $filter_div .= IsotopeHelper::create_buttons($iso->fields, $group_lib, $onegroup, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_label[$group_lib], $group_id, $module->id);
             $filter_div .= "</div>";
         }
         if ($params->get('splitfieldscolumn', 'false') == "true") {
@@ -690,7 +699,7 @@ if ($displayfilterfields != "hide") {
         $width = $layouts['field']->div_width;
         $col_width = "col-md-".$width." col-12";
         $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
-        $filter_div .=  IsotopeHelper::create_buttons($fields, 'fields', $fields, $params, $col_width, $button_bootstrap, 'false', 'fields', 0, $module->id);
+        $filter_div .=  IsotopeHelper::create_buttons($iso->fields, 'fields', $iso->fields, $params, $col_width, $button_bootstrap, 'false', 'fields', 0, $module->id);
         $filter_div .= "</div>";
     }
 }
@@ -713,18 +722,18 @@ foreach ($list as $key => $category) {
         $tag_img = "";
         $cat_img = "";
         if (($article_cat_tag  == "tagsfields") || ($article_cat_tag  == "cattagsfields")) { // filtre
-            foreach ($article_tags[$item->id] as $tag) {
+            foreach ($iso->article_tags[$item->id] as $tag) {
                 $isdefined = false; // supposed not found
                 if (($params->get('tagsmissinghidden', 'false') == 'false') || ($params->get('pagination', 'false') != 'false')) {
                     $isdefined = true;
                 } // don't check => ok
-                foreach ($article_tags[$item->id] as $tag) {
+                foreach ($iso->article_tags[$item->id] as $tag) {
                     // ignore tags not defined in the tags list if tagsmissinghidden param is set
                     if ($tags_list && (count($tags_list) > 0) && ($params->get('tagsmissinghidden', 'false') == 'true')) {
                         $isdefined = IsotopeHelper::checkTagSet($tag->tag, $filters['tags']);
                     }
-                    $tag_display .= " ".$tags_alias[$tag->tag];
-                    $tagimage  = json_decode($tags_image[$tags_alias[$tag->tag]]);
+                    $tag_display .= " ".$iso->tags_alias[$tag->tag];
+                    $tagimage  = json_decode($iso->tags_image[$iso->tags_alias[$tag->tag]]);
                     if (!$tagimage) {
                         continue;
                     }
@@ -744,25 +753,25 @@ foreach ($list as $key => $category) {
                 } // not in list : ignore it
             }
         }
-        $cat_params = json_decode($cats_params[$item->catid]);
+        $cat_params = json_decode($iso->cats_params[$item->catid]);
         if (($cat_params) && ($cat_params->image != "")) {
             $cat_img = "<img src='".URI::root().$cat_params->image."' alt='".$cat_params->image_alt."' class='iso_cat_img_art'/>";
         }
         $field_value = "";
         $field_cust = array();
         $data_range = "";
-        if (isset($article_fields) and array_key_exists($item->id, $article_fields)) {
-            foreach ($article_fields[$item->id] as $key_f => $tag_f) {
+        if (isset($iso->article_fields) and array_key_exists($item->id, $iso->article_fields)) {
+            foreach ($iso->article_fields[$item->id] as $key_f => $tag_f) {
                 if (is_array($tag_f)) { // multiple answers
                     $afield = "";
                     foreach ($tag_f as $avalue) {
-                        $obj = $fields[$avalue];
+                        $obj = $iso->fields[$avalue];
                         $afield .= $afield == "" ? $obj->render : ", ".$obj->render;
                     }
                     $field_cust['{'.$key_f.'}'] = (string)$afield;
                     $field_value .= " ".implode(' ', $tag_f);
                 } else { // one field
-                    $obj = $fields[$tag_f];
+                    $obj = $iso->fields[$tag_f];
                     if ((count($params_fields) == 0) ||  (in_array($obj->field_id, $params_fields))) {
                         $field_value .= " ".$tag_f;
                     }
@@ -790,19 +799,19 @@ foreach ($list as $key => $category) {
             }
         }
         $itemtags = "<span class='iso-tags' data='".$module->id."'>";
-        foreach ($article_tags[$item->id] as $tag) {
+        foreach ($iso->article_tags[$item->id] as $tag) {
             $iso_link_cls = "";
             $iso_link_sort = "";
             if ($tagsfilterlink == 'joomla') { // joomla link to tag component
-                $iso_link_cls = $tags_link[$tag->alias] ? " iso_tag_link" : "";
+                $iso_link_cls = $iso->tags_link[$tag->alias] ? " iso_tag_link" : "";
             }
             if ($tagsfilterlink == 'iso') { // isotope filtering
                 $iso_link_sort = ' data-sort-value="'.$tag->alias.'"';
                 $iso_link_cls = ' iso_tag_link';
             }
-            $itemtags .= '<span class="iso_tag_'.$tags_alias[$tag->tag].$iso_link_cls.'"'.$iso_link_sort.'>';
+            $itemtags .= '<span class="iso_tag_'.$iso->tags_alias[$tag->tag].$iso_link_cls.'"'.$iso_link_sort.'>';
             if ($tagsfilterlink == 'joomla') { // joomla link to tag component
-                $itemtags .= '<a href="'.$tags_link[$tag->alias].'"  target="_blank">';
+                $itemtags .= '<a href="'.$iso->tags_link[$tag->alias].'"  target="_blank">';
             }
             if ($tagsfilterlink == 'iso') { // isotope link 
                 $itemtags .= '<a href="" class="'.$tagsfilterlinkcls.'">';
@@ -869,7 +878,7 @@ foreach ($list as $key => $category) {
         $libdate = $choixdate == "modified" ? $libupdated : ($choixdate == "created" ? $libcreated : $libpublished);
         $perso = $params->get('perso');
         $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount); // suppress null field if required
-        $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $cats_lib[$item->catid],"{date}" => $libdate.date($libdateformat, strtotime($item->displayDate)),"{create}" => HTMLHelper::_('date', $item->created, $libotherdateformat),"{pub}" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"{modif}" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "{visit}" => $item->hits, "{intro}" => $item->displayIntrotext,"{stars}" => $rating,"{rating}" => $item->rating,"{ratingcnt}" => $item->rating_count,"{count}" => $phocacount,"{tagsimg}" => $tag_img, "{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured);
+        $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $iso->cats_lib[$item->catid],"{date}" => $libdate.date($libdateformat, strtotime($item->displayDate)),"{create}" => HTMLHelper::_('date', $item->created, $libotherdateformat),"{pub}" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"{modif}" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "{visit}" => $item->hits, "{intro}" => $item->displayIntrotext,"{stars}" => $rating,"{rating}" => $item->rating,"{ratingcnt}" => $item->rating_count,"{count}" => $phocacount,"{tagsimg}" => $tag_img, "{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured);
         foreach ($arr_css as $key_c => $val_c) {
             $perso = str_replace($key_c, Text::_($val_c), $perso);
         }
@@ -921,7 +930,7 @@ if ($displayalpha != "false") {
         $awidth = 12;
     }
     $isotope_alpha_div = '<div class="isotope_button-group filter-button-group-alpha iso_alpha col-md-'.$awidth.' col-12 '.$layouts["alpha"]->div_align.'" data-filter-group="alpha" data="'.$module->id.'">';
-    $isotope_alpha_div .= IsotopeHelper::create_alpha_buttons($alpha, $button_bootstrap);
+    $isotope_alpha_div .= IsotopeHelper::create_alpha_buttons($iso->alpha, $button_bootstrap);
     $isotope_alpha_div .= '</div>';
 }
 // =============================Lang. filter ============================================//

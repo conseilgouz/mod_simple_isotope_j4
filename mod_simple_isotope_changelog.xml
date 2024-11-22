@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.3</version>
+        <note>
+            <item>Update : 22/11/2024</item>
+        </note>
+		<addition>
+            <item>Category : new parameter : show-hide category counters</item>
+		</addition>
+		<change>
+            <item>Helper : change parameters calls to be an object</item>
+		</change>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.2</version>
         <note>
             <item>Update : 21/11/2024</item>

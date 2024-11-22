@@ -58,9 +58,9 @@ if ($displaybootstrap == 'true') {
 $imgmaxwidth =  $params->get('introimg_maxwidth', '0');
 $imgmaxheight =  $params->get('introimg_maxheight', '0');
 
+
 $displayrange =  $params->get('displayrange', 'false');
 $displayalpha =  $params->get('displayalpha', 'false');
-$rangefields =   $params->get('rangefields', '');
 $rangestep =   $params->get('rangestep', '0');
 $minrange = '';
 $maxrange = '';
@@ -68,50 +68,53 @@ $rangetitle =  '';
 $rangelabel =  '';
 $rangedesc =  '';
 
-$tags = array();
-$tags_alias = array();
-$tags_image = array();
-$tags_parent = array();
-$tags_note = array();
-$tags_link = array();
-$tags_count = array();
-$tags_parent_alias = array();
-$fields = array();
-$cats_lib = array();
-$cats_alias = array();
-$cats_note = array();
-$cats_params = array();
-$article_fields = array();
-$article_fields_names = array();
-$alpha = array();
-$article_tags = array();
+$iso = new \StdClass();
+$iso->rangefields =   $params->get('rangefields', '');
+$iso->tags = array();
+$iso->tags_alias = array();
+$iso->tags_image = array();
+$iso->tags_parent = array();
+$iso->tags_note = array();
+$iso->tags_link = array();
+$iso->tags_count = array();
+$iso->tags_parent_alias = array();
+$iso->fields = array();
+$iso->cats_lib = array();
+$iso->cats_alias = array();
+$iso->cats_note = array();
+$iso->cats_count = array();
+$iso->cats_params = array();
+$iso->article_fields = array();
+$iso->article_fields_names = array();
+$iso->alpha = array();
+$iso->article_tags = array();
 
 if ($iso_entree == "webLinks") {
-    $categories = $params->get('wl_categories');
+    $iso->categories = $params->get('wl_categories');
     $weblinks_params = ComponentHelper::getParams('com_weblinks');
-    $list = IsotopeHelper::getWebLinks($params, $weblinks_params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $article_tags, $cats_lib, $cats_alias, $cats_note, $cats_params, $fields, $article_fields, $article_fields_names, $rangefields, $alpha);
+    $list = IsotopeHelper::getWebLinks($params, $weblinks_params, $tags_list, $iso);
     if (!$list) {
         return false;
     } // on a eu une erreur: on sort
 } else {
-    $categories = $params->get('categories');
-    if (is_null($categories)) {
+    $iso->categories = $params->get('categories');
+    if (is_null($iso->categories)) {
         $res = IsotopeHelper::getAllCategories($params);
-        $categories = array();
+        $iso->categories = array();
         foreach ($res as $catid) {
             if ($catid->count > 0) {
-                $categories[] = $catid->id;
+                $iso->categories[] = $catid->id;
             }
         }
     }
     if ($params->get("pagination", "false") != 'false') {
         // -> get all categories infos
-        foreach ($categories as $catid) {
+        foreach ($iso->categories as $catid) {
             $infos = IsotopeHelper::getCategoryName($catid);
-            $cats_lib[$catid] = $infos[0]->title;
-            $cats_alias[$catid] = $infos[0]->alias;
-            $cats_note[$catid] = $infos[0]->note;
-            $cats_params[$catid] = $infos[0]->params;
+            $iso->cats_lib[$catid] = $infos[0]->title;
+            $iso->cats_alias[$catid] = $infos[0]->alias;
+            $iso->cats_note[$catid] = $infos[0]->note;
+            $iso->cats_params[$catid] = $infos[0]->params;
         }
         $limit = (int) $params->get("page_count", 0);
         $order =  $params->get("page_order", "a.ordering");
@@ -141,20 +144,20 @@ if ($iso_entree == "webLinks") {
         $tags_list = [];
     }
     $pagination = "";
-    $list[] = IsotopeHelper::getItems($categories, $params, $tags_list, $tags, $tags_alias, $tags_note, $tags_image, $tags_link, $tags_count, $tags_parent, $tags_parent_alias, $cats_lib, $cats_alias, $cats_note, $cats_params, $article_tags, $module, $fields, $article_fields, $article_fields_names, $pagination, $limitstart, $limit, $order, $rangefields, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange, $alpha);
+    $list[] = IsotopeHelper::getItems($params, $tags_list, $iso, $pagination, $limitstart, $limit, $order, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange);
 }
 // pagination : check tags_list to add missing tags in the list
 if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
     $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
     $missings = IsotopeHelper::getMissingTags($tags_list, $authorised);
     foreach ($missings as $tag) {
-        if (!in_array($tag->tag, $tags)) {
-            $tags[] = $tag->tag;
-            $tags_alias[$tag->tag] = $tag->alias;
-            $tags_image[$tag->alias] = $tag->images;
-            $tags_note[$tag->alias] = $tag->note;
-            $tags_parent[$tag->alias] = $tag->parent_title;
-            $tags_parent_alias[$tag->alias] = $tag->parent_alias;
+        if (!in_array($tag->tag, $iso->tags)) {
+            $iso->tags[] = $tag->tag;
+            $iso->tags_alias[$tag->tag] = $tag->alias;
+            $iso->tags_image[$tag->alias] = $tag->images;
+            $iso->tags_note[$tag->alias] = $tag->note;
+            $iso->tags_parent[$tag->alias] = $tag->parent_title;
+            $iso->tags_parent_alias[$tag->alias] = $tag->parent_alias;
         }
     }
 }
@@ -270,7 +273,7 @@ $displayfilter =  $params->get('displayfilter', 'button');
 if ($iso_entree == "webLinks") {
     $default_cat = $params->get('default_cat_wl', '');
     if (($default_cat != "") && ($default_cat != "none")) {
-        $default_cat = $cats_alias[$params->get('default_cat_wl')];
+        $default_cat = $iso->cats_alias[$params->get('default_cat_wl')];
     }
     $default_tag = $params->get('default_tag', '');
     if (($default_tag != "") && ($default_tag != "none")) {
@@ -280,7 +283,7 @@ if ($iso_entree == "webLinks") {
 } else {
     $default_cat = $params->get('default_cat', '');
     if (($default_cat != "") && ($default_cat != "none")) {
-        $default_cat = $cats_alias[$params->get('default_cat')];
+        $default_cat = $iso->cats_alias[$params->get('default_cat')];
     }
     $default_tag = $params->get('default_tag', '');
     if (($default_tag != "") && ($default_tag != "none")) {
