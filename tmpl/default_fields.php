@@ -768,14 +768,16 @@ foreach ($list as $key => $category) {
                         $obj = $iso->fields[$avalue];
                         $afield .= $afield == "" ? $obj->render : ", ".$obj->render;
                     }
-                    $field_cust['{'.$key_f.'}'] = (string)$afield;
+                    $field_cust[$key_f] = (string)$afield;
+                    $field_cust['field '.$obj->field_id] = (string)$afield;
                     $field_value .= " ".implode(' ', $tag_f);
                 } else { // one field
                     $obj = $iso->fields[$tag_f];
                     if ((count($params_fields) == 0) ||  (in_array($obj->field_id, $params_fields))) {
                         $field_value .= " ".$tag_f;
                     }
-                    $field_cust['{'.$key_f.'}'] = (string)$obj->render; // field display value
+                    $field_cust[$key_f] = (string)$obj->render; 
+                    $field_cust['field '.$obj->field_id] = (string)$obj->render; 
                 }
                 if (($displayrange == "true") && ($key_f == $rangetitle)  && isset($obj->val)) {
                     $data_range = " data-range='".$obj->val."' ";
@@ -814,7 +816,7 @@ foreach ($list as $key => $category) {
                 $itemtags .= '<a href="'.$iso->tags_link[$tag->alias].'"  target="_blank">';
             }
             if ($tagsfilterlink == 'iso') { // isotope link 
-                $itemtags .= '<a href="" class="'.$tagsfilterlinkcls.'">';
+                $itemtags .= '<a href="" class="text-decoration-none '.$tagsfilterlinkcls.'">';
             }
             $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
             if ($tagsfilterlink == 'joomla' || $tagsfilterlink == 'iso') { // joomla link to tag component
@@ -873,19 +875,25 @@ foreach ($list as $key => $category) {
         for ($i = 1; $i <= $item->rating; $i++) {
             $rating .= '<img src='.$modulefield.'images/icon.png />';
         }
-        $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext);
+        $deb = '{';
+        $end = '}';
+        if ($params->get('bracket', 'bracket') == 'squarred') {
+            $deb = '[';
+            $end = ']';
+        }
+        $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext,$deb,$end);
         $choixdate = $params->get('choixdate', 'modified');
         $libdate = $choixdate == "modified" ? $libupdated : ($choixdate == "created" ? $libcreated : $libpublished);
         $perso = $params->get('perso');
-        $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount); // suppress null field if required
-        $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $iso->cats_lib[$item->catid],"{date}" => $libdate.date($libdateformat, strtotime($item->displayDate)),"{create}" => HTMLHelper::_('date', $item->created, $libotherdateformat),"{pub}" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"{modif}" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "{visit}" => $item->hits, "{intro}" => $item->displayIntrotext,"{stars}" => $rating,"{rating}" => $item->rating,"{ratingcnt}" => $item->rating_count,"{count}" => $phocacount,"{tagsimg}" => $tag_img, "{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured);
+        $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount,$deb,$end); // suppress null field if required
+        $arr_css = array("id" => $item->id,"title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libdate.date($libdateformat, strtotime($item->displayDate)),"create" => HTMLHelper::_('date', $item->created, $libotherdateformat),"pub" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"modif" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "visit" => $item->hits, "intro" => $item->displayIntrotext,"stars" => $rating,"rating" => $item->rating,"ratingcnt" => $item->rating_count,"count" => $phocacount,"tagsimg" => $tag_img, "catsimg" => $cat_img, "link" => $item->link, "introimg" => $item->introimg, "subtitle" => $item->subtitle, "new" => $item->new, "tags" => $itemtags,"featured" => $item->featured);
         foreach ($arr_css as $key_c => $val_c) {
-            $perso = str_replace($key_c, Text::_($val_c), $perso);
+            $perso = str_replace($deb.$key_c.$end, Text::_($val_c), $perso);
         }
         foreach ($field_cust as $key_f => $val_f) { // display fields values
-            $perso = str_replace($key_f, Text::_($val_f), $perso);
+            $perso = str_replace($deb.$key_f.$end, Text::_($val_f), $perso);
         }
-        $perso = IsotopeHelper::checkNoField($perso); // suppress empty fields
+        $perso = IsotopeHelper::checkNoField($perso,$deb,$end); // suppress empty fields
         // apply content plugins
         $app = Factory::getApplication(); // Joomla 4.0
         $item_cls = new \stdClass();

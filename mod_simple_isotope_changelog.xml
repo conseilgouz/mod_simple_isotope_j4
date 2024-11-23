@@ -2,6 +2,23 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.4</version>
+        <note>
+            <item>Update : 23/11/2024</item>
+        </note>
+        <addition>
+            <item>New parameter : brackets for predefined fields in display customization</item>
+        </addition>
+        <fix>
+            <item>custom display : field fieldid tag not working</item>
+        </fix>
+        <change>
+            <item>Iso Tag links in article detail : no underline</item>
+        </change>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.3</version>
         <note>
             <item>Update : 22/11/2024</item>

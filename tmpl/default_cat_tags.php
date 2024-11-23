@@ -695,14 +695,16 @@ foreach ($list as $key => $category) {
                             $obj = $iso->fields[$avalue];
                             $afield .= $afield == "" ? $obj->render : ", ".$obj->render;
                         }
-                        $field_cust['{'.$key_f.'}'] = (string)$afield;
+                        $field_cust[$key_f] = (string)$afield;
+                        $field_cust['field '.$obj->field_id] = (string)$afield; // field display value, PHP 8
                         $field_value .= " ".implode(' ', $tag_f);
                     } else { // one field
                         $obj = $iso->fields[$tag_f];
                         if ((count($params_fields) == 0) ||  (in_array($obj->field_id, $params_fields))) {
                             $field_value .= " ".$tag_f;
                         }
-                        $field_cust['{'.$key_f.'}'] = (string)$obj->render; // field display value
+                        $field_cust[$key_f] = (string)$obj->render; // field display value
+                        $field_cust['field '.$obj->field_id] = (string)$obj->render; // field display value, PHP 8
                     }
                     if (($displayrange == "true") && ($key_f == $rangetitle)  && isset($obj->val)) {
                         $data_range = " data-range='".$obj->val."' ";
@@ -725,7 +727,7 @@ foreach ($list as $key => $category) {
                     $itemtags .= '<a href="'.$iso->tags_link[$tag->alias].'"  target="_blank">';
                 }
                 if ($tagsfilterlink == 'iso') { // isotope link
-                    $itemtags .= '<a href="" class="'.$tagsfilterlinkcls.'">';
+                    $itemtags .= '<a href="" class="text-decoration-none '.$tagsfilterlinkcls.'">';
                 }
                 $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
                 if ($tagsfilterlink == 'joomla' || $tagsfilterlink == 'iso') { // joomla link to tag component
@@ -766,6 +768,12 @@ foreach ($list as $key => $category) {
                     $item->subtitle = '<small>'.trim($item->subtitle).'</small>';
                 }
             }
+            $deb = '{';
+            $end = '}';
+            if ($params->get('bracket', 'bracket') == 'squarred') {
+                $deb = '[';
+                $end = ']';
+            }
             if ($iso_entree == "webLinks") {
                 $canEdit = $user->authorise('core.edit', 'com_weblinks.category.' . $item->catid);
                 if ($canEdit) {
@@ -781,12 +789,12 @@ foreach ($list as $key => $category) {
                 }
 
                 $perso = $params->get('perso');
-                $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $iso->cats_lib[$item->catid],"{date}" => $libcreated.date($libdateformat, strtotime($item->created)), "{visit}" => $item->hits, "{intro}" => $item->description,"{tagsimg}" => $tag_img,"{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new, "{tags}" => $itemtags,"{featured}" => $item->featured,"{url}" => $item->url);
+                $arr_css = array("id" => $item->id,"title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libcreated.date($libdateformat, strtotime($item->created)), "visit" => $item->hits, "intro" => $item->description,"tagsimg" => $tag_img,"catsimg" => $cat_img, "link" => $item->link, "introimg" => $item->introimg, "subtitle" => $item->subtitle, "new" => $item->new, "tags" => $itemtags,"featured" => $item->featured,"url" => $item->url);
                 foreach ($arr_css as $key_c => $val_c) {
-                    $perso = str_replace($key_c, Text::_($val_c), $perso);
+                    $perso = str_replace($deb.$key_c.$end, Text::_($val_c), $perso);
                 }
                 foreach ($field_cust as $key_f => $val_f) { // affichage du contenu des champs personnalises
-                    $perso = str_replace($key_f, Text::_($val_f), $perso);
+                    $perso = str_replace($deb.$key_f.$end, Text::_($val_f), $perso);
                 }
                 // apply content plugins on weblinks
                 $app = Factory::getApplication(); // Joomla 4.0
@@ -815,7 +823,7 @@ foreach ($list as $key => $category) {
                 for ($i = 1; $i <= $item->rating; $i++) {
                     $rating .= '<img src='.$modulefield.'images/icon.png />';
                 }
-                $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext);
+                $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext,$deb,$end);
                 $choixdate = $params->get('choixdate', 'modified');
                 $libdate = "";
                 if (!is_numeric($choixdate)) {
@@ -823,15 +831,15 @@ foreach ($list as $key => $category) {
                 }
                 $perso = $params->get('perso');
                 $rating_count = isset($item->rating_count) ? $item->rating_count : 0;
-                $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount); // suppress null field if required
-                $arr_css = array("{id}" => $item->id,"{title}" => $title, "{cat}" => $iso->cats_lib[$item->catid],"{date}" => $libdate.date($libdateformat, strtotime($item->displayDate)),"{create}" => HTMLHelper::_('date', $item->created, $libotherdateformat),"{pub}" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"{modif}" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "{visit}" => $item->hits, "{intro}" => $item->displayIntrotext,"{stars}" => $rating,"{rating}" => $item->rating,"{ratingcnt}" => $rating_count,"{count}" => $phocacount,"{tagsimg}" => $tag_img, "{catsimg}" => $cat_img, "{link}" => $item->link, "{introimg}" => $item->introimg, "{subtitle}" => $item->subtitle, "{new}" => $item->new , "{tags}" => $itemtags,"{featured}" => $item->featured);
+                $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount,$deb,$end); // suppress null field if required
+                $arr_css = array("id" => $item->id,"title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libdate.date($libdateformat, strtotime($item->displayDate)),"create" => HTMLHelper::_('date', $item->created, $libotherdateformat),"pub" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"modif" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "visit" => $item->hits, "intro" => $item->displayIntrotext,"stars" => $rating,"rating" => $item->rating,"ratingcnt" => $rating_count,"count" => $phocacount,"tagsimg" => $tag_img, "catsimg" => $cat_img, "link" => $item->link, "introimg" => $item->introimg, "subtitle" => $item->subtitle, "new" => $item->new , "tags" => $itemtags,"featured" => $item->featured);
                 foreach ($arr_css as $key_c => $val_c) {
-                    $perso = str_replace($key_c, Text::_($val_c), $perso);
+                    $perso = str_replace($deb.$key_c.$end, Text::_($val_c), $perso);
                 }
                 foreach ($field_cust as $key_f => $val_f) { // affichage du contenu des champs personnalisees
-                    $perso = str_replace($key_f, Text::_($val_f), $perso);
+                    $perso = str_replace($deb.$key_f.$end, Text::_($val_f), $perso);
                 }
-                $perso = IsotopeHelper::checkNoField($perso); // suppress empty fields
+                $perso = IsotopeHelper::checkNoField($perso,$deb,$end); // suppress empty fields
                 // apply content plugins
                 $app = Factory::getApplication();
                 $item_cls = new \stdClass();

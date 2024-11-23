@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.4.3</version>
+	<version>4.4.4</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -614,9 +614,15 @@
 				<field showon="iso_entree!:cgisotope" name="formatotherdate" type="text" label="SSISO_FORMAT_OTHERDATE" description ="SSISO_FORMAT_OTHERDATE_DESC" 
 					default="d/m/Y"  />
 			    <field showon="iso_entree!:cgisotope" type="note" name="note1" label="SSISO_NOTE1" heading="p" />
+                <field	name="bracket" showon="iso_entree!:cgisotope"
+                    type="radio" class="btn-group btn-group-yesno clear" default="bracket"
+                    label="SSISO_BRACKET" description="SSISO_BRACKET_DESC" >
+                    <option value="bracket">SSISO_BRACKET_STD</option> 
+                    <option value="squarred">SSISO_BRACKET_SQUARRED</option> 
+                </field>
 				<field showon="iso_entree!:cgisotope" name="perso" type="textarea" label="SSISO_PERSO" description="SSISO_PERSO_DESC" cols="400" rows="4" filter="raw" 
 					default="{title}&lt;br&gt;{date} - {cat} - {visit} visites&lt;br&gt;{intro}"
-					/>			
+					/>
 				<field showon="iso_entree!:cgisotope" name="css" type="textarea" label="SSISO_CSS" description="SSISO_CSS_DESC" cols="400" rows="4" filter="raw" 
 					default="@media screen and (max-width: 600px) {.isotope_item img{max-width:100% !important} .isotope_item {width: 100% !important;}} .iso_fields_title{} .isotope_grid .isotope_item {padding: 0 15px 5px;box-shadow: 0 10px 6px -6px #777;}"	
 				/>	
