@@ -881,12 +881,12 @@ foreach ($list as $key => $category) {
             $deb = '[';
             $end = ']';
         }
-        $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext,$deb,$end);
+        $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext);
         $choixdate = $params->get('choixdate', 'modified');
         $libdate = $choixdate == "modified" ? $libupdated : ($choixdate == "created" ? $libcreated : $libpublished);
         $perso = $params->get('perso');
         $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount,$deb,$end); // suppress null field if required
-        $arr_css = array("id" => $item->id,"title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libdate.date($libdateformat, strtotime($item->displayDate)),"create" => HTMLHelper::_('date', $item->created, $libotherdateformat),"pub" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"modif" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "visit" => $item->hits, "intro" => $item->displayIntrotext,"stars" => $rating,"rating" => $item->rating,"ratingcnt" => $item->rating_count,"count" => $phocacount,"tagsimg" => $tag_img, "catsimg" => $cat_img, "link" => $item->link, "introimg" => $item->introimg, "subtitle" => $item->subtitle, "new" => $item->new, "tags" => $itemtags,"featured" => $item->featured);
+        $arr_css = array("title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libdate.date($libdateformat, strtotime($item->displayDate)),"create" => HTMLHelper::_('date', $item->created, $libotherdateformat),"pub" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"modif" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "visit" => $item->hits, "intro" => $item->displayIntrotext,"stars" => $rating,"ratingcnt" => $item->rating_count,"count" => $phocacount,"tagsimg" => $tag_img, "catsimg" => $cat_img, "tags" => $itemtags);
         foreach ($arr_css as $key_c => $val_c) {
             $perso = str_replace($deb.$key_c.$end, Text::_($val_c), $perso);
         }
@@ -894,6 +894,9 @@ foreach ($list as $key => $category) {
             $perso = str_replace($deb.$key_f.$end, Text::_($val_f), $perso);
         }
         $perso = IsotopeHelper::checkNoField($perso,$deb,$end); // suppress empty fields
+
+        $perso = IsotopeHelper::checkDBFields($item, $perso, $deb, $end); // check if any field from db definition is left
+        
         // apply content plugins
         $app = Factory::getApplication(); // Joomla 4.0
         $item_cls = new \stdClass();

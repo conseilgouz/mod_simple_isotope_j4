@@ -658,10 +658,10 @@ class SimpleIsotopeHelper
         return $html;
     }
     // check if PhocaCount exists in article. If so, get it.
-    public static function getArticlePhocaCount($text, $deb = "{", $end = "}")
+    public static function getArticlePhocaCount($text)
     {
-        $regex_one		= '/('.$deb.'phocacount\s*)(.*?)('.$end.')/si';
-        $regex_all		= '/'.$deb.'phocacount\s*.*?'.$end.'/si';
+        $regex_one		= '/(\{phocacount\s*)(.*?)(\})/si';
+        $regex_all		= '/{phocacount\s*.*?}/si';
         $matches 		= array();
         $count 			= 0;
         $count_matches	= preg_match_all($regex_all, $text, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
@@ -701,19 +701,25 @@ class SimpleIsotopeHelper
             $content_len = $matchesclose[0][1] - $content_deb;
             $content = substr($perso, $content_deb, $content_len);
             $replace_len += $content_len + strlen($matchesclose[0][0]);
-            if ((strpos($content, $deb.'rating'.$end) !== false) && ($item->rating == "0")) {
+            $regexone = '/\\'.$deb.'(.*)\\'.$end.'/siU';
+            preg_match($regexone, $content, $matchesone, PREG_OFFSET_CAPTURE);
+            $field = $matchesone[1][0];
+            if (isset($item->$field)) { // is a db field ?
+                if ($field == 'urls') {
+                    $ret = self::getUrls($item->urls, $item->params);
+                    if ($ret) {
+                        $content = str_replace($matchesone[0][0], $ret, $content);
+                    } else { // empty field
+                        $content = "";
+                    }
+                } elseif ($item->$field) {
+                    $content = str_replace($matchesone[0][0], $item->$field, $content);
+                } else { // empty field
+                    $content = "";
+                }
+            } elseif (($field == 'ratingcnt') && ($item->rating_count == "0")) {
                 $content = "";
-            }
-            if ((strpos($content, $deb.'ratingcnt'.$end) !== false) && ($item->rating_count == "0")) {
-                $content = "";
-            }
-            if ((strpos($content, $deb.'subtitle'.$end) !== false) && ($item->subtitle == "")) {
-                $content = "";
-            }
-            if ((strpos($content, $deb.'new'.$end) !== false) && ($item->new == "")) {
-                $content = "";
-            }
-            if ((strpos($content, $deb.'count'.$end) !== false) && ($phocacount == '?')) {
+            } elseif (($field == 'count') && ($phocacount == '?')) {
                 $content = "";
             }
             $perso = substr($perso, 0, $replace_deb).$content.substr($perso, $replace_deb + $replace_len);
@@ -744,6 +750,104 @@ class SimpleIsotopeHelper
         }
         return $perso;
     }
+    // look for field to be found in datatbase
+    public static function checkDBFields($item, $perso, $deb = "{", $end = "}")
+    {
+        $regexopen = '/\\'.$deb.'(.*)\\'.$end.'/siU';
+        $count_matches	= preg_match_all($regexopen, $perso, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
+
+        if (!$count_matches) {
+            return $perso; // no update
+        }
+        // replace shortcut by different size field, so make this reversed
+        for ($i = $count_matches - 1; $i >= 0; $i--) {
+            $replace_deb = $matches[0][$i][1];
+            $replace_len = strlen($matches[0][$i][0]);
+            $field = $matches[1][$i][0];
+            $content = $matches[0][$i][0]; // keep content
+            if (isset($item->$field)) { // is a db field ?
+                $content = $item->$field;
+                if ($field == 'urls') {
+                    $content = self::getUrls($item->urls, $item->params);
+                }
+            }
+            $perso = substr($perso, 0, $replace_deb).$content.substr($perso, $replace_deb + $replace_len);
+        }
+        return $perso;
+    }
+    // from components/com_content/tmpl/article/default_links.php
+    public static function getUrls($urls, $params)
+    {
+        $urls = json_decode($urls);
+        if (!$urls || (empty($urls->urla) && empty($urls->urlb) && empty($urls->urlc))) {
+            return "";
+        }
+        $ret = '<ul class="iso_links">';
+        $urlarray = [
+            [$urls->urla, $urls->urlatext, $urls->targeta, 'a'],
+            [$urls->urlb, $urls->urlbtext, $urls->targetb, 'b'],
+            [$urls->urlc, $urls->urlctext, $urls->targetc, 'c']
+            ];
+        foreach ($urlarray as $url) :
+            $link = $url[0];
+            $label = $url[1];
+            $target = $url[2];
+            $id = $url[3];
+
+            if (! $link) :
+                continue;
+            endif;
+
+            // If no label is present, take the link
+            $label = $label ?: $link;
+
+            // If no target is present, use the default
+            $target = $target ?: $params->get('target' . $id);
+            $ret .= '<li class="iso_link_'.$id.'">';
+            switch ($target) {
+                case 1:
+                    // Open in a new window
+                    $ret .= '<a href="' . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . '" target="_blank" rel="nofollow noopener noreferrer">' .
+                        htmlspecialchars($label, ENT_COMPAT, 'UTF-8') . '</a>';
+                    break;
+
+                case 2:
+                    // Open in a popup window
+                    $attribs = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=600';
+                    $ret .=  "<a href=\"" . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . "\" onclick=\"window.open(this.href, 'targetWindow', '" . $attribs . "'); return false;\" rel=\"noopener noreferrer\">" .
+                        htmlspecialchars($label, ENT_COMPAT, 'UTF-8') . '</a>';
+                    break;
+                case 3:
+                    $ret .= '<a href="' . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . '" rel="noopener noreferrer" data-bs-toggle="modal" data-bs-target="#linkModal">' .
+                        htmlspecialchars($label, ENT_COMPAT, 'UTF-8') . ' </a>';
+                    $ret .= HTMLHelper::_(
+                        'bootstrap.renderModal',
+                        'linkModal',
+                        [
+                            'url'    => $link,
+                            'title'  => $label,
+                            'height' => '100%',
+                            'width'  => '100%',
+                            'modalWidth'  => '500',
+                            'bodyHeight'  => '500',
+                            'footer' => '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-hidden="true">'
+                                . \Joomla\CMS\Language\Text::_('JLIB_HTML_BEHAVIOR_CLOSE') . '</button>'
+                        ]
+                    );
+                    break;
+
+                default:
+                    // Open in parent window
+                    $ret .= '<a href="' . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . '" rel="nofollow">' .
+                        htmlspecialchars($label, ENT_COMPAT, 'UTF-8') . ' </a>';
+                    break;
+            }
+            $ret .= '</li>';
+        endforeach;
+        $ret .= '</ul>';
+        return $ret;
+    }
+    
     // Check a tag is in the selected tags list
     public static function checkTagSet($tag, $filter)
     {

@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.5</version>
+        <note>
+            <item>Update : 24/11/2024</item>
+        </note>
+        <addition>
+            <item>Customization : add content table fields and urls</item>
+        </addition>
+        <fix>
+            <item>custom display : phocacount not working</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.4</version>
         <note>
             <item>Update : 23/11/2024</item>
