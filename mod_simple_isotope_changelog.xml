@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.6</version>
+        <note>
+            <item>Update : 25/11/2024</item>
+        </note>
+        <fix>
+            <item>Suppress notice in SimpleIsotopeHelper : Undefined array key on line 200 or 212</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.5</version>
         <note>
             <item>Update : 24/11/2024</item>
