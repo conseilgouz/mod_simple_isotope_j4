@@ -1,9 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module 
-* Version			: 4.1.9
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2023 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -11,14 +10,15 @@
 defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\Filesystem\Folder;
 use Joomla\CMS\Version;
+use Joomla\Database\DatabaseInterface;
+use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
 
 class mod_simple_isotopeInstallerScript
 {
 	private $min_joomla_version      = '4.0.0';
-	private $min_php_version         = '7.0';
+	private $min_php_version         = '8.0';
 	private $name                    = 'Simple Isotope';
 	private $exttype                 = 'module';
 	private $extname                 = 'mod_simple_isotope';
@@ -29,7 +29,7 @@ class mod_simple_isotopeInstallerScript
 	public function __construct()
 	{
 		$this->dir = __DIR__;
-		$this->lang = Factory::getLanguage();
+		$this->lang = Factory::getAppplication()->getLanguage();
 		$this->lang->load($this->extname);
 	}
     function preflight($type, $parent)
@@ -129,7 +129,7 @@ class mod_simple_isotopeInstallerScript
 			}
 		}
 		// remove obsolete update sites
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->delete('#__update_sites')
 			->where($db->quoteName('location') . ' like "%432473037d.url-de-test.ws/%"');
@@ -193,7 +193,7 @@ class mod_simple_isotopeInstallerScript
 			JPATH_PLUGINS . '/system/' . $this->installerName . '/language',
 			JPATH_PLUGINS . '/system/' . $this->installerName,
 		]);
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->delete('#__extensions')
 			->where($db->quoteName('element') . ' = ' . $db->quote($this->installerName))
@@ -203,5 +203,17 @@ class mod_simple_isotopeInstallerScript
 		$db->execute();
 		Factory::getCache()->clean('_system');
 	}
-	
+
+    public function delete($files = [])
+    {
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                Folder::delete($file);
+            }
+
+            if (is_file($file)) {
+                File::delete($file);
+            }
+        }
+    }
 }
