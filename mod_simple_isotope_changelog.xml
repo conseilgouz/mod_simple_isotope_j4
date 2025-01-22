@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.8</version>
+        <note>
+            <item>Update : 22/01/2025</item>
+        </note>
+        <fix>
+            <item>Installation script error</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.7</version>
         <note>
             <item>Update : 22/01/2025</item>

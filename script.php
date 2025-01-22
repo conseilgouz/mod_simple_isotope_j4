@@ -29,7 +29,7 @@ class mod_simple_isotopeInstallerScript
 	public function __construct()
 	{
 		$this->dir = __DIR__;
-		$this->lang = Factory::getAppplication()->getLanguage();
+		$this->lang = Factory::getApplication()->getLanguage();
 		$this->lang->load($this->extname);
 	}
     function preflight($type, $parent)
@@ -56,18 +56,6 @@ class mod_simple_isotopeInstallerScript
 		$xml = simplexml_load_file(JPATH_SITE . '/modules/'.$this->extname.'/'.$this->extname.'.xml');
 		$this->previous_version = $xml->version;
 		
-    }
-    
-    function install($parent)
-    {
-    }
-    
-    function uninstall($parent)
-    {
-    }
-    
-    function update($parent)
-    {
     }
     
     function postflight($type, $parent)
