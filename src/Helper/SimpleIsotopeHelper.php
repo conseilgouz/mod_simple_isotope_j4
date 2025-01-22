@@ -260,7 +260,7 @@ class SimpleIsotopeHelper
         $db->setQuery($query);
         return $db->loadObjectList();
     }
-    public static function getItems($params, $tags_list, &$iso, &$pagination, $start, $limit, $order, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange)
+    public static function getItems($params, $tags_list, &$iso, &$pagination, $start, $limit, $order, &$rangetitle, &$rangelabel, &$rangedesc, &$minrange, &$maxrange, $module)
     {
 
         $articles     = new ArticlesModel(array('ignore_request' => true));
@@ -404,6 +404,7 @@ class SimpleIsotopeHelper
                         $iso->tags_link[$tag->alias] = self::getTagLink($tag);
                         $iso->tags_parent[$tag->alias] = $tag->parent_title;
                         $iso->tags_parent_alias[$tag->alias] = $tag->parent_alias;
+                        $iso->tags_count[$tag->alias] = 0;
                     }
                     $iso->tags_count[$tag->alias]++;
                 }
@@ -445,7 +446,9 @@ class SimpleIsotopeHelper
                                         $iso->article_fields_names[$item->id][$field->name][] = $alias;
                                         if (!in_array($alias, $iso->fields)) {
                                             $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                            $iso->fields_count[$alias] = 0;
                                         }
+                                        $iso->fields_count[$alias]++;
                                     }
                                 }
                             } else { // one field value
@@ -460,7 +463,9 @@ class SimpleIsotopeHelper
                                     $iso->article_fields_names[$item->id][$field->name] = $alias;
                                     if (!in_array($alias, $iso->fields)) {
                                         $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                        $iso->fields_count[$alias] = 0;
                                     }
+                                    $iso->fields_count[$alias]++;
                                     $ix_field += 1;
                                 }
                             }
@@ -475,7 +480,9 @@ class SimpleIsotopeHelper
                                 $iso->article_fields[$item->id][$field->title] = $alias;
                                 $iso->article_fields_names[$item->id][$field->name] = $alias;
                                 $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                $iso->fields_count[$alias] = 0;
                             }
+                            $iso->fields_count[$alias]++;
                         }
                     }
                     if (is_numeric($show_date_field) && ($field->id == $show_date_field)) {
@@ -488,6 +495,7 @@ class SimpleIsotopeHelper
                     $infos = self::getCategoryName($item->catid);
                     $iso->cats_note[$item->catid] = $infos[0]->note;
                     $iso->cats_params[$item->catid] = $infos[0]->params;
+                    $iso->cats_count[$item->catid] = 0; // init counter
                 }
                 $iso->cats_count[$item->catid]++;
                 if (!in_array(substr($item->title, 0, 1), $iso->alpha)) {
@@ -853,7 +861,7 @@ class SimpleIsotopeHelper
         $ret .= '</ul>';
         return $ret;
     }
-    
+
     // Check a tag is in the selected tags list
     public static function checkTagSet($tag, $filter)
     {
@@ -865,7 +873,7 @@ class SimpleIsotopeHelper
         return false;
     }
     //-------------------------------------------- Create Fields buttons	-----------------------------------------------------------------------
-    public static function create_buttons($fields, $group_lib, $onefilter, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_title, $group_id = null, $module_id = null)
+    public static function create_buttons($fields, $group_lib, $onefilter, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_title, $group_id = null, $module_id = null, $fieldsfiltercount = 'false', $fields_count = [])
     {
         $params_fields = $params->get('displayfields');
         $libfilter = Text::_('SSISO_LIBFILTER');
@@ -890,6 +898,11 @@ class SimpleIsotopeHelper
             $first_time = true;
             foreach ($onefilter as $key => $filter) {
                 $obj = $fields[$key];
+                $fieldcount = '';
+                if ($fieldsfiltercount == 'true') {
+                    $fieldcount = '<span class="field-count badge bg-info">'.$fields_count[$key].'</span>';
+                }
+
                 if ($first_time) {
                     $result .=  '<button class="'.$button_bootstrap.'  iso_button_tout isotope_button_first is-checked filter-button-group-'.$group_lib.'" data-sort-value="*" data-parent="'.$obj->parent.'" data-child="'.$obj->child.'" />'.$liball.'</button>';
                     $first_time = false;
@@ -897,7 +910,7 @@ class SimpleIsotopeHelper
                 $aff_alias = $obj->alias;
                 $aff = $obj->render;
                 if (!is_null($aff)) {
-                    $result .=  '<button class="'.$button_bootstrap.'  iso_button_'.$group_lib.'_'.$aff_alias.'" data-sort-value="'.$aff_alias.'" data-parent="'.$obj->parent.'" data-child="'.$obj->child.'"/>'. Text::_($aff).'</button>';
+                    $result .=  '<button class="'.$button_bootstrap.'  iso_button_'.$group_lib.'_'.$aff_alias.'" data-sort-value="'.$aff_alias.'" data-parent="'.$obj->parent.'" data-child="'.$obj->child.'"/>'. Text::_($aff).$fieldcount.'</button>';
                 }
             }
             if ($splitfieldstitle == "true") {
@@ -928,6 +941,11 @@ class SimpleIsotopeHelper
             $first_time = true;
             foreach ($onefilter as $key => $filter) {
                 $obj = $fields[$key];
+                $fieldcount = '';
+                if ($fieldsfiltercount == 'true') {
+                    $fieldcount = ' ('.$fields_count[$key].')';
+                }
+
                 if ($first_time) {
                     $options['']['items'][] = ModulesHelper::createOption('', $liball);
                     $first_time = false;
@@ -935,7 +953,7 @@ class SimpleIsotopeHelper
                 $aff_alias = $obj->alias;
                 $aff = strip_tags($obj->render);
                 if (!is_null($aff)) {
-                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff));
+                    $options['']['items'][] = ModulesHelper::createOption($aff_alias, Text::_($aff).$fieldcount);
                 }
             }
 

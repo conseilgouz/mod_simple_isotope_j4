@@ -2,7 +2,7 @@
 /**
 * Simple isotope module  - Joomla Module
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -31,7 +31,7 @@ $tagsfilterparent =  $params->get('tagsfilterparent', 'false');
 $displayoffcanvas =  $params->get('displayoffcanvas', 'text');
 $offcanvaspos = $params->get('offcanvaspos', 'start');
 $offcanvasbtnpos = "leave";
-if  ($displayoffcanvas == "hamburger") {
+if ($displayoffcanvas == "hamburger") {
     $offcanvasbtnpos =  $params->get('offcanvasbtnpos', 'leave');
 }
 $filtersoffcanvas = $params->get('offcanvas', 'false');
@@ -43,6 +43,7 @@ $tagsfilterlinkcls =  $params->get('tagsfilterlinkcls', 'badge bg-info text-whit
 $tagsfilterimg =  $params->get('tagsfilterimg', 'false');
 $splitfields = $params->get('displayfiltersplitfields', 'false');
 $splitfieldstitle = $params->get('splitfieldstitle', 'false');
+$fieldsfiltercount =  $params->get('fieldsfiltercount', 'false');
 $blocklink =  $params->get('blocklink', 'false');
 $titlelink =  $params->get('titlelink', 'true');
 $language_filter = $params->get('language_filter', 'false');
@@ -472,7 +473,7 @@ if ($displayfilterfields != "hide") {
                 $aff_alias = $alias[$filter];
                 $tagcount = '';
                 if ($tagsfiltercount == 'true') {
-                     $tagcount = ' ('.$iso->tags_count[$aff_alias].') ';
+                    $tagcount = ' ('.$iso->tags_count[$aff_alias].') ';
                 }
                 if (!is_null($aff)) {
                     $selected = "";
@@ -507,7 +508,7 @@ if ($displayfilterfields != "hide") {
             }
         } else { // sort category names
             foreach ($filters['cat'] as $filter) {
-                if (array_key_exists($filter, $iso->cats_lib)) { 
+                if (array_key_exists($filter, $iso->cats_lib)) {
                     $sortFilter[$filter] = $iso->cats_lib[$filter];
                 }
             }
@@ -515,7 +516,7 @@ if ($displayfilterfields != "hide") {
         if ($params->get('catfilteralias', 'false') != 'order') { // don't sort categories
             asort($sortFilter, SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL); // alphabatic order
         }
-        if  (($displayfiltercat == "button")  || ($displayfiltercat == "multi") || ($displayfiltercat == "multiex")) {
+        if (($displayfiltercat == "button")  || ($displayfiltercat == "multi") || ($displayfiltercat == "multiex")) {
             $awidth = $layouts["cat"]->div_width;
             if (!property_exists($layouts["cat"], 'offcanvas')) {
                 $layouts["cat"]->offcanvas = "false";
@@ -683,12 +684,11 @@ if ($displayfilterfields != "hide") {
             $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
         }
         foreach ($group as $group_lib => $onegroup) {
-
             $first =  array_key_first($onegroup);
             $group_id = $onegroup[$first]->field_id;
             $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data-group-id="'.$group_id.'" data="'.$module->id.'">';
 
-            $filter_div .= IsotopeHelper::create_buttons($iso->fields, $group_lib, $onegroup, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_label[$group_lib], $group_id, $module->id);
+            $filter_div .= IsotopeHelper::create_buttons($iso->fields, $group_lib, $onegroup, $params, $col_width, $button_bootstrap, $splitfieldstitle, $group_label[$group_lib], $group_id, $module->id, $fieldsfiltercount, $iso->fields_count);
             $filter_div .= "</div>";
         }
         if ($params->get('splitfieldscolumn', 'false') == "true") {
@@ -699,7 +699,7 @@ if ($displayfilterfields != "hide") {
         $width = $layouts['field']->div_width;
         $col_width = "col-md-".$width." col-12";
         $filter_div .=  '<div class="'.$col_width.'  isotope_button-group filter-button-group-fields class_fields_'.$group_lib.' '.$layouts["field"]->div_align.'" data-filter-group="'.$group_lib.'" data="'.$module->id.'">';
-        $filter_div .=  IsotopeHelper::create_buttons($iso->fields, 'fields', $iso->fields, $params, $col_width, $button_bootstrap, 'false', 'fields', 0, $module->id);
+        $filter_div .=  IsotopeHelper::create_buttons($iso->fields, 'fields', $iso->fields, $params, $col_width, $button_bootstrap, 'false', 'fields', 0, $module->id,$fieldsfiltercount, $iso->fields_count);
         $filter_div .= "</div>";
     }
 }
@@ -769,15 +769,15 @@ foreach ($list as $key => $category) {
                         $afield .= $afield == "" ? $obj->render : ", ".$obj->render;
                     }
                     $field_cust[$key_f] = (string)$afield;
-                    $field_cust['field '.$obj->field_id] = (string)$afield;
+                    // $field_cust['field '.$obj->field_id] = (string)$afield; // revert this
                     $field_value .= " ".implode(' ', $tag_f);
                 } else { // one field
                     $obj = $iso->fields[$tag_f];
                     if ((count($params_fields) == 0) ||  (in_array($obj->field_id, $params_fields))) {
                         $field_value .= " ".$tag_f;
                     }
-                    $field_cust[$key_f] = (string)$obj->render; 
-                    $field_cust['field '.$obj->field_id] = (string)$obj->render; 
+                    $field_cust[$key_f] = (string)$obj->render;
+                    // $field_cust['field '.$obj->field_id] = (string)$obj->render; // revert this
                 }
                 if (($displayrange == "true") && ($key_f == $rangetitle)  && isset($obj->val)) {
                     $data_range = " data-range='".$obj->val."' ";
@@ -815,7 +815,7 @@ foreach ($list as $key => $category) {
             if ($tagsfilterlink == 'joomla') { // joomla link to tag component
                 $itemtags .= '<a href="'.$iso->tags_link[$tag->alias].'"  target="_blank">';
             }
-            if ($tagsfilterlink == 'iso') { // isotope link 
+            if ($tagsfilterlink == 'iso') { // isotope link
                 $itemtags .= '<a href="" class="text-decoration-none '.$tagsfilterlinkcls.'">';
             }
             $itemtags .= "<span class='iso_tagsep'><span>-</span></span>".$tag->tag;
@@ -885,7 +885,7 @@ foreach ($list as $key => $category) {
         $choixdate = $params->get('choixdate', 'modified');
         $libdate = $choixdate == "modified" ? $libupdated : ($choixdate == "created" ? $libcreated : $libpublished);
         $perso = $params->get('perso');
-        $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount,$deb,$end); // suppress null field if required
+        $perso = IsotopeHelper::checkNullFields($perso, $item, $phocacount, $deb, $end); // suppress null field if required
         $arr_css = array("title" => $title, "cat" => $iso->cats_lib[$item->catid],"date" => $libdate.date($libdateformat, strtotime($item->displayDate)),"create" => HTMLHelper::_('date', $item->created, $libotherdateformat),"pub" => HTMLHelper::_('date', $item->publish_up, $libotherdateformat),"modif" => HTMLHelper::_('date', $item->modified, $libotherdateformat), "visit" => $item->hits, "intro" => $item->displayIntrotext,"stars" => $rating,"ratingcnt" => $item->rating_count,"count" => $phocacount,"tagsimg" => $tag_img, "catsimg" => $cat_img, "tags" => $itemtags);
         foreach ($arr_css as $key_c => $val_c) {
             $perso = str_replace($deb.$key_c.$end, Text::_($val_c), $perso);
@@ -893,10 +893,10 @@ foreach ($list as $key => $category) {
         foreach ($field_cust as $key_f => $val_f) { // display fields values
             $perso = str_replace($deb.$key_f.$end, Text::_($val_f), $perso);
         }
-        $perso = IsotopeHelper::checkNoField($perso,$deb,$end); // suppress empty fields
+        $perso = IsotopeHelper::checkNoField($perso, $deb, $end); // suppress empty fields
 
         $perso = IsotopeHelper::checkDBFields($item, $perso, $deb, $end); // check if any field from db definition is left
-        
+
         // apply content plugins
         $app = Factory::getApplication(); // Joomla 4.0
         $item_cls = new \stdClass();

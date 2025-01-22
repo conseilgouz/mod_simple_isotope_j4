@@ -2,6 +2,21 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.7</version>
+        <note>
+            <item>Update : 22/01/2025</item>
+        </note>
+        <fix>
+            <item>Installation script : missing delete function</item>
+            <item>Fields : lost field name</item>
+        </fix>
+        <addition>
+            <item>Add fields count display</item>
+        </addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.6</version>
         <note>
             <item>Update : 25/11/2024</item>

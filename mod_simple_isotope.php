@@ -2,7 +2,7 @@
 /**
 * Simple isotope module  - Joomla Module
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -41,7 +41,7 @@ $iso_layout = $params->get('iso_layout', 'fitRows');
 $iso_nbcol = $params->get('iso_nbcol', 2);
 $tags_list = $params->get('tags', array());
 // check authorised tags
-$authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
+$authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->id);
 foreach ($tags_list as $key => $atag) {
     if (!IsotopeHelper::getTagAccess($atag, $authorised)) {
         unset($tags_list[$key]); // not authorized : remove it
@@ -86,6 +86,7 @@ $iso->cats_count = array();
 $iso->cats_params = array();
 $iso->article_fields = array();
 $iso->article_fields_names = array();
+$iso->fields_count = array();
 $iso->alpha = array();
 $iso->article_tags = array();
 
@@ -104,6 +105,7 @@ if ($iso_entree == "webLinks") {
         foreach ($res as $catid) {
             if ($catid->count > 0) {
                 $iso->categories[] = $catid->id;
+                $iso->cats_count[$catid->id] = 0; // initialize counter
             }
         }
     }
@@ -115,6 +117,7 @@ if ($iso_entree == "webLinks") {
             $iso->cats_alias[$catid] = $infos[0]->alias;
             $iso->cats_note[$catid] = $infos[0]->note;
             $iso->cats_params[$catid] = $infos[0]->params;
+            $iso->cats_count[$catid] = 0; // initialize counter
         }
         $limit = (int) $params->get("page_count", 0);
         $order =  $params->get("page_order", "a.ordering");
@@ -144,7 +147,7 @@ if ($iso_entree == "webLinks") {
         $tags_list = [];
     }
     $pagination = "";
-    $list[] = IsotopeHelper::getItems($params, $tags_list, $iso, $pagination, $limitstart, $limit, $order, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange);
+    $list[] = IsotopeHelper::getItems($params, $tags_list, $iso, $pagination, $limitstart, $limit, $order, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange,$module);
 }
 // pagination : check tags_list to add missing tags in the list
 if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
@@ -158,6 +161,7 @@ if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
             $iso->tags_note[$tag->alias] = $tag->note;
             $iso->tags_parent[$tag->alias] = $tag->parent_title;
             $iso->tags_parent_alias[$tag->alias] = $tag->parent_alias;
+            $iso->tags_count[$tag->alias] = 1;
         }
     }
 }

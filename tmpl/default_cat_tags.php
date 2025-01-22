@@ -2,7 +2,7 @@
 /**
 * Simple isotope module  - Joomla Module
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -696,7 +696,7 @@ foreach ($list as $key => $category) {
                             $afield .= $afield == "" ? $obj->render : ", ".$obj->render;
                         }
                         $field_cust[$key_f] = (string)$afield;
-                        $field_cust['field '.$obj->field_id] = (string)$afield; // field display value, PHP 8
+                        // $field_cust['field '.$obj->field_id] = (string)$afield; // field display value, PHP 8
                         $field_value .= " ".implode(' ', $tag_f);
                     } else { // one field
                         $obj = $iso->fields[$tag_f];
@@ -704,7 +704,7 @@ foreach ($list as $key => $category) {
                             $field_value .= " ".$tag_f;
                         }
                         $field_cust[$key_f] = (string)$obj->render; // field display value
-                        $field_cust['field '.$obj->field_id] = (string)$obj->render; // field display value, PHP 8
+                        //$field_cust['field '.$obj->field_id] = (string)$obj->render; // field display value, PHP 8
                     }
                     if (($displayrange == "true") && ($key_f == $rangetitle)  && isset($obj->val)) {
                         $data_range = " data-range='".$obj->val."' ";
