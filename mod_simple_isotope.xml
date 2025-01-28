@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.4.9</version>
+	<version>4.4.10</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -15,7 +15,6 @@
 		<folder module="mod_simple_isotope">services</folder>
 		<folder>tmpl</folder>
 		<folder>src</folder>
-		<filename>mod_simple_isotope.php</filename>
 		<filename>index.html</filename>
 	</files>
 	<media destination="mod_simple_isotope" folder="media">
