@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.11</version>
+        <note>
+            <item>Update : 28/01/2025</item>
+        </note>
+        <fix>
+            <item>Packaging error : missing default.php file</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.10</version>
         <note>
             <item>Update : 28/01/2025</item>
