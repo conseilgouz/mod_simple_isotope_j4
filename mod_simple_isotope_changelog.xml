@@ -2,6 +2,21 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.4.9</version>
+        <note>
+            <item>Update : 28/01/2025</item>
+        </note>
+        <fix>
+            <item>Fields : counters always to 1</item>
+        </fix>
+        <change>
+            <item>Use Joomla dispatcher (remove mod_simple_isotope.php file)</item>
+            <item>Helper : remove unused Weblinks custom fields code</item>
+        </change>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.4.8</version>
         <note>
             <item>Update : 22/01/2025</item>

@@ -2,7 +2,7 @@
 /**
 * Simple isotope module  - Joomla Module
 * Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -115,76 +115,7 @@ class SimpleIsotopeHelper
                 } else { // no intro img needed
                     $item->description = self::cleanIntrotext($item->description, $params);
                 }
-                $test = FieldsHelper::getFields('com_weblinks.weblink', $item);
-                foreach ($test as $field) {
-                    if (property_exists($field, 'value')) {
-                        $val = $field->value;
-                        if (!is_array($val)) {
-                            $alias_sort = FilterOutput::stringURLSafe((string)$val);
-                        }
-                    }
-                    if (($field->id == $iso->rangefields) && ($field->value != "")) { // min/max range values
-                        $rangetitle = $field->title;
-                        $rangelabel = $field->label;
-                        $rangedesc = $field->description;
-                        if (($field->value < $minrange) || ($minrange == '')) {
-                            $minrange = $field->value;
-                        }
-                        if (($field->value > $maxrange) || ($minrange == '')) {
-                            $maxrange = $field->value;
-                        }
-                    }
-                    $param = json_decode($field->fieldparams);
-                    if (property_exists($param, 'options')) { // fields with options
-                        $ix_field = 0;
-                        foreach ($param->options as $option) {
-                            if (is_array($field->value)) { // multiple field values
-                                foreach ($field->value as $avalue) {
-                                    if ($option->value == $avalue) {
-                                        $val = $option->name;
-                                        $alias_sort = FilterOutput::stringURLSafe((string)$ix_field.'_'.$option->name);
-                                        $alias =  FilterOutput::stringURLSafe((string)$val);
-                                        if ($alias == "") {
-                                            continue;
-                                        }
-                                        $iso->article_fields[$item->id][$field->title][] = $alias;
-                                        $iso->article_fields_names[$item->id][$field->name][] = $alias;
-                                        if (!in_array($alias, $iso->fields)) {
-                                            $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
-                                        }
-                                    }
-                                }
-                            } else { // one field value
-                                if ($option->value == $field->value) {
-                                    $val = $option->name;
-                                    $alias_sort = FilterOutput::stringURLSafe((string)$ix_field.'_'.$val);
-                                    $alias =  FilterOutput::stringURLSafe((string)$val);
-                                    if ($alias == "") {
-                                        continue;
-                                    }
-                                    $iso->article_fields[$item->id][$field->title] = $alias;
-                                    $iso->article_fields_names[$item->id][$field->name] = $alias;
-                                    if (!in_array($alias, $iso->fields)) {
-                                        $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
-                                    }
-                                    $ix_field += 1;
-                                }
-                            }
-                        }
-                    } else { // not an option field
-                        if (is_string($val)) {  // 30/09/2021 : ignore if not string
-                            $alias =  FilterOutput::stringURLSafe((string)$val);
-                            if (!in_array($alias, $iso->fields)) {
-                                if ($alias == "") {
-                                    continue;
-                                }
-                                $iso->article_fields[$item->id][$field->title] = $alias;
-                                $iso->article_fields_names[$item->id][$field->name] = $alias;
-                                $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params, 'weblink');
-                            }
-                        }
-                    }
-                }
+
                 $authorised = Access::getAuthorisedViewLevels(Factory::getApplication()->getIdentity()->get('id'));
                 $iso->article_tags[$item->id] = self::getWebLinkTags($item->id, $authorised); // article's tags
                 foreach ($iso->article_tags[$item->id] as $tag) {
@@ -446,6 +377,8 @@ class SimpleIsotopeHelper
                                         $iso->article_fields_names[$item->id][$field->name][] = $alias;
                                         if (!in_array($alias, $iso->fields)) {
                                             $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                        }
+                                        if (!isset($iso->fields_count[$alias])) {
                                             $iso->fields_count[$alias] = 0;
                                         }
                                         $iso->fields_count[$alias]++;
@@ -463,6 +396,8 @@ class SimpleIsotopeHelper
                                     $iso->article_fields_names[$item->id][$field->name] = $alias;
                                     if (!in_array($alias, $iso->fields)) {
                                         $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                                    }
+                                    if (!isset($iso->fields_count[$alias])) {
                                         $iso->fields_count[$alias] = 0;
                                     }
                                     $iso->fields_count[$alias]++;
@@ -480,6 +415,8 @@ class SimpleIsotopeHelper
                                 $iso->article_fields[$item->id][$field->title] = $alias;
                                 $iso->article_fields_names[$item->id][$field->name] = $alias;
                                 $iso->fields[$alias] = self::field_info($item, $val, $alias, $alias_sort, $field, $params);
+                            }
+                            if (!isset($iso->fields_count[$alias])) {
                                 $iso->fields_count[$alias] = 0;
                             }
                             $iso->fields_count[$alias]++;
