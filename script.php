@@ -18,7 +18,7 @@ use Joomla\Filesystem\File;
 class mod_simple_isotopeInstallerScript
 {
 	private $min_joomla_version      = '4.0.0';
-	private $min_php_version         = '8.0';
+	private $min_php_version         = '7.4';
 	private $name                    = 'Simple Isotope';
 	private $exttype                 = 'module';
 	private $extname                 = 'mod_simple_isotope';
