@@ -38,7 +38,7 @@ class SimpleIsotopeHelper
     public static function getCGVersion()
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('manifest_cache');
         $query->from($db->quoteName('#__extensions'));
         $query->where('name = "' . self::getCGName() . '"');
@@ -76,7 +76,7 @@ class SimpleIsotopeHelper
         $introtext_img_link  = $params->get('introtext_img_link', 'false');
 
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('*')
             ->from('#__weblinks AS u')
             ->where('catid = '.(int)$id.' AND state = 1')
@@ -155,7 +155,7 @@ class SimpleIsotopeHelper
     public static function getCategoryName($id)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('*')
             ->from('#__categories ')
             ->where('id = '.(int)$id)
@@ -172,7 +172,7 @@ class SimpleIsotopeHelper
             $sqllang = ''; // ignore lang
         }
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         if ($params->get('iso_entree', 'webLinks') == 'webLinks') {
             $query->select('distinct cat.id,cat.alias, count(cont.id) as count, cat.note')
             ->from('#__categories as cat ')
@@ -503,7 +503,7 @@ class SimpleIsotopeHelper
     public static function getTagTitle($id)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         // Construct the query
         $query->select('tags.title as tag, tags.alias as alias,tags.note as note, parent.title as parent_title,tags.language as language, parent.alias as parent_alias')
             ->from('#__tags as tags')
@@ -516,7 +516,7 @@ class SimpleIsotopeHelper
     public static function getTagAccess($id, $authorised)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         // Construct the query
         $query->select('tags.title as tag')
             ->from('#__tags as tags')
@@ -528,7 +528,7 @@ class SimpleIsotopeHelper
     public static function getArticleTags($id, $authorised)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images,tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
             ->from('#__contentitem_tag_map as map ')
             ->innerJoin('#__content as c on c.id = map.content_item_id')
@@ -543,7 +543,7 @@ class SimpleIsotopeHelper
     public static function getMissingTags($tags_list, $authorised)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('DISTINCT tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images, tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
         ->from('#__contentitem_tag_map as map ')
         ->innerJoin('#__tags as tags on tags.id = map.tag_id')
@@ -556,7 +556,7 @@ class SimpleIsotopeHelper
     public static function getWebLinkTags($id, $authorised)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('tags.title as tag, tags.alias as alias, tags.note as note, tags.images as images,tags.language as language, parent.title as parent_title, parent.alias as parent_alias, tags.id')
             ->from('#__contentitem_tag_map as map ')
             ->innerJoin('#__weblinks as w on w.id = map.content_item_id')
@@ -954,7 +954,7 @@ class SimpleIsotopeHelper
     private static function getModuleById($id)
     {
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('m.id, m.title, m.module, m.position, m.content, m.showtitle, m.params')
             ->from('#__modules AS m')
             ->where('m.id = '.(int)$id);
