@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.5.1</version>
+        <note>
+            <item>Update : 06/03/2025</item>
+        </note>
+        <fix>
+            <item>Reverse Joomla 5.3 compatibility : createQuery to getQuery</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.5.0</version>
         <note>
             <item>Update : 05/03/2025</item>
