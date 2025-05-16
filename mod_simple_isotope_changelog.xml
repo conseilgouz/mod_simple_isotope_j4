@@ -2,6 +2,19 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.5.2</version>
+        <note>
+            <item>Update : 16/05/2025</item>
+        </note>
+        <fix>
+            <item>Apply up.css to isotope-main class</item>
+            <item>Joomla 5.3.0 : replace see custom notes checkbox by yes/no buttons</item>
+            <item>fix english isotope page link</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.5.1</version>
         <note>
             <item>Update : 06/03/2025</item>

@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2025-03-06</creationDate>
+	<creationDate>2025-05-16</creationDate>
 	<copyright>Copyright (C) 2025 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.5.1</version>
+	<version>4.5.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -620,7 +620,10 @@
 					default="d/m/Y"  />
 				<field showon="iso_entree!:cgisotope" name="formatotherdate" type="text" label="SSISO_FORMAT_OTHERDATE" description ="SSISO_FORMAT_OTHERDATE_DESC" 
 					default="d/m/Y"  />
-                <field showon="iso_entree!:cgisotope" type="checkbox" name="see_notes" label="SSISO_SEE_PERSO" default="0" class="clear left" />
+                <field showon="iso_entree!:cgisotope" type="radio" name="see_notes" label="SSISO_SEE_PERSO" default="0" class="clear left btn-group btn-group-yesno">
+					<option value="1">JYES</option> 
+					<option value="0">JNO</option> 
+                </field>
 			    <field showon="iso_entree!:cgisotope[AND]see_notes:1" type="note" name="note1" label="SSISO_NOTE1" heading="p" />
                 <field	name="bracket" showon="iso_entree!:cgisotope"
                     type="radio" class="btn-group btn-group-yesno clear" default="bracket"
