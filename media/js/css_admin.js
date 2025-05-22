@@ -10,6 +10,10 @@
 *
 */
 jQuery(document).ready(function(){
+    if (document.querySelector('form').action.includes('com_advancedmodules')) {
+        // regularlabs conflict : exit
+        return;
+    }
 	jQuery( ".clear" ).parent('fieldset').parent('.controls').parent(".control-group").css({"clear":"both"});
 	jQuery( ".left" ).parent('fieldset').parent('.controls').parent(".control-group").css({"float":"left"});
 	jQuery( ".right" ).parent('fieldset').parent('.controls').parent(".control-group").css({"float":"right"});
