@@ -464,7 +464,10 @@ if ($displayfilterfields != "hide") {
             $filter_tag_div .= '<p class="hidden-phone" >'.$libfilter.' : </p>';
             $name = 'isotope-select-tags';
             $options = array();
-            $options['']['items'][] = ModulesHelper::createOption('', $liball);
+            if ( ($params->get('tagsshowall', 'true') == 'true') || 
+                 ($params->get('tagsshowall', 'true') == 'false' && ($default_tag == '' || $default_tag == 'none')) ){
+                $options['']['items'][] = ModulesHelper::createOption('', $liball);
+            }
             foreach ($sortFilter as $aval) {
                 $res = explode("&", $aval);
                 $filter = $res[1];
@@ -583,7 +586,10 @@ if ($displayfilterfields != "hide") {
             $filter_cat_div .= '<p class="hidden-phone" >'.$libfilter.' : </p>';
             $name = 'isotope-select-cat';
             $options = array();
-            $options['']['items'][] = ModulesHelper::createOption('', $liball);
+            if (($params->get('catsshowall', 'true') == 'true') || 
+                     ($params->get('catsshowall', 'true') == 'false' && ($default_cat == '' || $default_cat == 'none')) ){
+                $options['']['items'][] = ModulesHelper::createOption('', $liball);
+            }
             foreach ($sortFilter as $key => $filter) {
                 $aff = $iso->cats_lib[$key];
                 $aff_alias = $iso->cats_alias[$key];

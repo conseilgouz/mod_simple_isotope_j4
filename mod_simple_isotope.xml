@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2025-05-16</creationDate>
+	<creationDate>2025-05-22</creationDate>
 	<copyright>Copyright (C) 2025 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.5.2</version>
+	<version>4.5.3</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -201,7 +201,6 @@
 					
 				</field>
 <field	name="notefiltercatinfo"	type="note" label="CG_ISO_FILTERCATINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags,catfields,cattagsfields[AND]iso_entree:articles,webLinks" class="alert-success clear half"/>
-
 				<field name="default_cat"	
 					showon="iso_entree!:cgisotope[AND]cat_or_tag:cat,cattags,catfields[AND]iso_entree:articles"
 					type="category" multiple="false" extension="com_content" 
@@ -258,6 +257,13 @@
                     type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
                     label="SSISO_CATSFILTERCOUNT" 
                     description="SSISO_CATSFILTERCOUNTDESC">
+                    <option value="true">JYES</option>
+                    <option value="false">JNO</option>
+                </field>
+                <field showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,cat,catfields[AND]displayfiltercat:list" name="catsshowall"
+                    type="radio" class="btn-group btn-group-yesno half right" default="true" 
+                    label="SSISO_CATSSHOWALL" 
+                    description="SSISO_CATSSHOWALLDESC">
                     <option value="true">JYES</option>
                     <option value="false">JNO</option>
                 </field>
@@ -319,29 +325,36 @@
 					label="SSISO_TAGSFILTERIMG" 
 					description="SSISO_TAGSFILTERIMGDESC"
 				>
-				<option value="true">JYES</option>
-				<option value="false">JNO</option>
-			</field>
-			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfilterlink"
+                    <option value="true">JYES</option>
+                    <option value="false">JNO</option>
+                </field>
+                <field showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfilterlink"
 				type="radio" class="btn-group btn-group-yesno half left" default="false" 
 				label="SSISO_TAGSFILTERLINK" 
 				description="SSISO_TAGSFILTERLINKDESC">
-				<option value="false">JNO</option>
-				<option value="joomla">Joomla</option>
-                <option value="iso">Isotope</option>
-			</field>
-			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields[AND]tagsfilterlink:iso,joomla" name="tagsfilterlinkcls"
+                    <option value="false">JNO</option>
+                    <option value="joomla">Joomla</option>
+                    <option value="iso">Isotope</option>
+                </field>
+                <field showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields,cattagsfields[AND]tagsfilterlink:iso,joomla" name="tagsfilterlinkcls"
 				type="text" class="half right" default="badge bg-info text-white" 
 				label="SSISO_TAGSFILTERLINKCLS" 
 				description="SSISO_TAGSFILTERLINKCLSDESC">
-			</field>
-			<field showon="cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfiltercount"
-				type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
-				label="SSISO_TAGSFILTERCOUNT" 
-				description="SSISO_TAGSFILTERCOUNTDESC">
-				<option value="true">JYES</option>
-				<option value="false">JNO</option>
-			</field>
+                </field>
+                <field showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields,cattagsfields" name="tagsfiltercount"
+                    type="radio" class="btn-group btn-group-yesno clear half left" default="false" 
+                    label="SSISO_TAGSFILTERCOUNT" 
+                    description="SSISO_TAGSFILTERCOUNTDESC">
+                    <option value="true">JYES</option>
+                    <option value="false">JNO</option>
+                </field>
+                <field showon="iso_entree!:cgisotope[AND]cat_or_tag:cattags,tags,tagsfields,cattagsfields[AND]displayfilter:list" name="tagsshowall"
+                    type="radio" class="btn-group btn-group-yesno half right" default="true" 
+                    label="SSISO_TAGSSHOWALL" 
+                    description="SSISO_TAGSSHOWALLDESC">
+                    <option value="true">JYES</option>
+                    <option value="false">JNO</option>
+                </field>
 <field	name="notefilterfieldsinfo"	type="note" label="CG_ISO_FILTERFIELDSINFONOTE" showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,cattagsfields,tagsfields[AND]iso_entree:articles" class="alert-success clear half"/>
 				<field
 				    showon="iso_entree!:cgisotope[AND]cat_or_tag:fields,catfields,tagsfields[AND]iso_entree:articles"
@@ -387,7 +400,6 @@
                     <option value="true">JYES</option>
                     <option value="false">JNO</option>
                 </field>
-                
 <field	name="noteotherfilterinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_DISPLAYOTHERFILTERNOTE" class="alert-success clear half"/>
 				<field name="language_filter" showon="iso_entree!:cgisotope"
 					type="radio" class="btn-group"

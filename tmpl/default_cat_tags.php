@@ -446,7 +446,10 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                 $filter_cat_div .= '<div class="isotope_button-group filter-button-group-cat col-md-'.$awidth.' col-12 '.$layouts["cat"]->div_align.'" data-filter-group="cat" data="'.$module->id.'">';
                 $name = 'isotope-select-cat';
                 $options = array();
-                $options['']['items'][] = ModulesHelper::createOption('', $liball);
+                if ( ($params->get('catsshowall', 'true') == 'true') || 
+                     ($params->get('catsshowall', 'true') == 'false' && ($default_cat == '' || $default_cat == 'none')) ){
+                    $options['']['items'][] = ModulesHelper::createOption('', $liball);
+                }
                 foreach ($sortFilter as $key => $filter) {
                     $aff = $iso->cats_lib[$key];
                     $aff_alias = $iso->cats_alias[$key];
@@ -471,7 +474,7 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                     }
                 }
                 $filter_cat_div .= '<joomla-field-fancy-select '.implode(' ', $attributes).'>';
-                $filter_cat_div .= HTMLHelper::_('select.groupedlist', $options, $name, array('id'          => $name,'list.select' => $value,'list.attr'   => implode(' ', $selectAttr)));
+                $filter_cat_div .= HTMLHelper::_('select.groupedlist', $options, $name, array('id'          => $name,'list.select' => null,'list.attr'   => implode(' ', $selectAttr)));
 
                 $filter_cat_div .= '</joomla-field-fancy-select>';
                 $filter_cat_div .= '</div>';
@@ -599,7 +602,10 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                 // $filter_tag_div .= '<p class="hidden-phone" >'.$libfilter.' : </p>';
                 $name = 'isotope-select-tags';
                 $options = array();
-                $options['']['items'][] = ModulesHelper::createOption('', $liball);
+                if ( ($params->get('tagsshowall', 'true') == 'true') || 
+                     ($params->get('tagsshowall', 'true') == 'false' && ($default_tag == '' || $default_tag == 'none')) ){
+                    $options['']['items'][] = ModulesHelper::createOption('', $liball);
+                }
                 foreach ($sortFilter as $aval) {
                     $res = explode("&", $aval);
                     $filter = $res[1];
@@ -619,7 +625,7 @@ if (($displayfiltertags != "hide") || ($displayfiltercat != "hide")) {
                     }
                 }
                 $filter_tag_div .= '<joomla-field-fancy-select '.implode(' ', $attributes).'>';
-                $filter_tag_div .= HTMLHelper::_('select.groupedlist', $options, $name, array('id'          => $name,'list.select' => $value,'list.attr'   => implode(' ', $selectAttr)));
+                $filter_tag_div .= HTMLHelper::_('select.groupedlist', $options, $name, array('id'          => $name,'list.select' => null,'list.attr'   => implode(' ', $selectAttr)));
 
                 $filter_tag_div .= '</joomla-field-fancy-select>';
                 $filter_tag_div .= '</div>';

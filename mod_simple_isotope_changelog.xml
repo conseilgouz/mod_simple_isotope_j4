@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.5.3</version>
+        <note>
+            <item>Update : 22/05/2025</item>
+        </note>
+        <fix>
+            <item>List : suppress notice $value not defined</item>
+        </fix>
+        <addition>
+            <item>List : show/hide 'all' option for tags/categories</item>
+        </addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.5.2</version>
         <note>
             <item>Update : 16/05/2025</item>
