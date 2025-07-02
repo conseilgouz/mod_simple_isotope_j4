@@ -9,7 +9,7 @@
 
 namespace ConseilGouz\Module\SimpleIsotope\Site\Field;
 
-defined('JPATH_PLATFORM') or die;
+defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\SqlField;
 use Joomla\Database\DatabaseInterface;
