@@ -1006,6 +1006,21 @@ if ($params->get('readmore', 'false') == 'iframe') {
 } elseif ($params->get('readmore', 'false') == 'ajax') {
     echo '<input id="token" type="hidden" name="' . Session::getFormToken() . '" value="1" />';
     echo '<div id="isotope_an_article" class="isotope_an_article fg-c'.$width.' fg-cs12 isotope-hide" ></div>';
+} elseif ($params->get('readmore', 'false') == 'modal') {
+    HTMLHelper::_('bootstrap.modal', '.modal_iso');
+    $link = 'modules/mod_'.$module->name.'/tmpl/wait.html';
+    echo ' <div class="modal_iso modal modal-xl"  id="modalsrc_'.$module->id.'_id"  aria-labelledby="iframemodalsrc_'.$module->id.'_id" aria-hidden="true">
+            <div class="modal-dialog" style="height:90vh">
+                <div class="modal-content h-100 ">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body h-100 w-100">
+                        <iframe id="iframemodalsrc_'.$module->id.'_id" height="100%" width="100%" src="'.$link.'" name="iframe_modal"></iframe>
+                    </div>
+                </div>
+            </div>
+            </div>';
 }
 ?>
 <div class="iso_div_empty iso_hide_elem">

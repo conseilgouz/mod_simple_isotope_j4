@@ -1,8 +1,8 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.3.5 CG Isotope / 4.4.2 Simple Isotope
+* Version			: 4.6.2 CG Isotope / 4.6.2 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
-* copyright 		: Copyright (C) 2024 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -59,6 +59,7 @@ function CGIsotope(isoid,options) {
 	this.iso_article = document.querySelector('.isotope_an_article')
 	this.iso_div = document.querySelector('.isotope-main .isotope-div')
 	this.article_frame=document.querySelector('iframe#isotope_article_frame')
+	this.article_modal=document.querySelector('#modalsrc_'+this.isoid+'_id');
 
 	if (this.article_frame) {
 		this.article_frame.addEventListener('load',function(){ // Joomla 4.0
@@ -96,22 +97,30 @@ function CGIsotope(isoid,options) {
 	this.filters['lang'] = ['*'];
 	this.filters['alpha'] = ['*'];
 
-	if ((this.options.readmore == 'ajax') || (this.options.readmore == 'iframe'))  {
+	if ((this.options.readmore == 'ajax') || (this.options.readmore == 'iframe') || (this.options.readmore == 'modal'))  {
 		this.iso_height = this.grid_toggle.offsetHeight;
 		this.iso_width = this.grid_toggle.offsetWidth;
 		readmoretitles =  document.querySelectorAll('.isotope-readmore-title');
 		for (var t=0;t < readmoretitles.length;t++ ) {
+            
+            if ($myiso.options.readmore == 'modal') {
+                readmoretitles[t].setAttribute('data-bs-toggle','modal');
+                readmoretitles[t].setAttribute('data-bs-target','#modalsrc_'+this.isoid+'_id');
+            }
+            
 			['click', 'touchstart'].forEach(type => {
 				readmoretitles[t].addEventListener(type,function(e) {	
 					$pos = $myiso.iso_div.offsetTop;
 					document.querySelector("body").scrollTo($pos,1000)
 					e.stopPropagation();
-					e.preventDefault();		
-					$myiso.addClass($myiso.grid_toggle,'isotope-hide');
-					$myiso.addClass($myiso.iso_article,'isotope-open');
-					$myiso.removeClass($myiso.iso_article,'isotope-hide');
-					$myiso.iso_article.offsetHeight ='auto';
-					$myiso.addClass($myiso.iso_article,'article-loading');
+					e.preventDefault();	
+                    if ($myiso.options.readmore != 'modal') {
+                        $myiso.addClass($myiso.grid_toggle,'isotope-hide');
+                        $myiso.addClass($myiso.iso_article,'isotope-open');
+                        $myiso.removeClass($myiso.iso_article,'isotope-hide');
+                        $myiso.iso_article.offsetHeight ='auto';
+                        $myiso.addClass($myiso.iso_article,'article-loading');
+                    }
 					if ($myiso.options.readmore == 'ajax') {
 						document.querySelector("#isotope_an_article").innerHTML = '';
 						var mytoken = document.getElementById("token");
@@ -160,7 +169,13 @@ function CGIsotope(isoid,options) {
 									$myiso.resetToggle();
 							});
 						})
-				}
+                    } else if ($myiso.options.readmore == 'modal') {
+                        mymodal = $myiso.article_modal;
+                        myiframe = mymodal.querySelector('iframe');
+                        myiframe.init = myiframe.src; // save initial value
+                        $url= "index.php?option=com_content&amp;view=article&amp;id="+this.dataset['articleid']+"&amp;layout=modal&amp;tmpl=component";
+                        myiframe.src = $url;
+                    }
 	// listen to exit event
 				['click', 'touchstart'].forEach(type => {
 					$myiso.grid_toggle.addEventListener(type, function(e) {
@@ -172,6 +187,15 @@ function CGIsotope(isoid,options) {
 			})
 		});
 		}
+        if (this.options.readmore == 'modal') {
+            mymodal = this.article_modal;
+            mymodal.addEventListener('hide.bs.modal', function (event) {
+                console.log('closing');
+                mymodal = $myiso.article_modal;
+                myiframe = mymodal.querySelector('iframe');
+                myiframe.src = myiframe.init; // restore initial value
+            });
+        }
 	}
 	['click', 'touchstart'].forEach(type => {
 		$myiso.iso_div.addEventListener(type, function(e) {
