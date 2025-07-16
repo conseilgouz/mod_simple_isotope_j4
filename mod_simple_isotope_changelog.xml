@@ -6,6 +6,17 @@
         <note>
             <item>Update : 16/07/2025</item>
         </note>
+        <fix>
+            <item>Missing Modal in readmore options</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.6.2</version>
+        <note>
+            <item>Update : 16/07/2025</item>
+        </note>
         <addition>
             <item>Add Modal in readmore options</item>
         </addition>
