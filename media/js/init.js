@@ -171,6 +171,10 @@ function CGIsotope(isoid,options) {
 						})
                     } else if ($myiso.options.readmore == 'modal') {
                         mymodal = $myiso.article_modal;
+                        if (!$myiso.hasClass(mymodal,'show')) { // touchstart bug : force toggle
+                            amodal = new bootstrap.Modal(mymodal);
+                            amodal.toggle();
+                        }
                         myiframe = mymodal.querySelector('iframe');
                         myiframe.init = myiframe.src; // save initial value
                         $url= "index.php?option=com_content&amp;view=article&amp;id="+this.dataset['articleid']+"&amp;layout=modal&amp;tmpl=component";
@@ -180,7 +184,7 @@ function CGIsotope(isoid,options) {
 				['click', 'touchstart'].forEach(type => {
 					$myiso.grid_toggle.addEventListener(type, function(e) {
 							e.stopPropagation();
-							e.preventDefault();		
+							e.preventDefault();	
 							$myiso.resetToggle();
 							})
 				})

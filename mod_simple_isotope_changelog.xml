@@ -2,7 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
-		<version>4.6.2</version>
+		<version>4.6.4</version>
+        <note>
+            <item>Update : 16/07/2025</item>
+        </note>
+        <fix>
+            <item>>Readmore modal : touchscreen fix</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
+		<version>4.6.3</version>
         <note>
             <item>Update : 16/07/2025</item>
         </note>
