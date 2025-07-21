@@ -1,6 +1,5 @@
 /**
 * CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
-* Version			: 4.6.2 CG Isotope / 4.6.2 Simple Isotope
 * Package			: CG ISotope/Simple Isotope
 * copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
@@ -180,21 +179,22 @@ function CGIsotope(isoid,options) {
                         $url= "index.php?option=com_content&amp;view=article&amp;id="+this.dataset['articleid']+"&amp;layout=modal&amp;tmpl=component";
                         myiframe.src = $url;
                     }
-	// listen to exit event
-				['click', 'touchstart'].forEach(type => {
-					$myiso.grid_toggle.addEventListener(type, function(e) {
-							e.stopPropagation();
-							e.preventDefault();	
-							$myiso.resetToggle();
-							})
-				})
+                    // listen to exit event (modal is performed later)
+                    if ($myiso.options.readmore != 'modal') { 
+                        ['click', 'touchstart'].forEach(type => {
+                            $myiso.grid_toggle.addEventListener(type, function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();	
+                                $myiso.resetToggle();
+                            })
+                        })
+                    }
 			})
 		});
 		}
         if (this.options.readmore == 'modal') {
             mymodal = this.article_modal;
             mymodal.addEventListener('hide.bs.modal', function (event) {
-                console.log('closing');
                 mymodal = $myiso.article_modal;
                 myiframe = mymodal.querySelector('iframe');
                 myiframe.src = myiframe.init; // restore initial value

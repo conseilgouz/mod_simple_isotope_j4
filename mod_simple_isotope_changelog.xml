@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.6.5</version>
+        <note>
+            <item>Update : 21/07/2025</item>
+        </note>
+        <fix>
+            <item>Readmore modal : touchscreen fix after closing modal</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.6.4</version>
         <note>
             <item>Update : 16/07/2025</item>
