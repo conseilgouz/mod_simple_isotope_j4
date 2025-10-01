@@ -259,8 +259,8 @@ class SimpleIsotopeHelper
                     $menuitems = $menu->getItems('link', 'index.php?option=com_users&view=login');
                     if (isset($menuitems[0])) {
                         $Itemid = $menuitems[0]->id;
-                    } elseif ($app->input->getInt('Itemid') > 0) {
-                        $Itemid = $app->input->getInt('Itemid');
+                    } elseif ($app->getInput()->getInt('Itemid') > 0) {
+                        $Itemid = $app->getInput()->getInt('Itemid');
                     }
                     $item->link = Route::_('index.php?option=com_users&view=login&Itemid=' . $Itemid);
                 }
@@ -938,7 +938,7 @@ class SimpleIsotopeHelper
     // ==============================================    AJAX Request 	============================================================
     public static function getAjax()
     {
-        $input = Factory::getApplication()->input->request;
+        $input = Factory::getApplication()->getInput()->request;
         $id = $input->get('id');
         $module = self::getModuleById($id);
         $params = new Registry($module->params);

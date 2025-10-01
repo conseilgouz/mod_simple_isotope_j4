@@ -2,13 +2,16 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
-		<version>4.6.6</version>
+		<version>4.7.0</version>
         <note>
-            <item>Update : 21/07/2025</item>
+            <item>Update : 01/10/2025</item>
         </note>
         <fix>
-            <item>Readmore modal : touchscreen fix after closing modal</item>
+            <item>Joomla 6.x compatibility</item>
         </fix>
+        <change>
+            <item>Use ConseilGouz Library</item>
+        </change>
 	</changelog>
 	<changelog>
 		<element>mod_simple_isotope</element>
