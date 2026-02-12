@@ -1,8 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
+* Package			: Joomla 4.x/5.x/6.x
+* copyright 		: Copyright (C) 2026 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */

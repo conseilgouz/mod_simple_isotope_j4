@@ -1,8 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
+* Package			: Joomla 4.x/5.x/6.x
+* copyright 		: Copyright (C) 2026 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -432,7 +432,7 @@ if ($displayfilterfields != "hide") {
                         $checked = "is-checked";
                     }
                     $tagcount = '';
-                    if ($tagsfiltercount == 'true') {
+                    if (($tagsfiltercount == 'true') && isset($iso->tags_count[$aff_alias])) {
                         $tagcount = '<span class="tag-count badge bg-info">'.$iso->tags_count[$aff_alias].'</span>';
                     }
                     $filter_tag_div .= '<button class="'.$button_bootstrap.'  iso_button_tags_'.$aff_alias.' '.$checked.'" data-sort-value="'.$aff_alias.'" title="'.$iso->tags_note[$aff_alias].'"/>'.$img.Text::_($aff).$tagcount.'</button>';
@@ -475,7 +475,7 @@ if ($displayfilterfields != "hide") {
                 $aff = $filter;
                 $aff_alias = $alias[$filter];
                 $tagcount = '';
-                if ($tagsfiltercount == 'true') {
+                if (($tagsfiltercount == 'true') && isset($iso->tags_count[$aff_alias])){
                     $tagcount = ' ('.$iso->tags_count[$aff_alias].') ';
                 }
                 if (!is_null($aff)) {
@@ -903,15 +903,15 @@ foreach ($list as $key => $category) {
 
         $perso = IsotopeHelper::checkDBFields($item, $perso, $deb, $end); // check if any field from db definition is left
 
-        // apply content plugins
-        $app = Factory::getApplication(); // Joomla 4.0
-        $item_cls = new \stdClass();
-        $item_cls->id = $item->id;
-        $item_cls->text = $perso;
-        $item_cls->params = $params;
-        $app->triggerEvent('onContentPrepare', array('com_content.article', &$item_cls, &$item_cls->params, 0)); // Joomla 4.0
-        $perso = 	$item_cls->text;
-
+        if ($params->get('applyplugins','true') == 'true') { // apply content plugins
+            $app = Factory::getApplication(); // Joomla 4.0
+            $item_cls = new \stdClass();
+            $item_cls->id = $item->id;
+            $item_cls->text = $perso;
+            $item_cls->params = $params;
+            $app->triggerEvent('onContentPrepare', array('com_content.article', &$item_cls, &$item_cls->params, 0)); 
+            $perso = 	$item_cls->text;
+        }
         $isotope_grid_div .=  $perso;
         if ($params->get('readmore', 'false') != 'false') {
             $isotope_grid_div .=  '<p class="isotope-readmore">';

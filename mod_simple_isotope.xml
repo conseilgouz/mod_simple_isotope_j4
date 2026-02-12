@@ -2,12 +2,12 @@
 <extension type="module" client="site" method="upgrade" >
 	<name>Simple Isotope</name>
 	<author>ConseilGouz</author>
-	<creationDate>2025-10-01</creationDate>
-	<copyright>Copyright (C) 2025 ConseilGouz. All rights reserved.</copyright>
+	<creationDate>2026-02-12</creationDate>
+	<copyright>Copyright (C) 2026 ConseilGouz. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.7.0</version>
+	<version>4.7.2</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -610,6 +610,12 @@
 					<option value="modal">Modal</option>
 					<option value="false">JNO</option>
 				</field>
+                <field name="applyplugins"  type="radio" class="btn-group btn-group-yesno clear" default="true"
+                label="SSISO__APPLYPLUGINS" description="SSISO_APPLYPLUGINSDESC">
+                    <option value="true">JYES</option>
+                    <option value="false">JNO</option>
+                </field>
+                
 			</fieldset>
 			<fieldset name="perso" label="SSISO_CSS_PERSO" class="mt-2">
 				<field showon="iso_entree!:cgisotope" type="note" name="note0" label="SSISO_NOTE0" heading="p"/>

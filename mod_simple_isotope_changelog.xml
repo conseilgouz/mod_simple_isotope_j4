@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.7.2</version>
+        <note>
+            <item>Update : 12/02/2026</item>
+        </note>
+        <change>
+            <item>Database : use prepared statements</item>
+        </change>
+        <addition>
+            <item>New parameter : apply content plugins to articles</item>
+        </addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.7.0</version>
         <note>
             <item>Update : 01/10/2025</item>

@@ -1,8 +1,8 @@
 <?php
 /**
 * Simple isotope module  - Joomla Module
-* Package			: Joomla 4.x/5.x
-* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
+* Package			: Joomla 4.x/5.x/6.x
+* copyright 		: Copyright (C) 2026 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -77,10 +77,12 @@ class SimpleIsotopeHelper
 
         $db =  Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
+        $state = 1;
         $query->select('*')
             ->from('#__weblinks AS u')
-            ->where('catid = '.(int)$id.' AND state = 1')
-        ;
+            ->where('catid = :id AND state = :state')
+            ->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER)
+            ->bind(':state', $state, \Joomla\Database\ParameterType::INTEGER);
         $db->setQuery($query);
         $items = $db->loadObjectList();
         if ($items) {
@@ -158,8 +160,8 @@ class SimpleIsotopeHelper
         $query = $db->getQuery(true);
         $query->select('*')
             ->from('#__categories ')
-            ->where('id = '.(int)$id)
-        ;
+            ->where('id = :id');
+        $query->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER);
         $db->setQuery($query);
         return $db->loadObjectList();
     }
@@ -508,8 +510,8 @@ class SimpleIsotopeHelper
         $query->select('tags.title as tag, tags.alias as alias,tags.note as note, parent.title as parent_title,tags.language as language, parent.alias as parent_alias')
             ->from('#__tags as tags')
             ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-            ->where('tags.id = '.$id)
-        ;
+            ->where('tags.id = :id')
+            ->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER);
         $db->setQuery($query);
         return $db->loadObjectList();
     }
@@ -520,8 +522,10 @@ class SimpleIsotopeHelper
         // Construct the query
         $query->select('tags.title as tag')
             ->from('#__tags as tags')
-            ->where('tags.id = '.(int)$id.' AND tags.access IN ('.implode(',', $authorised).')')
-        ;
+            ->where('tags.id = :id AND tags.access IN (:aut)');
+        $query->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER);
+        $aut =  implode(',', $authorised);
+        $query->bind(':aut',$aut, \Joomla\Database\ParameterType::STRING);
         $db->setQuery($query);
         return $db->loadResult();
     }
@@ -534,8 +538,10 @@ class SimpleIsotopeHelper
             ->innerJoin('#__content as c on c.id = map.content_item_id')
             ->innerJoin('#__tags as tags on tags.id = map.tag_id')
             ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-            ->where('c.id = '.(int)$id.' AND map.type_alias like "com_content%" AND tags.access IN ('.implode(',', $authorised).')')
-        ;
+            ->where('c.id = :id AND map.type_alias like "com_content%" AND tags.access IN (:aut)');
+        $query->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER);
+        $aut =  implode(',', $authorised);
+        $query->bind(':aut',$aut, \Joomla\Database\ParameterType::STRING);
         $db->setQuery($query);
         return $db->loadObjectList();
     }
@@ -548,8 +554,11 @@ class SimpleIsotopeHelper
         ->from('#__contentitem_tag_map as map ')
         ->innerJoin('#__tags as tags on tags.id = map.tag_id')
         ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-        ->where('tags.id IN ('.implode(',', $tags_list).') AND map.type_alias like "com_content%" AND tags.access IN ('.implode(',', $authorised).')')
-        ;
+        ->where('tags.id IN (:tagslist) AND map.type_alias like "com_content%" AND tags.access IN (:aut)');
+        $tagslist =  implode(',', $tags_list);
+        $aut =  implode(',', $authorised);
+        $query->bind(':tagslist', $id, \Joomla\Database\ParameterType::STRING);
+        $query->bind(':aut',$aut, \Joomla\Database\ParameterType::STRING);
         $db->setQuery($query);
         return $db->loadObjectList();
     }
@@ -562,8 +571,10 @@ class SimpleIsotopeHelper
             ->innerJoin('#__weblinks as w on w.id = map.content_item_id')
             ->innerJoin('#__tags as tags on tags.id = map.tag_id')
             ->innerJoin('#__tags as parent on parent.id = tags.parent_id')
-            ->where('w.id = '.(int)$id.' AND map.type_alias like "com_weblinks%" AND tags.access IN ('.implode(',', $authorised).')')
-        ;
+            ->where('w.id = :id AND map.type_alias like "com_weblinks%" AND tags.access IN (:aut)');
+        $query->bind(':id', $id, \Joomla\Database\ParameterType::INTEGER);
+        $aut =  implode(',', $authorised);
+        $query->bind(':aut',$aut, \Joomla\Database\ParameterType::STRING);
         $db->setQuery($query);
         return $db->loadObjectList();
     }
