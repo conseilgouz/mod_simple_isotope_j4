@@ -611,11 +611,10 @@
 					<option value="false">JNO</option>
 				</field>
                 <field name="applyplugins"  type="radio" class="btn-group btn-group-yesno clear" default="true"
-                label="SSISO__APPLYPLUGINS" description="SSISO_APPLYPLUGINSDESC">
+                label="SSISO_APPLYPLUGINS" description="SSISO_APPLYPLUGINSDESC">
                     <option value="true">JYES</option>
                     <option value="false">JNO</option>
                 </field>
-                
 			</fieldset>
 			<fieldset name="perso" label="SSISO_CSS_PERSO" class="mt-2">
 				<field showon="iso_entree!:cgisotope" type="note" name="note0" label="SSISO_NOTE0" heading="p"/>
