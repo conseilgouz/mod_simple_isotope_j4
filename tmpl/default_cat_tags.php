@@ -828,7 +828,7 @@ foreach ($list as $key => $category) {
                 }
                 $rating = '';
                 for ($i = 1; $i <= $item->rating; $i++) {
-                    $rating .= '<img src='.$modulefield.'images/icon.png />';
+                    $rating .= '<img src='.$uri->root().$modulefield.'images/icon.png />';
                 }
                 $phocacount = IsotopeHelper::getArticlePhocaCount($item->fulltext);
                 $choixdate = $params->get('choixdate', 'modified');

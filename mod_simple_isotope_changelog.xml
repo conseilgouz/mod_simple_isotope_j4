@@ -2,6 +2,20 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.7.3</version>
+        <note>
+            <item>Update : 14/02/2026</item>
+        </note>
+        <fix>
+            <item>Vote image : handle multilanguage sites</item>
+        </fix>
+        <addition>
+            <item>New parameter : load custom fields only if required</item>
+        </addition>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.7.2</version>
         <note>
             <item>Update : 12/02/2026</item>

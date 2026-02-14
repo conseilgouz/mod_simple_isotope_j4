@@ -341,8 +341,11 @@ class SimpleIsotopeHelper
                     }
                     $iso->tags_count[$tag->alias]++;
                 }
-                $params_fields = $params->get('displayfields');  // fields
-                $test = FieldsHelper::getFields('com_content.article', $item);
+                $needfields =  // fields
+                $test = [];
+                if ($params->get('needfields','true') == 'true') {
+                    $test = FieldsHelper::getFields('com_content.article', $item);
+                }
                 foreach ($test as $field) {
                     if (property_exists($field, 'value')) {
                         $val = $field->value;
