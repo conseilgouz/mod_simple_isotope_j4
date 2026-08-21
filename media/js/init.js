@@ -1,7 +1,7 @@
 /**
-* CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x
+* CG Isotope Component/ Simple Isotope module for Joomla 4.x/5.x/6.x
 * Package			: CG ISotope/Simple Isotope
-* copyright 		: Copyright (C) 2025 ConseilGouz. All rights reserved.
+* copyright 		: Copyright (C) 2026 ConseilGouz. All rights reserved.
 * license    		: https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
 * From              : isotope.metafizzy.co
 */
@@ -176,7 +176,7 @@ function CGIsotope(isoid,options) {
                         }
                         myiframe = mymodal.querySelector('iframe');
                         myiframe.init = myiframe.src; // save initial value
-                        $url= "index.php?option=com_content&amp;view=article&amp;id="+this.dataset['articleid']+"&amp;layout=modal&amp;tmpl=component";
+                        $url= Joomla.getOptions('system.paths').rootFull+"index.php?option=com_content&amp;view=article&amp;id="+this.dataset['articleid']+"&amp;layout=modal&amp;tmpl=component";
                         myiframe.src = $url;
                     }
                     // listen to exit event (modal is performed later)

@@ -2,6 +2,18 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.7.4</version>
+        <note>
+            <item>Update : 21/08/2026</item>
+        </note>
+        <fix>
+            <item>Read more modal : add rootfull to url</item>
+            <item>Use ConseilGouz Library 1.1.4</item>
+        </fix>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.7.3</version>
         <note>
             <item>Update : 14/02/2026</item>
