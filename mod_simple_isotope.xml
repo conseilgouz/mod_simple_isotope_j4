@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorEmail>pascal.leconte@conseilgouz.com</authorEmail>
 	<authorUrl>www.conseilgouz.com</authorUrl>
-	<version>4.7.5</version>
+	<version>4.7.6</version>
 	<description>SIMPLEISOTOPEDESC</description>
 	<namespace path="src">ConseilGouz\Module\SimpleIsotope</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -34,7 +34,8 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic" 
-			addfieldprefix="">
+			addfieldprefix=""
+            addruleprefix="ConseilGouz\Library\Rule" >
 			<field name="version" type="ConseilGouz\Library\Field\Version"  margintop="-3em" extension="mod_simple_isotope"/>
 <field	name="notegeneralinfo"	type="note" label="CG_ISO_GENERALINFONOTE" class="alert-success clear half"/>
 				<field name="iso_entree" type="radio"	default="articles"	class="btn-group half left"
@@ -547,12 +548,18 @@
 					label="SSISO_NBCOL"	description="SSISO_NBCOLDESC" 
 				/>				
 <field	name="notearticleinfo"	showon="iso_entree!:cgisotope" type="note" label="CG_ISO_DISPLAYARTICLENOTE" class="alert-success clear half"/>
-				<field name="backgroundcolor"  class="half left" showon="iso_entree!:cgisotope"
+				<field name="type-color" type="radio" class="btn-group half left"  label="SSISO_TYPE_COLOR" description="SSISO_TYPE_COLOR_DESC" default="pick">
+                		<option value="pick">SSISO_PICK</option>
+                        <option value="var">SSISO_VAR</option>
+				</field>
+                <field name="backgroundcolor" class="half right" showon="iso_entree!:cgisotope[AND]type-color:pick"
 					type="color" default="#eee"
 					label="SSISO_BACKGD" description="SSISO_BACKGDDESC" />	
-				
-   				<field name="introtext_limit" class="half right"
-				showon="iso_entree:articles"
+				<field name="backgroundcolorvar" type="ConseilGouz\Library\Field\Cgvariable" showon="type-color:var"
+                    label="SSISO_VAR_COLOR" description="SSISO_VAR_COLOR_DESC" default="" class="half right"
+                    validate="variable"/>
+   				<field name="introtext_limit" 
+				showon="iso_entree:articles" class="clear"
 				type="number" default="100" min="0" max="500" step="20"
 				label="SSISO_NBCHAR" description="SSISO_NBCHARDESC"	 />
 				<field name="hide_more" showon="iso_entree:articles"
