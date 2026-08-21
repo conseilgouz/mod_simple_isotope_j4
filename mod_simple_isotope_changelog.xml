@@ -2,6 +2,17 @@
 	<changelog>
 		<element>mod_simple_isotope</element>
 		<type>Module</type>
+		<version>4.7.5</version>
+        <note>
+            <item>Update : 21/08/2026</item>
+        </note>
+        <change>
+            <item>Background color type : pick or variable</item>
+        </change>
+	</changelog>
+	<changelog>
+		<element>mod_simple_isotope</element>
+		<type>Module</type>
 		<version>4.7.4</version>
         <note>
             <item>Update : 21/08/2026</item>

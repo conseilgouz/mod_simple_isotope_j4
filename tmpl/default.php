@@ -147,7 +147,7 @@ if ($iso_entree == "webLinks") {
         $tags_list = [];
     }
     $pagination = "";
-    $list[] = IsotopeHelper::getItems($params, $tags_list, $iso, $pagination, $limitstart, $limit, $order, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange,$module);
+    $list[] = IsotopeHelper::getItems($params, $tags_list, $iso, $pagination, $limitstart, $limit, $order, $rangetitle, $rangelabel, $rangedesc, $minrange, $maxrange, $module);
 }
 // pagination : check tags_list to add missing tags in the list
 if (sizeof($tags_list) && ($params->get("pagination", "false") != 'false')) {
@@ -319,6 +319,11 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
     } else {
         $displayfiltercat = $displayfilterfields;
     }
+    if ($params->get("type-color", "pick") == "pick") {
+        $background = $params->get("backgroundcolor", "#eee");
+    } else {
+        $background = "var(".$params->get("backgroundcolorvar", "--bs-light-border-subtle").")";
+    }
 
     $document->addScriptOptions(
         'mod_simple_isotope_'.$module->id,
@@ -326,7 +331,7 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
               'default_cat' => $default_cat,
               'default_field' => $default_field,
               'layout' => $iso_layout,'nbcol' => $iso_nbcol,
-              'background' => $params->get("backgroundcolor", "#eee"),
+              'background' => $background,
               'imgmaxwidth' => $params->get('introimg_maxwidth', '0'),
               'imgmaxheight' => $params->get('introimg_maxheight', '0'),
               'sortby' => $sortBy, 'ascending' => $sortAscending,
@@ -357,14 +362,18 @@ if (($article_cat_tag == "fields") || ($article_cat_tag == "catfields") || ($art
         $searchmultiex = "true";
     }
     $displayfiltertags = $params->get('displayfiltertags', $displayfilter);
-
+    if ($params->get("type-color", "pick") == "pick") {
+        $background = $params->get("backgroundcolor", "#eee");
+    } else {
+        $background = "var(".$params->get("backgroundcolorvar", "--bs-light-border-subtle").")";
+    }
     $document->addScriptOptions(
         'mod_simple_isotope_'.$module->id,
         array('entree' => $iso_entree,'article_cat_tag' => $article_cat_tag,
               'default_cat' => $default_cat,
               'default_tag' => $default_tag,
               'layout' => $iso_layout,'nbcol' => $iso_nbcol,
-              'background' => $params->get("backgroundcolor", "#eee"),
+              'background' => $background,
               'imgmaxwidth' => $params->get('introimg_maxwidth', '0'),
               'imgmaxheight' => $params->get('introimg_maxheight', '0'),
               'sortby' => $sortBy, 'ascending' => $sortAscending,
